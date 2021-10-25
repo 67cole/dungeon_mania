@@ -11,6 +11,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class DungeonManiaController {
+    
+    // List to store information about dungeons 
+    private List<Dungeon> dungeons = new ArrayList<Dungeon>();
+    private int dungeonCounter = '0';
+
     public DungeonManiaController() {
     }
 
@@ -40,6 +45,22 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse newGame(String dungeonName, String gameMode) throws IllegalArgumentException {
+        DungeonResponse dr = null;
+        // Plan
+        // First: Have to create a new dungeon by using the json file in the dungeons folder, and inserting the entitys on to the map.
+        
+        // Create the unique identifier for the new dungeon
+        String dungeonId = String.format("dungeon%d", dungeonCounter);
+        dungeonCounter += 1;
+
+        // Make a new dungeon object and add it to the dungeons list
+        Dungeon main = new Dungeon(dungeonName, dungeonId);
+        dungeons.add(main);
+
+        // To do: Inventory, Entities, Buildables, Goals
+        // Need a way to add the entity position location from the json into the dungeon object.
+
+
         return null;
     }
     
