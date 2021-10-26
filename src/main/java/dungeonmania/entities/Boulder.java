@@ -1,7 +1,9 @@
 package dungeonmania.entities;
 
+import dungeonmania.util.Position;
+
 public class Boulder extends StaticEntity{
-    public Boulder(int x, int y, String type) {
-        super(x,y,type);     
-    }    
+    public Boulder(Position position, String type, String ID, boolean IsInteractable) {
+        super(position,type, ID, IsInteractable);
+    }   
 }

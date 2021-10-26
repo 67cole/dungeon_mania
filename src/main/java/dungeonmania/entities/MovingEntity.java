@@ -1,6 +1,7 @@
 package dungeonmania.entities;
 
 import dungeonmania.util.Position;
+import dungeonmania.util.Direction;
 
 public abstract class MovingEntity implements Entity {
     /**
@@ -39,23 +40,28 @@ public abstract class MovingEntity implements Entity {
     }
 
     /**
-     * Move up into square
+     * Move the entity around
      */
-    public void moveUp() {
+    public void moveEntity(Direction direction) {}
+
+    /**
+     * Move the position by one square up
+     */
+    public void moveUpward() {
         int newY = position.getY() - 1;
         position.translateBy(position.getX(), newY);
     }
 
     /**
-     * Move down into square
+     * Move the position by one square down
      */
-    public void moveDown() {
-        int newY = position.getY() + 1;
-        position.translateBy(position.getX(), newY);
+    public void moveDownward() {
+        int newY1 = position.getY() + 1;
+        position.translateBy(position.getX(), newY1);
     }
 
     /**
-     * Move left in square
+     * Move the position by one square left
      */
     public void moveLeft() {
         int newX = position.getX() - 1;
@@ -63,11 +69,11 @@ public abstract class MovingEntity implements Entity {
     }
 
     /**
-     * Move right in square
+     * Move the position by one square right
      */
     public void moveRight() {
-        int newX = position.getX() + 1;
-        position.translateBy(newX, position.getX());
+        int newX1 = position.getX() + 1;
+        position.translateBy(newX1, position.getX());
     }
 
     /**

@@ -2,9 +2,11 @@ package dungeonmania.entities;
 
 import dungeonmania.util.*;
 
-public class Character extends MovingEntity {
-    private final static int STARTING_HEALTH = 10;
-    private final static int ATTACK = 2;
+import java.util.Random;
+
+public class ZombieToast extends MovingEntity {
+    private final static int STARTING_HEALTH = 3;
+    private final static int ATTACK = 1;
 
     /**
      * Health of character
@@ -28,7 +30,7 @@ public class Character extends MovingEntity {
      * @param ID - the ID of entity
      * @param isInteractable - check if the entity is interactable
      */
-    public Character(Position position, String type, String ID, boolean isInteractable) {
+    public ZombieToast(Position position, String type, String ID, boolean isInteractable) {
         super(position, type, ID, isInteractable);
         this.health = STARTING_HEALTH;
         this.attack = ATTACK;
@@ -77,30 +79,30 @@ public class Character extends MovingEntity {
         this.alive = alive;
     }
 
-    /**
-     * Moving the entity
-     */
     @Override
     public void moveEntity(Direction direction) {
-        switch(direction) {
-            case UP:
+        
+        // For now, zombies travel randomely
+        Random random = new Random();
+        int randDirection = random.nextInt(5);
+
+        switch(randDirection) {
+            case 1:
                 moveUpward();
                 break;
-
-            case DOWN:
+            
+            case 2:
                 moveDownward();
                 break;
             
-            case LEFT:
+            case 3:
                 moveLeft();
                 break;
             
-            case RIGHT:
+            case 4:
                 moveRight();
-                break;
-            
-            case NONE:
                 break;
         }   
     }
 }
+
