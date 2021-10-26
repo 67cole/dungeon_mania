@@ -1,7 +1,9 @@
 package dungeonmania.entities;
 
+import dungeonmania.util.Position;
+
 public class Door extends StaticEntity {
-    public Door(int x, int y, String type) {
-        super(x,y,type);
-    }  
+    public Door(Position position, String type, String ID, boolean IsInteractable) {
+        super(position,type, ID, IsInteractable);
+    } 
 }

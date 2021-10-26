@@ -7,7 +7,7 @@ public class StaticEntityTest {
     @Test
     public void testEntitiesAddedToDungeon() {
         DungeonManiaController controller = new DungeonManiaController();
-        controller.newGame("boulders.json", null);
+        controller.newGame("boulders", null);
     
     }
     

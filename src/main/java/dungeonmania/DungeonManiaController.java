@@ -1,10 +1,13 @@
 package dungeonmania;
 
 import dungeonmania.entities.*;
+import dungeonmania.entities.Character;
 import dungeonmania.exceptions.InvalidActionException;
 import dungeonmania.response.models.DungeonResponse;
+import dungeonmania.response.models.EntityResponse;
 import dungeonmania.util.Direction;
 import dungeonmania.util.FileLoader;
+import dungeonmania.util.Position;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -30,7 +33,12 @@ public class DungeonManiaController {
     
     // List to store information about dungeons 
     private List<Dungeon> dungeons = new ArrayList<Dungeon>();
-    private int dungeonCounter = '0';
+
+    // This will be changed based on negame or loadgame
+    private String currDungeon;
+
+    private int dungeonCounter = 0;
+    private int entityCounter = 0;
 
     public DungeonManiaController() {
     }
@@ -72,11 +80,29 @@ public class DungeonManiaController {
         // Make a new dungeon object and add it to the dungeons list
         Dungeon main = new Dungeon(dungeonName, dungeonId);
         dungeons.add(main);
+        currDungeon = dungeonId;
+
+        addEntitiesToList(dungeonName, main);
+        
 
         // To do: Inventory, Entities, Buildables, Goals
         // Need a way to add the entity position location from the json into the dungeon object.
         //Open up the json file and obtain information on x,y, and type. Depending on the type, we will create that corresponding
         //Class and add it into the entities list for the dungeon.
+        List<EntityResponse> er_list = new ArrayList<EntityResponse>();
+        for(Entity entity: main.getEntities()) {
+            EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
+            er_list.add(er);
+        }
+
+
+
+        
+        return null;
+    }
+    
+    public void addEntitiesToList(String dungeonName, Dungeon main) {
+
         String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
         try {
             JsonObject json_object = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
@@ -88,46 +114,51 @@ public class DungeonManiaController {
                 String type = entity.get("type").getAsString();
                 int x = entity.get("x").getAsInt();
                 int y = entity.get("y").getAsInt();
-                System.out.println("HI");
+                Position position = new Position(x,y);;
+                String entityId =  String.format("entity%d", entityCounter);
+                entityCounter += 1;
 
                 switch(type) {
-                    case "wall":
-                        Wall wall_entity = new Wall(x, y, type);
-                        main.addEntities(wall_entity);
+                    case "wall":                       
+                        Wall wall_entity = new Wall(position, type, entityId , false);
+                        main.addEntities(wall_entity);  
                         break;
                     case "exit":
-                        Exit exit_entity = new Exit(x,y,type);
+                        Exit exit_entity = new Exit(position, type, entityId, true);
                         main.addEntities(exit_entity);
                         break;
                     case "boulder":
-                        Boulder boulder_entity = new Boulder(x,y,type);
+                        Boulder boulder_entity = new Boulder(position, type, entityId, true);
                         main.addEntities(boulder_entity);
                         break;
                     case "switch":
-                        Switch switch_entity = new Switch(x,y,type);
+                        Switch switch_entity = new Switch(position, type, entityId, true);
                         main.addEntities(switch_entity);
                         break;
                     case "door":
-                        Door door_entity = new Door(x,y,type);
+                        Door door_entity = new Door(position, type, entityId, true);
                         main.addEntities(door_entity);
                         break;
                     case "portal":
-                        Portal portal_entity = new Portal(x,y,type);
+                        Portal portal_entity = new Portal(position, type, entityId, true);
                         main.addEntities(portal_entity);
                         break;
                     case "zombie_toast_spawner":
-                        ZombieToastSpawner zombie_toast_entity = new ZombieToastSpawner(x,y,type);
+                        ZombieToastSpawner zombie_toast_entity = new ZombieToastSpawner(position, type, entityId, true);
                         main.addEntities(zombie_toast_entity);
+                        break;
+                    case "character":
+                        position = new Position(x,y);
+                        entityId = String.format("entity%d", entityCounter);
+                        Character character1 = new Character(position, type, entityId, true);
+                        main.addEntities(character1);
                         break;
                     
                 }
-
-
             }
         } catch (Exception e) {
 
-        }
-        return null;
+        }   
     }
     
     public DungeonResponse saveGame(String name) throws IllegalArgumentException {
@@ -143,6 +174,28 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
+        for (Dungeon dungeon : dungeons) {
+            if (dungeon.getDungeonId().equals(currDungeon)) {
+                List<Entity> entities = dungeon.getEntities();
+
+                for (Entity entity : entities) {
+
+                    // Character Movement
+                    if (entity.getType().equals("character")) {
+                        MovingEntity temp = (MovingEntity) entity;
+                        temp.moveEntity(movementDirection);
+                    }
+                    
+                    // Enemy Movement
+
+
+
+
+                }
+            }
+        }
+
+        // Not meant to return null, just temporary :)
         return null;
     }
 

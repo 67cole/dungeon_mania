@@ -8,6 +8,7 @@ public class MiscTest {
     @Test
     public void testDungeons() {
         assertTrue(DungeonManiaController.dungeons().size() > 0);
+        assertTrue(DungeonManiaController.dungeons().size() > -1);
         assertTrue(DungeonManiaController.dungeons().contains("maze"));
     }
 }
