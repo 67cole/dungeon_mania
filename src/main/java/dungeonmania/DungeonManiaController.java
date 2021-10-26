@@ -81,14 +81,12 @@ public class DungeonManiaController {
         try {
             JsonObject json_object = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
             JsonArray entities_list = json_object.get("entities").getAsJsonArray();
-            System.out.println(entities_list.size());
-            
+
             for (int i = 0; i < entities_list.size(); i++) {
                 JsonObject entity = entities_list.get(i).getAsJsonObject();
                 String type = entity.get("type").getAsString();
                 int x = entity.get("x").getAsInt();
                 int y = entity.get("y").getAsInt();
-                System.out.println("HI");
 
                 switch(type) {
                     case "wall":
@@ -126,11 +124,6 @@ public class DungeonManiaController {
             }
         } catch (Exception e) {
 
-        }
-        List<Entity> list = main.getEntities();
-        System.out.println(list.size());
-        for (Entity blah : list) {
-            System.out.println(blah.getType());   
         }
         
         
