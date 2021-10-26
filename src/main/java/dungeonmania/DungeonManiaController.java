@@ -1,6 +1,7 @@
 package dungeonmania;
 
 import dungeonmania.entities.*;
+import dungeonmania.entities.Character;
 import dungeonmania.exceptions.InvalidActionException;
 import dungeonmania.response.models.DungeonResponse;
 import dungeonmania.response.models.EntityResponse;
@@ -33,6 +34,10 @@ public class DungeonManiaController {
     
     // List to store information about dungeons 
     private List<Dungeon> dungeons = new ArrayList<Dungeon>();
+
+    // This will be changed based on negame or loadgame
+    private String currDungeon;
+
     private int dungeonCounter = 0;
     private int entityCounter = 0;
 
@@ -76,6 +81,7 @@ public class DungeonManiaController {
         // Make a new dungeon object and add it to the dungeons list
         Dungeon main = new Dungeon(dungeonName, dungeonId);
         dungeons.add(main);
+        currDungeon = dungeonId;
 
         addEntitiesToList(dungeonName, main);
         
@@ -142,6 +148,12 @@ public class DungeonManiaController {
                         ZombieToastSpawner zombie_toast_entity = new ZombieToastSpawner(position, type, entityId, true);
                         main.addEntities(zombie_toast_entity);
                         break;
+                    case "character":
+                        position = new Position(x,y);
+                        entityId = String.format("entity%d", entityCounter);
+                        Character character1 = new Character(position, type, entityId, true);
+                        main.addEntities(character1);
+                        break;
                     
                 }
             }
@@ -163,6 +175,28 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
+        for (Dungeon dungeon : dungeons) {
+            if (dungeon.getDungeonId().equals(currDungeon)) {
+                List<Entity> entities = dungeon.getEntities();
+
+                for (Entity entity : entities) {
+
+                    // Character Movement
+                    if (entity.getType().equals("character")) {
+                        MovingEntity temp = (MovingEntity) entity;
+                        temp.moveEntity(movementDirection);
+                    }
+                    
+                    // Enemy Movement
+
+
+
+
+                }
+            }
+        }
+
+        // Not meant to return null, just temporary :)
         return null;
     }
 
