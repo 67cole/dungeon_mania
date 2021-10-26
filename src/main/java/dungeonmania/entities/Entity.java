@@ -5,11 +5,8 @@ import java.util.List;
 import dungeonmania.util.Position;
 
 
-public class Entity {
-
-    public Entity(String entityId, String entityType, Position position) {
-
-    }
-
-
+public interface Entity {
+    int getX();
+    int getY();
+    String getType();
 }
