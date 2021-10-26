@@ -6,7 +6,8 @@ import dungeonmania.util.Position;
 
 
 public interface Entity {
-    int getX();
-    int getY();
+    Position getPosition();
     String getType();
+    String getID();
+    boolean getIsInteractable();
 }
