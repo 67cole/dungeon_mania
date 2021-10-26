@@ -4,6 +4,7 @@ import dungeonmania.entities.*;
 import dungeonmania.entities.Character;
 import dungeonmania.exceptions.InvalidActionException;
 import dungeonmania.response.models.DungeonResponse;
+import dungeonmania.response.models.EntityResponse;
 import dungeonmania.util.Direction;
 import dungeonmania.util.FileLoader;
 import dungeonmania.util.Position;
@@ -83,18 +84,28 @@ public class DungeonManiaController {
         currDungeon = dungeonId;
 
         addEntitiesToList(dungeonName, main);
+        
+
 
         // To do: Inventory, Entities, Buildables, Goals
         // Need a way to add the entity position location from the json into the dungeon object.
         //Open up the json file and obtain information on x,y, and type. Depending on the type, we will create that corresponding
         //Class and add it into the entities list for the dungeon.
+        List<EntityResponse> er_list = new ArrayList<EntityResponse>();
+        for(Entity entity: main.getEntities()) {
+            EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
+            er_list.add(er);
+        }
+
+
+
         
         return null;
     }
     
     public void addEntitiesToList(String dungeonName, Dungeon main) {
 
-        String filename = "src\\main\\resources\\dungeons\\" + dungeonName;
+        String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
         try {
             JsonObject json_object = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
             JsonArray entities_list = json_object.get("entities").getAsJsonArray();
@@ -104,49 +115,36 @@ public class DungeonManiaController {
                 String type = entity.get("type").getAsString();
                 int x = entity.get("x").getAsInt();
                 int y = entity.get("y").getAsInt();
-                Position position;
-                String entityId;
+                Position position = new Position(x,y);;
+                String entityId =  String.format("entity%d", entityCounter);
+                entityCounter += 1;
 
                 switch(type) {
-                    case "wall":
-                        position = new Position(x,y);
-                        entityId =  String.format("entity%d", entityCounter);
+                    case "wall":                       
                         Wall wall_entity = new Wall(position, type, entityId , false);
-                        main.addEntities(wall_entity);
+                        main.addEntities(wall_entity);  
                         break;
                     case "exit":
-                        position = new Position(x,y);
-                        entityId =  String.format("entity%d", entityCounter);
                         Exit exit_entity = new Exit(position, type, entityId, true);
                         main.addEntities(exit_entity);
                         break;
                     case "boulder":
-                        position = new Position(x,y);
-                        entityId =  String.format("entity%d", entityCounter);
                         Boulder boulder_entity = new Boulder(position, type, entityId, true);
                         main.addEntities(boulder_entity);
                         break;
                     case "switch":
-                        position = new Position(x,y);
-                        entityId =  String.format("entity%d", entityCounter);
                         Switch switch_entity = new Switch(position, type, entityId, true);
                         main.addEntities(switch_entity);
                         break;
                     case "door":
-                        position = new Position(x,y);
-                        entityId =  String.format("entity%d", entityCounter);
                         Door door_entity = new Door(position, type, entityId, true);
                         main.addEntities(door_entity);
                         break;
                     case "portal":
-                        position = new Position(x,y);
-                        entityId =  String.format("entity%d", entityCounter);
                         Portal portal_entity = new Portal(position, type, entityId, true);
                         main.addEntities(portal_entity);
                         break;
                     case "zombie_toast_spawner":
-                        position = new Position(x,y);
-                        entityId =  String.format("entity%d", entityCounter);
                         ZombieToastSpawner zombie_toast_entity = new ZombieToastSpawner(position, type, entityId, true);
                         main.addEntities(zombie_toast_entity);
                         break;
@@ -161,7 +159,7 @@ public class DungeonManiaController {
             }
         } catch (Exception e) {
 
-        }    
+        }   
     }
 
     public DungeonResponse saveGame(String name) throws IllegalArgumentException {
