@@ -10,6 +10,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+
 public class DungeonManiaController {
     
     // List to store information about dungeons 
@@ -57,8 +64,10 @@ public class DungeonManiaController {
         Dungeon main = new Dungeon(dungeonName, dungeonId);
         dungeons.add(main);
 
+
         // To do: Inventory, Entities, Buildables, Goals
         // Need a way to add the entity position location from the json into the dungeon object.
+        
 
 
         return null;
