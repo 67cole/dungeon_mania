@@ -8,6 +8,7 @@ import dungeonmania.util.FileLoader;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.BufferedReader;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -73,22 +74,28 @@ public class DungeonManiaController {
         Dungeon main = new Dungeon(dungeonName, dungeonId);
         dungeons.add(main);
 
+        addEntitiesToMap(dungeonName, main);
+
         // To do: Inventory, Entities, Buildables, Goals
         // Need a way to add the entity position location from the json into the dungeon object.
         //Open up the json file and obtain information on x,y, and type. Depending on the type, we will create that corresponding
         //Class and add it into the entities list for the dungeon.
-        String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
+        
+        return null;
+    }
+    
+    public void addEntitiesToMap(String dungeonName, Dungeon main) {
+
+        String filename = "src\\main\\resources\\dungeons\\" + dungeonName;
         try {
             JsonObject json_object = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
             JsonArray entities_list = json_object.get("entities").getAsJsonArray();
-            System.out.println(entities_list.size());
-            
+           
             for (int i = 0; i < entities_list.size(); i++) {
                 JsonObject entity = entities_list.get(i).getAsJsonObject();
                 String type = entity.get("type").getAsString();
                 int x = entity.get("x").getAsInt();
                 int y = entity.get("y").getAsInt();
-                System.out.println("HI");
 
                 switch(type) {
                     case "wall":
@@ -127,16 +134,8 @@ public class DungeonManiaController {
         } catch (Exception e) {
 
         }
-        List<Entity> list = main.getEntities();
-        System.out.println(list.size());
-        for (Entity blah : list) {
-            System.out.println(blah.getType());   
-        }
-        
-        
-        return null;
     }
-    
+
     public DungeonResponse saveGame(String name) throws IllegalArgumentException {
         return null;
     }
