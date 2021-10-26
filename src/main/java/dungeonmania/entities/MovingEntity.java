@@ -32,7 +32,6 @@ public abstract class MovingEntity implements Entity {
      * @param isInteractable - check if the entity is interactable
      */
     public MovingEntity(Position position, String type, String ID, boolean isInteractable) {
-        super();
         this.position = position;
         this.type = type;
         this.ID = ID;
@@ -49,7 +48,7 @@ public abstract class MovingEntity implements Entity {
      */
     public void moveUpward() {
         int newY = position.getY() - 1;
-        position.translateBy(position.getX(), newY);
+        setPosition(position.translateBy(position.getX(), newY));
     }
 
     /**
@@ -57,7 +56,7 @@ public abstract class MovingEntity implements Entity {
      */
     public void moveDownward() {
         int newY1 = position.getY() + 1;
-        position.translateBy(position.getX(), newY1);
+        setPosition(position.translateBy(position.getX(), newY1));
     }
 
     /**
@@ -65,7 +64,7 @@ public abstract class MovingEntity implements Entity {
      */
     public void moveLeft() {
         int newX = position.getX() - 1;
-        position.translateBy(newX, position.getY());
+        setPosition(position.translateBy(newX, position.getY()));
     }
 
     /**
@@ -73,7 +72,7 @@ public abstract class MovingEntity implements Entity {
      */
     public void moveRight() {
         int newX1 = position.getX() + 1;
-        position.translateBy(newX1, position.getX());
+        setPosition(position.translateBy(newX1, position.getY()));
     }
 
     /**
@@ -81,6 +80,10 @@ public abstract class MovingEntity implements Entity {
      */
     public Position getPosition() {
         return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
     }
 
     /**
