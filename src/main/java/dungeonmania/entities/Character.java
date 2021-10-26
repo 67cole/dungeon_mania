@@ -84,19 +84,19 @@ public class Character extends MovingEntity {
     public void moveEntity(Direction direction) {
         switch(direction) {
             case UP:
-                moveUpward();
+                super.moveUpward();
                 break;
 
             case DOWN:
-                moveDownward();
+                super.moveDownward();
                 break;
             
             case LEFT:
-                moveLeft();
+                super.moveLeft();
                 break;
             
             case RIGHT:
-                moveRight();
+                super.moveRight();
                 break;
             
             case NONE:

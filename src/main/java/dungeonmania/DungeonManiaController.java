@@ -5,9 +5,11 @@ import dungeonmania.entities.Character;
 import dungeonmania.exceptions.InvalidActionException;
 import dungeonmania.response.models.DungeonResponse;
 import dungeonmania.response.models.EntityResponse;
+import dungeonmania.response.models.ItemResponse;
 import dungeonmania.util.Direction;
 import dungeonmania.util.FileLoader;
 import dungeonmania.util.Position;
+
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -70,7 +72,6 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse newGame(String dungeonName, String gameMode) throws IllegalArgumentException {
-        DungeonResponse dr = null;
         // Plan
         // First: Have to create a new dungeon by using the json file in the dungeons folder, and inserting the entitys on to the map.
         
@@ -97,10 +98,14 @@ public class DungeonManiaController {
             er_list.add(er);
         }
 
+        List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
+        List<String> emptyBuildables = new ArrayList<String>();
+
+        DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, er_list, emptyInventory, emptyBuildables, "enemies");
 
 
         
-        return null;
+        return dr;
     }
     
     public void addEntitiesToList(String dungeonName, Dungeon main) {
@@ -148,9 +153,7 @@ public class DungeonManiaController {
                         ZombieToastSpawner zombie_toast_entity = new ZombieToastSpawner(position, type, entityId, true);
                         main.addEntities(zombie_toast_entity);
                         break;
-                    case "character":
-                        position = new Position(x,y);
-                        entityId = String.format("entity%d", entityCounter);
+                    case "player":
                         Character character1 = new Character(position, type, entityId, true);
                         main.addEntities(character1);
                         break;
@@ -182,8 +185,8 @@ public class DungeonManiaController {
                 for (Entity entity : entities) {
 
                     // Character Movement
-                    if (entity.getType().equals("character")) {
-                        MovingEntity temp = (MovingEntity) entity;
+                    if (entity.getType().equals("player")) {
+                        Character temp = (Character) entity;
                         temp.moveEntity(movementDirection);
                     }
                     

@@ -73,7 +73,7 @@ public abstract class MovingEntity implements Entity {
      */
     public void moveRight() {
         int newX1 = position.getX() + 1;
-        position.translateBy(newX1, position.getX());
+        position.translateBy(newX1, position.getY());
     }
 
     /**
