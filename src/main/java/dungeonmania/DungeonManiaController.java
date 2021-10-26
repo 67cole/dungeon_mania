@@ -1,13 +1,21 @@
 package dungeonmania;
 
+import dungeonmania.entities.*;
 import dungeonmania.exceptions.InvalidActionException;
 import dungeonmania.response.models.DungeonResponse;
 import dungeonmania.util.Direction;
 import dungeonmania.util.FileLoader;
 
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -16,6 +24,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
+
+import org.json.JSONArray;
 
 public class DungeonManiaController {
     
@@ -64,15 +74,68 @@ public class DungeonManiaController {
         Dungeon main = new Dungeon(dungeonName, dungeonId);
         dungeons.add(main);
 
+        addEntitiesToMap(dungeonName, main);
 
         // To do: Inventory, Entities, Buildables, Goals
         // Need a way to add the entity position location from the json into the dungeon object.
+        //Open up the json file and obtain information on x,y, and type. Depending on the type, we will create that corresponding
+        //Class and add it into the entities list for the dungeon.
         
-
-
         return null;
     }
     
+    public void addEntitiesToMap(String dungeonName, Dungeon main) {
+
+        String filename = "src\\main\\resources\\dungeons\\" + dungeonName;
+        try {
+            JsonObject json_object = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
+            JsonArray entities_list = json_object.get("entities").getAsJsonArray();
+           
+            for (int i = 0; i < entities_list.size(); i++) {
+                JsonObject entity = entities_list.get(i).getAsJsonObject();
+                String type = entity.get("type").getAsString();
+                int x = entity.get("x").getAsInt();
+                int y = entity.get("y").getAsInt();
+
+                switch(type) {
+                    case "wall":
+                        Wall wall_entity = new Wall(x, y, type);
+                        main.addEntities(wall_entity);
+                        break;
+                    case "exit":
+                        Exit exit_entity = new Exit(x,y,type);
+                        main.addEntities(exit_entity);
+                        break;
+                    case "boulder":
+                        Boulder boulder_entity = new Boulder(x,y,type);
+                        main.addEntities(boulder_entity);
+                        break;
+                    case "switch":
+                        Switch switch_entity = new Switch(x,y,type);
+                        main.addEntities(switch_entity);
+                        break;
+                    case "door":
+                        Door door_entity = new Door(x,y,type);
+                        main.addEntities(door_entity);
+                        break;
+                    case "portal":
+                        Portal portal_entity = new Portal(x,y,type);
+                        main.addEntities(portal_entity);
+                        break;
+                    case "zombie_toast_spawner":
+                        ZombieToastSpawner zombie_toast_entity = new ZombieToastSpawner(x,y,type);
+                        main.addEntities(zombie_toast_entity);
+                        break;
+                    
+                }
+
+
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
     public DungeonResponse saveGame(String name) throws IllegalArgumentException {
         return null;
     }
