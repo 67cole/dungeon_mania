@@ -96,7 +96,6 @@ public class Character extends MovingEntity {
                 break;
             
             case RIGHT:
-                System.out.println("Pressing d key");
                 moveRight();
                 break;
             
