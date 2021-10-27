@@ -1,18 +1,20 @@
 package dungeonmania.entities;
 
+import java.util.List;
+
 import dungeonmania.util.Position;
 
 public abstract class StaticEntity implements Entity{
     private Position position;
     private String type;
     private String ID;
-    private boolean IsInteractable;
+    private boolean isInteractable;
 
-    StaticEntity(Position position, String type, String ID, boolean IsInteractable) {
+    StaticEntity(Position position, String type, String ID, boolean isInteractable) {
         this.position = position;
         this.type = type; 
         this.ID = ID;
-        this.IsInteractable = IsInteractable;   
+        this.isInteractable = isInteractable;   
     } 
 
     /**
@@ -68,9 +70,9 @@ public abstract class StaticEntity implements Entity{
     
     @Override
     public boolean getIsInteractable() {
-        return this.IsInteractable;
+        return this.isInteractable;
     }
     
-    public void entityFunction() {}
-
+    public void entityFunction(List<Entity> entities, Character player) {
+    }   
 }

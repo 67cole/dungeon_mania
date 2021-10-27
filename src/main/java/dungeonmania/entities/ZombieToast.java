@@ -2,6 +2,7 @@ package dungeonmania.entities;
 
 import dungeonmania.util.*;
 
+import java.util.List;
 import java.util.Random;
 
 public class ZombieToast extends MovingEntity {
@@ -103,6 +104,12 @@ public class ZombieToast extends MovingEntity {
                 super.moveRight();
                 break;
         }   
+    }
+
+    @Override
+    public void entityFunction(List<Entity> entities, Character player) {
+        // TODO Auto-generated method stub
+        
     }
 }
 

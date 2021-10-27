@@ -1,5 +1,7 @@
 package dungeonmania.entities;
 
+import java.util.List;
+
 import dungeonmania.util.*;
 
 public class Character extends MovingEntity {
@@ -103,4 +105,7 @@ public class Character extends MovingEntity {
                 break;
         }   
     }
+
+    @Override
+    public void entityFunction(List<Entity> entities, Character player) {}     
 }
