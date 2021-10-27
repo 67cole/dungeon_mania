@@ -15,6 +15,42 @@ public abstract class StaticEntity implements Entity{
         this.IsInteractable = IsInteractable;   
     } 
 
+    /**
+     * Move the position by one square up
+     */
+    public void moveUpward() {
+        setPosition(position.translateBy(0, -1));
+    }
+
+    /**
+     * Move the position by one square down
+     */
+    public void moveDownward() {
+        setPosition(position.translateBy(0, 1));
+    }
+
+    /**
+     * Move the position by one square left
+     */
+    public void moveLeft() {
+        setPosition(position.translateBy(-1, 0));
+    }
+
+    /**
+     * Move the position by one square right
+     */
+    public void moveRight() {
+        setPosition(position.translateBy(1, 0));
+    }
+
+    /**
+     * Sets the position
+     * @param position
+     */
+    public void setPosition(Position position) {
+        this.position = position;
+    }
+
     @Override
     public Position getPosition() {
         return this.position;
@@ -35,4 +71,6 @@ public abstract class StaticEntity implements Entity{
         return this.IsInteractable;
     }
     
+    public void entityFunction() {}
+
 }
