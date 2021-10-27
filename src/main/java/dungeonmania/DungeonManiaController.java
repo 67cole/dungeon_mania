@@ -4,6 +4,7 @@ import dungeonmania.entities.*;
 import dungeonmania.exceptions.InvalidActionException;
 import dungeonmania.response.models.DungeonResponse;
 import dungeonmania.response.models.EntityResponse;
+import dungeonmania.response.models.ItemResponse;
 import dungeonmania.util.Direction;
 import dungeonmania.util.FileLoader;
 import dungeonmania.util.Position;
@@ -32,6 +33,7 @@ import org.json.JSONArray;
 public class DungeonManiaController {
     
     // List to store information about dungeons 
+    
     private List<Dungeon> dungeons = new ArrayList<Dungeon>();
     private int dungeonCounter = 0;
     private int entityCounter = 0;
@@ -65,7 +67,8 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse newGame(String dungeonName, String gameMode) throws IllegalArgumentException {
-        DungeonResponse dr = null;
+        List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
+        List<String> emptyBuildables = new ArrayList<String>();
         // Plan
         // First: Have to create a new dungeon by using the json file in the dungeons folder, and inserting the entitys on to the map.
         
@@ -91,10 +94,14 @@ public class DungeonManiaController {
             er_list.add(er);
         }
 
+        String goals = getGoalsFromJson(dungeonName);
+        DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, er_list, emptyInventory, emptyBuildables, goals);
+
+
 
 
         
-        return null;
+        return dr;
     }
     
     public void addEntitiesToList(String dungeonName, Dungeon main) {
@@ -148,6 +155,68 @@ public class DungeonManiaController {
         } catch (Exception e) {
 
         }   
+    }
+
+    public String getGoalsFromJson(String dungeonName)  {
+        String return_goal = "";
+        String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
+        try {
+            JsonObject json_object = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
+            JsonObject goalCondition = json_object.get("goal-condition").getAsJsonObject();
+            String goal = goalCondition.get("goal").getAsString();
+            switch(goal) {
+                case "AND":
+                    JsonArray subgoals = goalCondition.get("subgoals").getAsJsonArray();
+                    for (int i = 0; i < subgoals.size(); i++) {
+                        JsonObject goals = subgoals.get(i).getAsJsonObject();
+                        if (goals.get("goal").getAsString().equals("enemies")) {
+                            if (findEnemies(filename, "mercenary") && findEnemies(filename, "spider")) {
+                                return_goal += ":mercenary AND :spider";    
+                            } else if (findEnemies(filename, "spider")) {
+                                return_goal += ":spider";
+                            } else if (findEnemies(filename, "mercenary")) {
+                                return_goal += ":mercenary";
+                            }
+                        } 
+                        else {
+                            return_goal += ":" + goals.get("goal").getAsString();
+                        }                   
+                        if (i + 1 != subgoals.size()) {
+                            return_goal += " AND ";
+                        }
+                    }
+                    break;
+                case "exit":
+                    return_goal = ":exit";
+                    break;
+                case "boulders":
+                    return_goal = ":boulder";
+                    break;
+
+            }
+        } catch (Exception e) {
+
+        }
+        return return_goal;
+        
+    }
+
+    public boolean findEnemies(String filename, String enemy) {
+        try {
+            JsonObject json_object = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
+            JsonArray entities_list = json_object.get("entities").getAsJsonArray();
+            for (int i = 0; i < entities_list.size(); i++) {
+                JsonObject entity = entities_list.get(i).getAsJsonObject();
+                if (entity.get("type").getAsString().equals(enemy)) {
+                    return true;
+                }
+            }
+
+        } catch (Exception e) {
+
+        }     
+        return false;
+
     }
 
     public DungeonResponse saveGame(String name) throws IllegalArgumentException {
