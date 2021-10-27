@@ -5,10 +5,16 @@ import java.util.List;
 import dungeonmania.util.Position;
 
 public class Portal extends StaticEntity {
+    private String colour;
     public Portal(Position position, String type, String ID, boolean IsInteractable, String colour) {
-        super(position,type, ID, IsInteractable, colour);
+        super(position,type, ID, IsInteractable);
+        this.colour = colour;
     } 
 
+    public String getColour() {
+        return this.colour;
+    }
+    
     /**
      * @param position_of_player
      * @param entities

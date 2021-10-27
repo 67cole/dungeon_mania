@@ -9,15 +9,49 @@ public abstract class StaticEntity implements Entity{
     private String type;
     private String ID;
     private boolean isInteractable;
-    private String colour;
 
-    StaticEntity(Position position, String type, String ID, boolean isInteractable, String colour) {
+    StaticEntity(Position position, String type, String ID, boolean isInteractable) {
         this.position = position;
         this.type = type; 
         this.ID = ID;
-        this.isInteractable = isInteractable;  
-        this.colour = colour; 
+        this.isInteractable = isInteractable;   
     } 
+
+    /**
+     * Move the position by one square up
+     */
+    public void moveUpward() {
+        setPosition(position.translateBy(0, -1));
+    }
+
+    /**
+     * Move the position by one square down
+     */
+    public void moveDownward() {
+        setPosition(position.translateBy(0, 1));
+    }
+
+    /**
+     * Move the position by one square left
+     */
+    public void moveLeft() {
+        setPosition(position.translateBy(-1, 0));
+    }
+
+    /**
+     * Move the position by one square right
+     */
+    public void moveRight() {
+        setPosition(position.translateBy(1, 0));
+    }
+
+    /**
+     * Sets the position
+     * @param position
+     */
+    public void setPosition(Position position) {
+        this.position = position;
+    }
 
     @Override
     public Position getPosition() {
@@ -38,12 +72,7 @@ public abstract class StaticEntity implements Entity{
     public boolean getIsInteractable() {
         return this.isInteractable;
     }
-
-    public String getColour() {
-        return this.colour;
-    }
-
-    @Override
+    
     public void entityFunction(List<Entity> entities, Character player) {
     }   
 }

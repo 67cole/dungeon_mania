@@ -85,7 +85,8 @@ public class DungeonManiaController {
         dungeonCounter += 1;
 
         // Make a new dungeon object and add it to the dungeons list
-        Dungeon main = new Dungeon(dungeonName, dungeonId);
+        String goals = getGoalsFromJson(dungeonName);
+        Dungeon main = new Dungeon(dungeonName, dungeonId, goals);
         dungeons.add(main);
         currDungeon = dungeonId;
 
@@ -101,8 +102,7 @@ public class DungeonManiaController {
             EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
             erList.add(er);
         }
-
-        String goals = getGoalsFromJson(dungeonName);
+        
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
 
         
@@ -130,23 +130,23 @@ public class DungeonManiaController {
                         main.addEntities(characterEntity);  
                         break;
                     case "wall":                       
-                        Wall wallEntity = new Wall(position, type, entityId , false, null);
+                        Wall wallEntity = new Wall(position, type, entityId , false);
                         main.addEntities(wallEntity);  
                         break;
                     case "exit":
-                        Exit exitEntity = new Exit(position, type, entityId, true, null);
+                        Exit exitEntity = new Exit(position, type, entityId, true);
                         main.addEntities(exitEntity);
                         break;
                     case "boulder":
-                        Boulder boulderEntity= new Boulder(position, type, entityId, true, null);
+                        Boulder boulderEntity= new Boulder(position, type, entityId, true);
                         main.addEntities(boulderEntity);
                         break;
                     case "switch":
-                        Switch switchEntity = new Switch(position, type, entityId, true, null);
+                        Switch switchEntity = new Switch(position, type, entityId, true);
                         main.addEntities(switchEntity);
                         break;
                     case "door":
-                        Door doorEntity= new Door(position, type, entityId, true, null);
+                        Door doorEntity= new Door(position, type, entityId, true);
                         main.addEntities(doorEntity);
                         break;
                     case "portal":
@@ -155,7 +155,7 @@ public class DungeonManiaController {
                         main.addEntities(portalEntity);
                         break;
                     case "zombie_toast_spawner":
-                        ZombieToastSpawner zombieToastSpawner = new ZombieToastSpawner(position, type, entityId, true, null);
+                        ZombieToastSpawner zombieToastSpawner = new ZombieToastSpawner(position, type, entityId, true);
                         main.addEntities(zombieToastSpawner);
                         break;
                 }
@@ -252,8 +252,24 @@ public class DungeonManiaController {
 
                     // Character Movement
                     if (entity.getType().equals("player")) {
-                        Character temp = (Character) entity;
+                        MovingEntity temp = (MovingEntity) entity;
+
+                        // Either the character moves or it doesnt.
+
+                        // Check if it it blocked by a wall, in which it doesnt move
+                        // or if theres 2 boulders next to each other
+                        if (!temp.checkMovement(movementDirection, entities)) continue;
+                        
+
+                        // If it is here movement is allowed and
+                        // it might need to interact with an entity.
                         temp.moveEntity(movementDirection);
+                        // Check if it is empty square or an entity
+                        Entity intEntity = temp.checkNext(movementDirection, entities);
+                        if (intEntity != null) {
+                            // we have an interactable
+                            intEntity.entityFunction(entities, (Character) temp);
+                        }
                     }
                     
                     // Enemy Movement
@@ -272,11 +288,10 @@ public class DungeonManiaController {
         }
 
         DungeonResponse dr = new DungeonResponse(main.getDungeonId(), main.getDungeonName(),
-            erList, emptyInventory, emptyBuildables, "treasure");
-
-
+            erList, emptyInventory, emptyBuildables, main.getDungeonGoals());
         return dr;
     }
+
 
     public DungeonResponse interact(String entityId) throws IllegalArgumentException, InvalidActionException {
         return null;
