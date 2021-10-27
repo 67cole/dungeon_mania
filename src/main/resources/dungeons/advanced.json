@@ -104,11 +104,6 @@
         "type": "player"
       },
       {
-        "x": 2,
-        "y": 2,
-        "type": "zombie_toast_spawner"
-      },
-      {
         "x": 6,
         "y": 1,
         "type": "sword"

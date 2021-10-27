@@ -1,8 +1,8 @@
 package dungeonmania.entities;
 
-import dungeonmania.util.*;
-
 import java.util.List;
+
+import dungeonmania.util.*;
 
 public class Character extends MovingEntity {
     private final static int STARTING_HEALTH = 10;
@@ -83,27 +83,29 @@ public class Character extends MovingEntity {
      * Moving the entity
      */
     @Override
-    public void moveEntity(Direction direction, List<Entity> entities) {
-        boolean check = super.checkMovement(direction, entities);
+    public void moveEntity(Direction direction) {
         switch(direction) {
             case UP:
-                if (check) super.moveUpward();
+                super.moveUpward();
                 break;
 
             case DOWN:
-                if (check) super.moveDownward();
+                super.moveDownward();
                 break;
             
             case LEFT:
-                if (check) super.moveLeft();
+                super.moveLeft();
                 break;
             
             case RIGHT:
-                if (check) super.moveRight();
+                super.moveRight();
                 break;
             
             case NONE:
                 break;
         }   
     }
+
+    @Override
+    public void entityFunction(List<Entity> entities, Character player) {}     
 }

@@ -1,7 +1,6 @@
 package dungeonmania.entities;
-
-import java.util.ArrayList;
 import java.util.List;
+
 import dungeonmania.util.Position;
 
 
@@ -10,4 +9,5 @@ public interface Entity {
     String getType();
     String getID();
     boolean getIsInteractable();
+    void entityFunction(List<Entity> entities, Character player);
 }

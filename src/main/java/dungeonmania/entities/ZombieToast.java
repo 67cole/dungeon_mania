@@ -2,6 +2,7 @@ package dungeonmania.entities;
 
 import dungeonmania.util.*;
 
+import java.util.List;
 import java.util.Random;
 import java.util.List;
 
@@ -81,31 +82,35 @@ public class ZombieToast extends MovingEntity {
     }
 
     @Override
-    public void moveEntity(Direction direction, List<Entity> entities) {
+    public void moveEntity(Direction direction) {
 
         // For now, zombies travel randomely
         Random random = new Random();
         int randDirection = random.nextInt(5);
 
-        boolean check = super.checkMovement(direction, entities);
-
         switch(randDirection) {
             case 1:
-                if (check) super.moveUpward();
+                super.moveUpward();
                 break;
             
             case 2:
-                if (check) super.moveDownward();
+                super.moveDownward();
                 break;
             
             case 3:
-                if (check) super.moveLeft();
+                super.moveLeft();
                 break;
             
             case 4:
-                if (check) super.moveRight();
+                super.moveRight();
                 break;
         }   
+    }
+
+    @Override
+    public void entityFunction(List<Entity> entities, Character player) {
+        // TODO Auto-generated method stub
+        
     }
 }
 

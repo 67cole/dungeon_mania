@@ -13,10 +13,20 @@ public class Dungeon {
 
     private String dungeonName;
     private String dungeonId;
+    private String dungeonGoals;
 
-    public Dungeon(String dungeonName, String dungeonId) {
+    public Dungeon(String dungeonName, String dungeonId, String dungeonGoals) {
         this.dungeonName = dungeonName;
         this.dungeonId = dungeonId;
+        this.dungeonGoals = dungeonGoals;
+    }
+    
+    public String getDungeonGoals() {
+        return dungeonGoals;
+    }
+
+    public void setDungeonGoals(String dungeonGoals) {
+        this.dungeonGoals = dungeonGoals;
     }
 
     public List<Entity> getEntities() {
