@@ -4,6 +4,7 @@ import dungeonmania.util.*;
 
 import java.util.List;
 import java.util.Random;
+import java.util.List;
 
 public class ZombieToast extends MovingEntity {
     private final static int STARTING_HEALTH = 3;
