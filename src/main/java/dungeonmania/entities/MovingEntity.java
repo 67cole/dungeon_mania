@@ -47,32 +47,28 @@ public abstract class MovingEntity implements Entity {
      * Move the position by one square up
      */
     public void moveUpward() {
-        int newY = position.getY() - 1;
-        setPosition(position.translateBy(position.getX(), newY));
+        setPosition(position.translateBy(0, -1));
     }
 
     /**
      * Move the position by one square down
      */
     public void moveDownward() {
-        int newY1 = position.getY() + 1;
-        setPosition(position.translateBy(position.getX(), newY1));
+        setPosition(position.translateBy(0, 1));
     }
 
     /**
      * Move the position by one square left
      */
     public void moveLeft() {
-        int newX = position.getX() - 1;
-        setPosition(position.translateBy(newX, position.getY()));
+        setPosition(position.translateBy(-1, 0));
     }
 
     /**
      * Move the position by one square right
      */
     public void moveRight() {
-        int newX1 = position.getX() + 1;
-        setPosition(position.translateBy(newX1, position.getY()));
+        setPosition(position.translateBy(1, 0));
     }
 
     /**
@@ -82,6 +78,10 @@ public abstract class MovingEntity implements Entity {
         return position;
     }
 
+    /**
+     * Sets the position
+     * @param position
+     */
     public void setPosition(Position position) {
         this.position = position;
     }

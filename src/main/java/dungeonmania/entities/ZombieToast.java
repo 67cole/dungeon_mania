@@ -81,26 +81,26 @@ public class ZombieToast extends MovingEntity {
 
     @Override
     public void moveEntity(Direction direction) {
-        
+
         // For now, zombies travel randomely
         Random random = new Random();
         int randDirection = random.nextInt(5);
 
         switch(randDirection) {
             case 1:
-                moveUpward();
+                super.moveUpward();
                 break;
             
             case 2:
-                moveDownward();
+                super.moveDownward();
                 break;
             
             case 3:
-                moveLeft();
+                super.moveLeft();
                 break;
             
             case 4:
-                moveRight();
+                super.moveRight();
                 break;
         }   
     }

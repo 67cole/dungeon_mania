@@ -11,6 +11,7 @@ import dungeonmania.util.Direction;
 import dungeonmania.util.FileLoader;
 import dungeonmania.util.Position;
 
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -72,7 +73,6 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse newGame(String dungeonName, String gameMode) throws IllegalArgumentException {
-
         // Plan
         // First: Have to create a new dungeon by using the json file in the dungeons folder, and inserting the entitys on to the map.
         
@@ -211,7 +211,6 @@ public class DungeonManiaController {
             er_list, emptyInventory, emptyBuildables, "treasure");
 
 
-        // Not meant to return null, just temporary :)
         return dr;
     }
 
