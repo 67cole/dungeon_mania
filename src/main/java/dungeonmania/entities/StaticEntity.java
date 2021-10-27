@@ -71,6 +71,6 @@ public abstract class StaticEntity implements Entity{
         return this.IsInteractable;
     }
     
-    public void entityFunction() {}
+    public void entityFunction(List<Entity> entities, Character player) {}
 
 }
