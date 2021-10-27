@@ -74,11 +74,9 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse newGame(String dungeonName, String gameMode) throws IllegalArgumentException {
-<<<<<<< src/main/java/dungeonmania/DungeonManiaController.java
+
         List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
         List<String> emptyBuildables = new ArrayList<String>();
-=======
->>>>>>> src/main/java/dungeonmania/DungeonManiaController.java
         // Plan
         // First: Have to create a new dungeon by using the json file in the dungeons folder, and inserting the entitys on to the map.
         
@@ -104,7 +102,6 @@ public class DungeonManiaController {
             er_list.add(er);
         }
 
-<<<<<<< src/main/java/dungeonmania/DungeonManiaController.java
         String goals = getGoalsFromJson(dungeonName);
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, er_list, emptyInventory, emptyBuildables, goals);
 
@@ -167,7 +164,6 @@ public class DungeonManiaController {
 
         }   
     }
-<<<<<<< src/main/java/dungeonmania/DungeonManiaController.java
 
     public String getGoalsFromJson(String dungeonName)  {
         String return_goal = "";
@@ -231,9 +227,6 @@ public class DungeonManiaController {
 
     }
 
-=======
-    
->>>>>>> src/main/java/dungeonmania/DungeonManiaController.java
     public DungeonResponse saveGame(String name) throws IllegalArgumentException {
         return null;
     }
