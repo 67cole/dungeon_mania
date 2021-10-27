@@ -33,6 +33,7 @@ import com.google.gson.stream.JsonReader;
 
 import org.json.JSONArray;
 
+
 public class DungeonManiaController {
     
     // List to store information about dungeons 
@@ -43,6 +44,7 @@ public class DungeonManiaController {
 
     private int dungeonCounter = 0;
     private int entityCounter = 0;
+    private static int tickCounter = 0;
 
     public DungeonManiaController() {
     }
@@ -178,26 +180,49 @@ public class DungeonManiaController {
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
         
         Dungeon main = null;
-        
+        DungeonManiaController.tickCounter++;
+        ZombieToast holder = null;
+        int con = 0;
+         
         for (Dungeon dungeon : dungeons) {
             if (dungeon.getDungeonId().equals(currDungeon)) {
                 main = dungeon;
                 List<Entity> entities = dungeon.getEntities();
+                System.out.println(DungeonManiaController.tickCounter);
+
 
                 for (Entity entity : entities) {
 
                     // Character Movement
                     if (entity.getType().equals("player")) {
                         Character temp = (Character) entity;
-                        temp.moveEntity(movementDirection);
+                        temp.moveEntity(movementDirection, entities);
+                        System.out.println("testing here");
+                    }
+
+                    // Zombie Spawner 
+                    if (entity.getType().equals("zombie_toast_spawner") && DungeonManiaController.tickCounter % 20 == 0) {
+                        Position zombieSpawn = checkWhiteSpace(entity.getPosition(), entities);
+
+
+                        // If there is no white space around zombie spawner, don't spawn zombie
+                        if (zombieSpawn == null) continue;
+
+                        String entityId =  String.format("entity%d", entityCounter);
+                        entityCounter += 1;
+
+                        ZombieToast zombieToastEntity = new ZombieToast(zombieSpawn, "zombie_toast", entityId, true);
+                        holder = zombieToastEntity;
+                        con = 1;
                     }
                     
-                    // Enemy Movement
 
                 }
             }
         }
-
+        
+        if (con == 1) main.addEntities(holder);
+    
         List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
         List<String> emptyBuildables = new ArrayList<String>();
 
@@ -219,6 +244,43 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse build(String buildable) throws IllegalArgumentException, InvalidActionException {
+        return null;
+    }
+
+
+
+    /**
+     * 
+     * 
+     *              HELPER FUNCTIONS
+     * 
+     * 
+     */
+
+
+    /**
+     * Check if white space is empty or not
+     */
+    public Position checkWhiteSpace(Position position, List<Entity> entities) {
+        List<Position> adjacents = position.getAdjacentPositions();
+
+        // List Position 1, 3, 5, 7 are adjacent
+        for (int i = 1; i < adjacents.size(); i = i + 2) {
+            Position temp = adjacents.get(i);
+            int check = 0;
+
+            for (Entity entity : entities) {
+                if (entity.getPosition().equals(temp)) {
+                    check = 1; 
+                    break;
+                } 
+            }
+
+            if (check == 0) {
+                return temp;
+            }
+        }   
+
         return null;
     }
 }

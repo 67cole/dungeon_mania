@@ -2,6 +2,8 @@ package dungeonmania.entities;
 
 import dungeonmania.util.*;
 
+import java.util.List;
+
 public class Character extends MovingEntity {
     private final static int STARTING_HEALTH = 10;
     private final static int ATTACK = 2;
@@ -81,22 +83,23 @@ public class Character extends MovingEntity {
      * Moving the entity
      */
     @Override
-    public void moveEntity(Direction direction) {
+    public void moveEntity(Direction direction, List<Entity> entities) {
+        boolean check = super.checkMovement(direction, entities);
         switch(direction) {
             case UP:
-                super.moveUpward();
+                if (check) super.moveUpward();
                 break;
 
             case DOWN:
-                super.moveDownward();
+                if (check) super.moveDownward();
                 break;
             
             case LEFT:
-                super.moveLeft();
+                if (check) super.moveLeft();
                 break;
             
             case RIGHT:
-                super.moveRight();
+                if (check) super.moveRight();
                 break;
             
             case NONE:
