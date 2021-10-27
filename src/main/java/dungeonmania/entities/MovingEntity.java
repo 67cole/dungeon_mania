@@ -116,6 +116,11 @@ public abstract class MovingEntity implements Entity {
                 Position attemptedMove = position.translateBy(0, -1);
 
                 for (Entity entity : entities) {
+
+                    if (boulderBlocked(direction, attemptedMove, entities, entity)) {
+                        return false;
+                    }
+
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove)) {
                         return false;
                     }
@@ -126,6 +131,10 @@ public abstract class MovingEntity implements Entity {
                 Position attemptedMove1 = position.translateBy(0, 1);
 
                 for (Entity entity : entities) {
+                    if (boulderBlocked(direction, attemptedMove1, entities, entity)) {
+                        return false;
+                    }
+
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove1)) {
                         return false;
                     }
@@ -136,6 +145,10 @@ public abstract class MovingEntity implements Entity {
                 Position attemptedMove2 = position.translateBy(-1, 0);
 
                 for (Entity entity : entities) {
+                    if (boulderBlocked(direction, attemptedMove2, entities, entity)) {
+                        return false;
+                    }
+
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove2)) {
                         return false;
                     }
@@ -146,6 +159,11 @@ public abstract class MovingEntity implements Entity {
                 Position attemptedMove3 = position.translateBy(1, 0);
 
                 for (Entity entity : entities) {
+
+                    if (boulderBlocked(direction, attemptedMove3, entities, entity)) {
+                        return false;
+                    }
+
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove3)) {
                         return false;
                     }
@@ -164,9 +182,9 @@ public abstract class MovingEntity implements Entity {
         switch (direction) {
             case UP:
                 Position attemptedMove = position.translateBy(0, -1);
-
+            
                 for (Entity entity : entities) {
-                    if (entity.getPosition().equals(attemptedMove)) {
+                    if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove)) {
                         return entity;
                     }
                 }
@@ -176,7 +194,7 @@ public abstract class MovingEntity implements Entity {
                 Position attemptedMove1 = position.translateBy(0, 1);
 
                 for (Entity entity : entities) {
-                    if (entity.getPosition().equals(attemptedMove1)) {
+                    if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove1)) {
                         return entity;
                     }
                 }
@@ -186,7 +204,7 @@ public abstract class MovingEntity implements Entity {
                 Position attemptedMove2 = position.translateBy(-1, 0);
 
                 for (Entity entity : entities) {
-                    if (entity.getPosition().equals(attemptedMove2)) {
+                    if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove2)) {
                         return entity;
                     }
                 }
@@ -196,7 +214,7 @@ public abstract class MovingEntity implements Entity {
                 Position attemptedMove3 = position.translateBy(1, 0);
 
                 for (Entity entity : entities) {
-                    if (entity.getPosition().equals(attemptedMove3)) {
+                    if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove3)) {
                         return entity;
                     }
                 }
@@ -208,9 +226,36 @@ public abstract class MovingEntity implements Entity {
 
         // If it's a white square, you can move
         return null; 
+    }   
+
+    public boolean boulderBlocked(Direction direction, Position attemptedMove, List<Entity> entities, Entity entity) {
+
+        if (entity.getType().equals("boulder") && entity.getPosition().equals(attemptedMove)) {
+            
+            StaticEntity main = (StaticEntity) entity;
+            System.out.println("entered here");
+
+            if (main.checkNext(direction, entities) == null) {
+                return false;
+            }
+
+            if (main.checkNext(direction, entities).getType().equals("boulder") ||
+                main.checkNext(direction, entities).getType().equals("wall")) {
+                
+                System.out.println("entered here2");
+                // Next entity is a wall or boulder. Must block it.
+                return true;
+            }
+        }
+
+
+        return false;
     }
 
-    public void entityFunction(List<Entity> entities, Character player) {}
+
+    public void entityFunction(List<Entity> entities, Character player, Direction direction) {
+        System.out.println("entered 257");
+    }
     
 
 

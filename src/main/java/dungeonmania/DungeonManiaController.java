@@ -269,7 +269,8 @@ public class DungeonManiaController {
                         
                         if (intEntity != null) {
                             // we have an interactable
-                            intEntity.entityFunction(entities, (Character) temp);
+                            System.out.println(intEntity.getType());
+                            intEntity.entityFunction(entities, (Character) temp, movementDirection);
                         }
                     }
                     

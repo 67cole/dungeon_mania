@@ -106,10 +106,5 @@ public class ZombieToast extends MovingEntity {
         }   
     }
 
-    @Override
-    public void entityFunction(List<Entity> entities, Character player) {
-        // TODO Auto-generated method stub
-        
-    }
 }
 
