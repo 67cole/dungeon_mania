@@ -148,7 +148,7 @@ public class DungeonManiaController {
                         main.addEntities(switchEntity);
                         break;
                     case "door":
-                        Door doorEntity= new Door(position, type, entityId, true);
+                        Door doorEntity = new Door(position, type, entityId, true);
                         main.addEntities(doorEntity);
                         break;
                     case "portal":
@@ -159,6 +159,10 @@ public class DungeonManiaController {
                     case "zombie_toast_spawner":
                         ZombieToastSpawner zombieToastSpawner = new ZombieToastSpawner(position, type, entityId, true);
                         main.addEntities(zombieToastSpawner);
+                        break;
+                    case "spider":
+                        Spider spiderEntity = new Spider(position, type, entityId, true);
+                        main.addEntities(spiderEntity);
                         break;
                 }
             }
@@ -268,20 +272,21 @@ public class DungeonManiaController {
                         if (!temp.checkMovement(movementDirection, entities)) continue;
                         
                         Entity intEntity = temp.checkNext(movementDirection, entities);
+                        
                         // If it is here movement is allowed and
                         // it might need to interact with an entity.
                         temp.moveEntity(movementDirection);
+
                         // Check if it is empty square or an entity
                         
                         
                         if (intEntity != null) {
                             // we have an interactable
-                            System.out.println(intEntity.getType());
                             intEntity.entityFunction(entities, (Character) temp, movementDirection);
                         }
                     }
 
-                    // Zombie Spawner 
+                    // Zombie Spawner Ticks
                     if (entity.getType().equals("zombie_toast_spawner") && DungeonManiaController.tickCounter % 20 == 0) {
                         Position zombieSpawn = checkWhiteSpace(entity.getPosition(), entities);
 
@@ -295,6 +300,44 @@ public class DungeonManiaController {
                         ZombieToast zombieToastEntity = new ZombieToast(zombieSpawn, "zombie_toast", entityId, true);
                         holder = zombieToastEntity;
                         con = 1;
+                    }
+
+                    // Zombie Movement
+                    if (entity.getType().equals("zombie_toast")) {
+                        MovingEntity temp = (MovingEntity) entity;
+
+                        // Either the character moves or it doesnt.
+
+                        // Check if it it blocked by a wall, in which it doesnt move
+                        // or if theres 2 boulders next to each other
+                        if (!temp.checkMovement(movementDirection, entities)) continue;
+                        
+                        Entity intEntity = temp.checkNext(movementDirection, entities);
+                        // If it is here movement is allowed and
+                        // it might need to interact with an entity.
+
+                        if (intEntity.getType().equals("portal")) continue;
+
+                        temp.moveEntity(movementDirection);
+                        // Check if it is empty square or an entity
+                        
+                        if (intEntity != null) {
+                            // we have an interactable
+                            intEntity.entityFunction(entities, (Character) temp, movementDirection);
+                        }
+                    }
+
+                    // Spider Movement
+                    if (entity.getType().equals("spider")) {
+                        MovingEntity temp = (MovingEntity) entity;
+
+                        if (DungeonManiaController.tickCounter == 1) {
+                            temp.moveUpward();
+                            continue;
+                        }
+
+                        
+
                     }
                 }
             }
