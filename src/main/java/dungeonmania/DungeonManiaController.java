@@ -85,7 +85,8 @@ public class DungeonManiaController {
         dungeonCounter += 1;
 
         // Make a new dungeon object and add it to the dungeons list
-        Dungeon main = new Dungeon(dungeonName, dungeonId);
+        String goals = getGoalsFromJson(dungeonName);
+        Dungeon main = new Dungeon(dungeonName, dungeonId, goals);
         dungeons.add(main);
         currDungeon = dungeonId;
 
@@ -102,7 +103,6 @@ public class DungeonManiaController {
             er_list.add(er);
         }
 
-        String goals = getGoalsFromJson(dungeonName);
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, er_list, emptyInventory, emptyBuildables, goals);
 
         
@@ -252,8 +252,24 @@ public class DungeonManiaController {
 
                     // Character Movement
                     if (entity.getType().equals("player")) {
-                        Character temp = (Character) entity;
+                        MovingEntity temp = (MovingEntity) entity;
+
+                        // Either the character moves or it doesnt.
+
+                        // Check if it it blocked by a wall, in which it doesnt move
+                        // or if theres 2 boulders next to each other
+                        if (!temp.checkMovement(movementDirection, entities)) continue;
+                        
+
+                        // If it is here movement is allowed and
+                        // it might need to interact with an entity.
                         temp.moveEntity(movementDirection);
+                        // Check if it is empty square or an entity
+                        Entity intEntity = temp.checkNext(movementDirection, entities);
+                        if (intEntity != null) {
+                            // we have an interactable
+                            intEntity.entityFunction(entities, (Character) temp);
+                        }
                     }
                     
                     // Enemy Movement
@@ -272,11 +288,10 @@ public class DungeonManiaController {
         }
 
         DungeonResponse dr = new DungeonResponse(main.getDungeonId(), main.getDungeonName(),
-            er_list, emptyInventory, emptyBuildables, "treasure");
-
-
+            er_list, emptyInventory, emptyBuildables, main.getDungeonGoals());
         return dr;
     }
+
 
     public DungeonResponse interact(String entityId) throws IllegalArgumentException, InvalidActionException {
         return null;
