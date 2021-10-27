@@ -3,6 +3,7 @@ package dungeonmania.entities;
 import java.util.List;
 
 import dungeonmania.util.Position;
+import dungeonmania.util.Direction;
 
 public abstract class StaticEntity implements Entity{
     private Position position;
@@ -53,6 +54,60 @@ public abstract class StaticEntity implements Entity{
         this.position = position;
     }
 
+    public Entity checkNext(Direction direction, List<Entity> entities) {
+
+        switch (direction) {
+            case UP:
+                Position attemptedMove = position.translateBy(0, -1);
+
+                for (Entity entity : entities) {
+                    if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove)) {
+                        return entity;
+                    }
+                }
+                break;
+
+            case DOWN:
+                Position attemptedMove1 = position.translateBy(0, 1);
+
+                for (Entity entity : entities) {
+                    if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove1)) {
+                        return entity;
+                    }
+                }
+                break;
+
+            case LEFT:
+                Position attemptedMove2 = position.translateBy(-1, 0);
+
+                for (Entity entity : entities) {
+                    if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove2)) {
+                        return entity;
+                    }
+                }
+                break;
+
+            case RIGHT:
+                Position attemptedMove3 = position.translateBy(1, 0);
+
+                for (Entity entity : entities) {
+                    if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove3)) {
+                        return entity;
+                    }
+                }
+                break; 
+
+            case NONE:
+                return null;
+        }
+
+        // If it's a white square, you can move
+
+        return null; 
+    }
+
+
+
     @Override
     public Position getPosition() {
         return this.position;
@@ -73,6 +128,7 @@ public abstract class StaticEntity implements Entity{
         return this.isInteractable;
     }
     
-    public void entityFunction(List<Entity> entities, Character player) {
+    public void entityFunction(List<Entity> entities, Character player, Direction direction) {
+        System.out.println("entered 132");
     }   
 }

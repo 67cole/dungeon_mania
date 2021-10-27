@@ -282,7 +282,7 @@ public class DungeonManiaController {
                         
                         if (intEntity != null) {
                             // we have an interactable
-                            intEntity.entityFunction(entities, (Character) temp);
+                            intEntity.entityFunction(entities, (Character) temp, movementDirection);
                         }
                     }
 
@@ -323,7 +323,7 @@ public class DungeonManiaController {
                         
                         if (intEntity != null) {
                             // we have an interactable
-                            intEntity.entityFunction(entities, (Character) temp);
+                            intEntity.entityFunction(entities, (Character) temp, movementDirection);
                         }
                     }
 

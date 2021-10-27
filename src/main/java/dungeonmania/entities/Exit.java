@@ -10,7 +10,4 @@ public class Exit extends StaticEntity {
         super(position,type, ID, isInteractable);
     }
 
-    @Override
-    public void entityFunction(List<Entity> entities, Character player) {
-    }
 }
