@@ -2,21 +2,17 @@ package dungeonmania.entities;
 
 import dungeonmania.util.*;
 
-import java.util.List;
-import java.util.Random;
-
-
-public class ZombieToast extends MovingEntity {
-    private final static int STARTING_HEALTH = 3;
+public class Spider extends MovingEntity {
+    private final static int STARTING_HEALTH = 1;
     private final static int ATTACK = 1;
 
     /**
-     * Health of zombie
+     * Health of character
      */
     private int health;
 
     /**
-     * Attack of zombie
+     * Attack of character
      */
     private int attack;
 
@@ -32,7 +28,7 @@ public class ZombieToast extends MovingEntity {
      * @param ID - the ID of entity
      * @param isInteractable - check if the entity is interactable
      */
-    public ZombieToast(Position position, String type, String ID, boolean isInteractable) {
+    public Spider(Position position, String type, String ID, boolean isInteractable) {
         super(position, type, ID, isInteractable);
         this.health = STARTING_HEALTH;
         this.attack = ATTACK;
@@ -81,36 +77,14 @@ public class ZombieToast extends MovingEntity {
         this.alive = alive;
     }
 
+    /**
+     * Movement for the spider
+     */
     @Override
     public void moveEntity(Direction direction) {
-
-        // For now, zombies travel randomely
-        Random random = new Random();
-        int randDirection = random.nextInt(5);
-
-        switch(randDirection) {
-            case 1:
-                super.moveUpward();
-                break;
-            
-            case 2:
-                super.moveDownward();
-                break;
-            
-            case 3:
-                super.moveLeft();
-                break;
-            
-            case 4:
-                super.moveRight();
-                break;
-        }   
-    }
-
-    @Override
-    public void entityFunction(List<Entity> entities, Character player) {
-        // TODO: Auto-generated method stub
         
     }
-}
 
+
+
+}
