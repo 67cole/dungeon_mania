@@ -1,7 +1,9 @@
 package dungeonmania;
 
 import dungeonmania.entities.*;
+import dungeonmania.entities.Character;
 import dungeonmania.exceptions.InvalidActionException;
+import dungeonmania.response.models.AnimationQueue;
 import dungeonmania.response.models.DungeonResponse;
 import dungeonmania.response.models.EntityResponse;
 import dungeonmania.response.models.ItemResponse;
@@ -9,13 +11,14 @@ import dungeonmania.util.Direction;
 import dungeonmania.util.FileLoader;
 import dungeonmania.util.Position;
 
+
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.BufferedReader;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.DriverAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -35,6 +38,10 @@ public class DungeonManiaController {
     // List to store information about dungeons 
     
     private List<Dungeon> dungeons = new ArrayList<Dungeon>();
+
+    // This will be changed based on negame or loadgame
+    private String currDungeon;
+
     private int dungeonCounter = 0;
     private int entityCounter = 0;
 
@@ -67,8 +74,11 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse newGame(String dungeonName, String gameMode) throws IllegalArgumentException {
+<<<<<<< src/main/java/dungeonmania/DungeonManiaController.java
         List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
         List<String> emptyBuildables = new ArrayList<String>();
+=======
+>>>>>>> src/main/java/dungeonmania/DungeonManiaController.java
         // Plan
         // First: Have to create a new dungeon by using the json file in the dungeons folder, and inserting the entitys on to the map.
         
@@ -79,10 +89,10 @@ public class DungeonManiaController {
         // Make a new dungeon object and add it to the dungeons list
         Dungeon main = new Dungeon(dungeonName, dungeonId);
         dungeons.add(main);
+        currDungeon = dungeonId;
 
         addEntitiesToList(dungeonName, main);
         
-
 
         // To do: Inventory, Entities, Buildables, Goals
         // Need a way to add the entity position location from the json into the dungeon object.
@@ -94,11 +104,9 @@ public class DungeonManiaController {
             er_list.add(er);
         }
 
+<<<<<<< src/main/java/dungeonmania/DungeonManiaController.java
         String goals = getGoalsFromJson(dungeonName);
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, er_list, emptyInventory, emptyBuildables, goals);
-
-
-
 
         
         return dr;
@@ -110,7 +118,7 @@ public class DungeonManiaController {
         try {
             JsonObject json_object = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
             JsonArray entities_list = json_object.get("entities").getAsJsonArray();
-           
+            
             for (int i = 0; i < entities_list.size(); i++) {
                 JsonObject entity = entities_list.get(i).getAsJsonObject();
                 String type = entity.get("type").getAsString();
@@ -121,6 +129,10 @@ public class DungeonManiaController {
                 entityCounter += 1;
 
                 switch(type) {
+                    case "player":
+                        Character character_entity = new Character(position, type, entityId , false);
+                        main.addEntities(character_entity);  
+                        break;
                     case "wall":                       
                         Wall wall_entity = new Wall(position, type, entityId , false);
                         main.addEntities(wall_entity);  
@@ -149,13 +161,13 @@ public class DungeonManiaController {
                         ZombieToastSpawner zombie_toast_entity = new ZombieToastSpawner(position, type, entityId, true);
                         main.addEntities(zombie_toast_entity);
                         break;
-                    
                 }
             }
         } catch (Exception e) {
 
         }   
     }
+<<<<<<< src/main/java/dungeonmania/DungeonManiaController.java
 
     public String getGoalsFromJson(String dungeonName)  {
         String return_goal = "";
@@ -219,6 +231,9 @@ public class DungeonManiaController {
 
     }
 
+=======
+    
+>>>>>>> src/main/java/dungeonmania/DungeonManiaController.java
     public DungeonResponse saveGame(String name) throws IllegalArgumentException {
         return null;
     }
@@ -232,7 +247,42 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
-        return null;
+        
+        Dungeon main = null;
+        
+        for (Dungeon dungeon : dungeons) {
+            if (dungeon.getDungeonId().equals(currDungeon)) {
+                main = dungeon;
+                List<Entity> entities = dungeon.getEntities();
+
+                for (Entity entity : entities) {
+
+                    // Character Movement
+                    if (entity.getType().equals("player")) {
+                        Character temp = (Character) entity;
+                        temp.moveEntity(movementDirection);
+                    }
+                    
+                    // Enemy Movement
+
+                }
+            }
+        }
+
+        List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
+        List<String> emptyBuildables = new ArrayList<String>();
+
+        List<EntityResponse> er_list = new ArrayList<EntityResponse>();
+        for(Entity entity: main.getEntities()) {
+            EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
+            er_list.add(er);
+        }
+
+        DungeonResponse dr = new DungeonResponse(main.getDungeonId(), main.getDungeonName(),
+            er_list, emptyInventory, emptyBuildables, "treasure");
+
+
+        return dr;
     }
 
     public DungeonResponse interact(String entityId) throws IllegalArgumentException, InvalidActionException {
