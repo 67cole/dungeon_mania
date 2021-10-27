@@ -41,6 +41,7 @@ public class Portal extends StaticEntity {
                 Portal portal = (Portal) entity;
                 if (portal.getColour().equals(colour)) {
                     player.setPosition(portal.getPosition());
+                    break;
                 }      
             }
         }

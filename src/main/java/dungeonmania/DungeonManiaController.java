@@ -240,7 +240,7 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
-        
+
         Dungeon main = null;
         
         for (Dungeon dungeon : dungeons) {
@@ -260,12 +260,13 @@ public class DungeonManiaController {
                         // or if theres 2 boulders next to each other
                         if (!temp.checkMovement(movementDirection, entities)) continue;
                         
-
+                        Entity intEntity = temp.checkNext(movementDirection, entities);
                         // If it is here movement is allowed and
                         // it might need to interact with an entity.
                         temp.moveEntity(movementDirection);
                         // Check if it is empty square or an entity
-                        Entity intEntity = temp.checkNext(movementDirection, entities);
+                        
+                        
                         if (intEntity != null) {
                             // we have an interactable
                             intEntity.entityFunction(entities, (Character) temp);
