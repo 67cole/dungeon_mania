@@ -50,6 +50,7 @@ public class DungeonManiaController {
     private int dungeonCounter = 0;
     private int entityCounter = 0;
     private static int tickCounter = 0;
+    private static boolean firstKey = true;
 
     public DungeonManiaController() {
     }
@@ -416,11 +417,7 @@ public class DungeonManiaController {
         if (con2 == 1) main.addEntities(mercenaryHolder);
 
         // Remove the collectible from the map
-        if (entityToBeRemoved != null) {
-            if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectibleEntity")) {
-                main.removeEntity(entityToBeRemoved);
-            }
-        }
+        entityRemover(entityToBeRemoved, main, firstKey);
 
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
         for(Entity entity: main.getEntities()) {
@@ -536,8 +533,34 @@ public class DungeonManiaController {
         return null;
     }
 
+    /**
+     * Searches for a key
+     */
+    public boolean keyChecker(List<ItemResponse> inventory) {
+        for (ItemResponse item: inventory) {
+            if (item.getType().equals("key")) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-
-
-
+    /**
+     * Removes an entity from Entities List
+     */
+     public void entityRemover(Entity entityToBeRemoved, Dungeon main, boolean firstKey) {
+        if (entityToBeRemoved != null) {
+            if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectibleEntity")) {
+                if (entityToBeRemoved.getType().equals("key")) {
+                    if (firstKey) {
+                        DungeonManiaController.firstKey = false;
+                    }
+                    else if (keyChecker(main.inventory)) {
+                        return;
+                    }
+                }
+                main.removeEntity(entityToBeRemoved);
+            }
+        }
+    }
 }
