@@ -3,6 +3,7 @@ package dungeonmania;
 import java.util.ArrayList;
 import java.util.List;
 
+import dungeonmania.response.models.ItemResponse;
 import dungeonmania.entities.Entity;
 
 
@@ -10,6 +11,8 @@ public class Dungeon {
 
     // Keep track of all entities in the dungeon
     private List<Entity> entities = new ArrayList<Entity>();
+    public  List<ItemResponse> inventory = new ArrayList<ItemResponse>();
+    public  List<String> buildables = new ArrayList<String>();
 
     private String dungeonName;
     private String dungeonId;
@@ -63,6 +66,15 @@ public class Dungeon {
         this.keyCounter = keyCounter;
     }
 
+    public List<ItemResponse> getInventory() {
+        return inventory;
+    }
+
+    public List<String> getBuildables() {
+        return buildables;
+    }
+
+
     /**
      * Adds an entity into the entities list
      * @param entity
@@ -75,7 +87,7 @@ public class Dungeon {
      * Removes an entity from the entities list
      * @param entity
      */
-    public void removeEntities(Entity entity) {
+    public void removeEntity(Entity entity) {
         entities.remove(entity);
     }
 

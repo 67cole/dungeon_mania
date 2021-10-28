@@ -134,6 +134,7 @@ public class DungeonManiaController {
                     case "player":
                         Character characterEntity = new Character(position, type, entityId , false);
                         main.addEntities(characterEntity);  
+                        characterEntity.setSpawn(position);
                         break;
                     case "wall":                       
                         Wall wallEntity = new Wall(position, type, entityId , false);
@@ -292,20 +293,27 @@ public class DungeonManiaController {
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
 
         Dungeon main = null;
-        List<ItemResponse> inventory = new ArrayList<ItemResponse>();
-        List<String> buildables = new ArrayList<String>();
+        Entity entityToBeRemoved = null;
         
         DungeonManiaController.tickCounter++;
-        ZombieToast holder = null;
+        ZombieToast zombieHolder = null;
+        Mercenary mercenaryHolder = null;
         int con = 0;
+        int con2 = 0;
+        int con3 = 0;
 
          
         for (Dungeon dungeon : dungeons) {
             if (dungeon.getDungeonId().equals(currDungeon)) {
+                Position playerSpawnPosition = null;
                 main = dungeon;
                 List<Entity> entities = dungeon.getEntities();
-
                 for (Entity entity : entities) {
+                    // Mercenary should only spawn if there is an enemy for the dungeon
+                    if (entity.getType().equals("zombie_toast") || entity.getType().equals("spider") || entity.getType().equals("mercenary")) {
+                        con3 = 1;
+                    }
+
                     // Character Movement
                     if (entity.getType().equals("player")) {
                         // If the inital direction is NONE then an item has been used
@@ -313,29 +321,33 @@ public class DungeonManiaController {
                             
                         }
                         MovingEntity temp = (MovingEntity) entity;
+                        Character temp2  = (Character) entity;
+                        playerSpawnPosition = temp2.getSpawn();
 
                         // Either the character moves or it doesnt.
 
                         // Check if it it blocked by a wall, in which it doesnt move
                         // or if theres 2 boulders next to each other
                         if (!temp.checkMovement(movementDirection, entities)) continue;
-                        
                         Entity intEntity = temp.checkNext(movementDirection, entities);
-                        
                         // If it is here movement is allowed and
                         // it might need to interact with an entity.
                         temp.moveEntity(movementDirection);
 
                         // Check if it is empty square or an entity
                         if (intEntity != null) {
+<<<<<<< HEAD
                             // Adding item to inventory and checking for buildables
                             intEntity.entityFunction(entities, (Character) temp, movementDirection);
+=======
+                            intEntity.entityFunction(entities, (Character) temp, movementDirection, main);
+                            entityToBeRemoved = intEntity;
+>>>>>>> master
                         }
 
                         if (main.getDungeonGoals().contains("exit")) {
                             checkExitGoal(entities, main, temp);
                         }
-
                     }
 
                     // Zombie Spawner Ticks
@@ -350,7 +362,7 @@ public class DungeonManiaController {
                         entityCounter += 1;
 
                         ZombieToast zombieToastEntity = new ZombieToast(zombieSpawn, "zombie_toast", entityId, true);
-                        holder = zombieToastEntity;
+                        zombieHolder = zombieToastEntity;
                         con = 1;
                     }
 
@@ -375,7 +387,7 @@ public class DungeonManiaController {
                         
                         if (intEntity != null) {
                             // we have an interactable
-                            intEntity.entityFunction(entities, (Character) temp, movementDirection);
+                            intEntity.entityFunction(entities, (Character) temp, movementDirection, main);
                         }
                     }
 
@@ -386,20 +398,34 @@ public class DungeonManiaController {
                         if (DungeonManiaController.tickCounter == 1) {
                             temp.moveUpward();
                             continue;
-                        }
-
-                        
+                        }   
                     }
                 }
                 // update goals
                 if (main.getDungeonGoals().contains("boulder")) {
                     checkBoulderGoal(entities, main);
                 }
-
-            }
+                // Mercenary Spawn Ticks
+                // Every 35 ticks of the game causes a new mercenary to spawn
+                if (DungeonManiaController.tickCounter % 35 == 0 && con3 == 1) {
+                    String entityId =  String.format("entity%d", entityCounter);
+                    entityCounter += 1;
+                    Mercenary mercenaryEntity = new Mercenary(playerSpawnPosition, "mercenary", entityId, true);
+                    mercenaryHolder = mercenaryEntity;
+                    con2 = 1;
+                }
+            }     
         }
         
-        if (con == 1) main.addEntities(holder);
+        if (con == 1) main.addEntities(zombieHolder);
+        if (con2 == 1) main.addEntities(mercenaryHolder);
+
+        // Remove the collectible from the map
+        if (entityToBeRemoved != null) {
+            if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectibleEntity")) {
+                main.removeEntity(entityToBeRemoved);
+            }
+        }
 
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
         for(Entity entity: main.getEntities()) {
@@ -408,7 +434,7 @@ public class DungeonManiaController {
         }
 
         DungeonResponse dr = new DungeonResponse(main.getDungeonId(), main.getDungeonName(),
-            erList, inventory, buildables, main.getDungeonGoals());
+            erList, main.inventory, main.buildables, main.getDungeonGoals());
         return dr;
     }
 
@@ -506,75 +532,17 @@ public class DungeonManiaController {
         }
     }
 
-    public boolean keyChecker(List<ItemResponse> inventory) {
-        for (ItemResponse item: inventory) {
-            if (item.getType().equals("key")) {
-                return true;
-            }
+    public Position getPlayerPosition(List<Entity> entities) {
+        for (Entity player: entities) {
+            if (player.getType().equals("player")) {
+                return player.getPosition();
+            } 
         }
-        return false;
+        return null;
     }
 
-    public void addItem(Entity intEntity, Dungeon main, List<String> buildables, List<ItemResponse> inventory) {
-        // Check if Entity is a collectible
-        if (intEntity.getClass().getSuperclass().getName().equals("CollectibleEntity")) {
-            // Checking to see if there is already an existing key
-            if (intEntity.getType().equals("key")) {
-                if (!keyChecker(inventory)) {
-                    return;
-                }
-            }
-            // Add the collectible to inventory
-            ItemResponse newItem = new ItemResponse(intEntity.getID(), intEntity.getType());
-            inventory.add(newItem);
-            // Remove the collectible from the map
-            main.removeEntities(intEntity);
-            // Check if buildable list already contains shield or bow
-            int bow = 0;
-            int shield = 0;
-            for (String buildable: buildables) {
-                if (buildable.equals("bow")) {
-                    bow = 1;
-                }
-                if (buildable.equals("shield")) {
-                    shield = 1;
-                }
-            }   
-            // Check if buildable can be made
-            int wood = 0;
-            int arrow = 0;
-            int key = 0;
-            int treasure = 0;
-            for (ItemResponse item: inventory) {
-                switch(item.getType()) {
-                    case "wood":
-                        wood++;
-                        break;
-                    case "arrow":
-                        arrow++;
-                        break;
-                    case "key":
-                        key++;
-                        break;
-                    case "treasure":
-                        treasure++;
-                        break;
-                }
-            }
-            // Creating a bow if bow does not already exist in buildables
-            if (wood == 1 && arrow == 3 && bow != 1) {
-                buildables.add("bow");
-            } 
-            // Creating a shield with treasure if shield does not already exist in buildables
-            if (wood == 2 && treasure == 1 && shield != 1) {
-                buildables.add("shield");
-            } 
-            // Creating a shield with key if shield does not already exist in buildables
-            else if (wood == 2 && key == 1 && shield != 1) {
-                buildables.add("shield");
-            } 
-        }
-    }
+
+
 
 
 }
