@@ -134,6 +134,7 @@ public class DungeonManiaController {
                     case "player":
                         Character characterEntity = new Character(position, type, entityId , false);
                         main.addEntities(characterEntity);  
+                        characterEntity.setSpawn(position);
                         break;
                     case "wall":                       
                         Wall wallEntity = new Wall(position, type, entityId , false);
@@ -295,16 +296,24 @@ public class DungeonManiaController {
         Entity entityToBeRemoved = null;
         
         DungeonManiaController.tickCounter++;
-        ZombieToast holder = null;
+        ZombieToast zombieHolder = null;
+        Mercenary mercenaryHolder = null;
         int con = 0;
+        int con2 = 0;
+        int con3 = 0;
 
          
         for (Dungeon dungeon : dungeons) {
             if (dungeon.getDungeonId().equals(currDungeon)) {
+                Position playerSpawnPosition = null;
                 main = dungeon;
                 List<Entity> entities = dungeon.getEntities();
-
                 for (Entity entity : entities) {
+                    // Mercenary should only spawn if there is an enemy for the dungeon
+                    if (entity.getType().equals("zombie_toast") || entity.getType().equals("spider") || entity.getType().equals("mercenary")) {
+                        con3 = 1;
+                    }
+
                     // Character Movement
                     if (entity.getType().equals("player")) {
                         // If the inital direction is NONE then an item has been used
@@ -312,6 +321,8 @@ public class DungeonManiaController {
                             
                         }
                         MovingEntity temp = (MovingEntity) entity;
+                        Character temp2  = (Character) entity;
+                        playerSpawnPosition = temp2.getSpawn();
 
                         // Either the character moves or it doesnt.
 
@@ -346,7 +357,7 @@ public class DungeonManiaController {
                         entityCounter += 1;
 
                         ZombieToast zombieToastEntity = new ZombieToast(zombieSpawn, "zombie_toast", entityId, true);
-                        holder = zombieToastEntity;
+                        zombieHolder = zombieToastEntity;
                         con = 1;
                     }
 
@@ -382,26 +393,34 @@ public class DungeonManiaController {
                         if (DungeonManiaController.tickCounter == 1) {
                             temp.moveUpward();
                             continue;
-                        }
-
-                        
+                        }   
                     }
                 }
                 // update goals
                 if (main.getDungeonGoals().contains("boulder")) {
                     checkBoulderGoal(entities, main);
                 }
-
-            }
-            // Remove the collectible from the map
-            if (entityToBeRemoved != null) {
-                if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectibleEntity")) {
-                    main.removeEntity(entityToBeRemoved);
+                // Mercenary Spawn Ticks
+                // Every 35 ticks of the game causes a new mercenary to spawn
+                if (DungeonManiaController.tickCounter % 35 == 0 && con3 == 1) {
+                    String entityId =  String.format("entity%d", entityCounter);
+                    entityCounter += 1;
+                    Mercenary mercenaryEntity = new Mercenary(playerSpawnPosition, "mercenary", entityId, true);
+                    mercenaryHolder = mercenaryEntity;
+                    con2 = 1;
                 }
-            }
+            }     
         }
         
-        if (con == 1) main.addEntities(holder);
+        if (con == 1) main.addEntities(zombieHolder);
+        if (con2 == 1) main.addEntities(mercenaryHolder);
+
+        // Remove the collectible from the map
+        if (entityToBeRemoved != null) {
+            if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectibleEntity")) {
+                main.removeEntity(entityToBeRemoved);
+            }
+        }
 
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
         for(Entity entity: main.getEntities()) {
@@ -507,5 +526,18 @@ public class DungeonManiaController {
             }
         }
     }
+
+    public Position getPlayerPosition(List<Entity> entities) {
+        for (Entity player: entities) {
+            if (player.getType().equals("player")) {
+                return player.getPosition();
+            } 
+        }
+        return null;
+    }
+
+
+
+
 
 }

@@ -7,17 +7,17 @@ public class Spider extends MovingEntity {
     private final static int ATTACK = 1;
 
     /**
-     * Health of character
+     * Health of spider
      */
     private int health;
 
     /**
-     * Attack of character
+     * Attack of spider
      */
     private int attack;
 
     /**
-     * Condition of zombie
+     * Condition of spider
      */
     private boolean alive;
 
@@ -58,7 +58,7 @@ public class Spider extends MovingEntity {
 
     /**
      * Setter for attack
-     * If the health is less than 1, i.e. <= 0, the character is dead
+     * If the health is less than 1, i.e. <= 0, the spider is dead
      * @param health
      */
     public void setHealth(int health) {
@@ -70,7 +70,7 @@ public class Spider extends MovingEntity {
     }
 
     /**
-     * Setter for character's condition
+     * Setter for spider's condition
      * @param alive
      */
     public void setAlive(boolean alive) {
