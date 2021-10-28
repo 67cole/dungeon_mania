@@ -329,7 +329,7 @@ public class DungeonManiaController {
                         // Check if it is empty square or an entity
                         if (intEntity != null) {
                             // Adding item to inventory and checking for buildables
-                            addItem(intEntity, main, buildables, inventory);
+                            intEntity.entityFunction(entities, (Character) temp, movementDirection);
                         }
 
                         if (main.getDungeonGoals().contains("exit")) {

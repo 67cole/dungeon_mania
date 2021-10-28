@@ -14,5 +14,8 @@ public class Key extends CollectibleEntity{
     public int getKeyNum() {
         return this.keyNum;
     }
+
+    
+
 }
 
