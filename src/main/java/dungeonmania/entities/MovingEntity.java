@@ -210,6 +210,7 @@ public abstract class MovingEntity implements Entity {
         return null; 
     }
 
+    @Override
     public void entityFunction(List<Entity> entities, Character player) {}
     
 

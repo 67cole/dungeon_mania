@@ -73,6 +73,7 @@ public abstract class StaticEntity implements Entity{
         return this.isInteractable;
     }
     
+    @Override
     public void entityFunction(List<Entity> entities, Character player) {
     }   
 }

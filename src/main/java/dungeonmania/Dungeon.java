@@ -14,11 +14,13 @@ public class Dungeon {
     private String dungeonName;
     private String dungeonId;
     private String dungeonGoals;
+    private int keyCounter;
 
     public Dungeon(String dungeonName, String dungeonId, String dungeonGoals) {
         this.dungeonName = dungeonName;
         this.dungeonId = dungeonId;
         this.dungeonGoals = dungeonGoals;
+        this.keyCounter = 0;
     }
     
     public String getDungeonGoals() {
@@ -51,6 +53,14 @@ public class Dungeon {
 
     public void setDungeonId(String dungeonId) {
         this.dungeonId = dungeonId;
+    }
+
+    public int getKeyCounter() {
+        return this.keyCounter;
+    }
+
+    public void setKeyCounter(int keyCounter) {
+        this.keyCounter = keyCounter;
     }
 
     /**

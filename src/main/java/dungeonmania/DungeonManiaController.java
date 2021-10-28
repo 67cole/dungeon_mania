@@ -2,6 +2,9 @@ package dungeonmania;
 
 import dungeonmania.entities.*;
 import dungeonmania.entities.Character;
+import dungeonmania.entities.BuildableEntities.*;
+import dungeonmania.entities.CollectibleEntities.*;
+import dungeonmania.entities.RareCollectibleEntities.*;
 import dungeonmania.exceptions.InvalidActionException;
 import dungeonmania.response.models.AnimationQueue;
 import dungeonmania.response.models.DungeonResponse;
@@ -158,6 +161,47 @@ public class DungeonManiaController {
                         ZombieToastSpawner zombieToastSpawner = new ZombieToastSpawner(position, type, entityId, true);
                         main.addEntities(zombieToastSpawner);
                         break;
+                    case "key":
+                        main.setKeyCounter(main.getKeyCounter() + 1);
+                        Key key = new Key(position, type, entityId, true, main.getKeyCounter());
+                        main.addEntities(key);
+                        break;
+                    case "armour":
+                        Armour armour = new Armour(position, type, entityId, true);
+                        main.addEntities(armour);
+                        break;
+                    case "arrow":
+                        Arrows arrows = new Arrows(position, type, entityId, true);
+                        main.addEntities(arrows);
+                        break;
+                    case "bomb":
+                        Bomb bomb = new Bomb(position, type, entityId, true);
+                        main.addEntities(bomb);
+                        break;
+                    case "health_potion":
+                        HealthPotion healthPotion = new HealthPotion(position, type, entityId, true);
+                        main.addEntities(healthPotion);
+                        break;
+                    case "invincibility_potion":
+                        InvincibilityPotion invincibilityPotion = new InvincibilityPotion(position, type, entityId, true);
+                        main.addEntities(invincibilityPotion);
+                        break;
+                    case "invisibility_potion":
+                        InvisibilityPotion invisibilityPotion = new InvisibilityPotion(position, type, entityId, true);
+                        main.addEntities(invisibilityPotion);
+                        break;
+                    case "sword":
+                        Sword sword = new Sword(position, type, entityId, true);
+                        main.addEntities(sword);
+                        break;
+                    case "treasure":
+                        Treasure treasure = new Treasure(position, type, entityId, true);
+                        main.addEntities(treasure);
+                        break;
+                    case "wood":
+                        Wood wood = new Wood(position, type, entityId, true);
+                        main.addEntities(wood);
+                        break;
                 }
             }
         } catch (Exception e) {
@@ -242,6 +286,8 @@ public class DungeonManiaController {
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
         
         Dungeon main = null;
+        List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
+        List<String> emptyBuildables = new ArrayList<String>();
         
         for (Dungeon dungeon : dungeons) {
             if (dungeon.getDungeonId().equals(currDungeon)) {
@@ -277,9 +323,6 @@ public class DungeonManiaController {
                 }
             }
         }
-
-        List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
-        List<String> emptyBuildables = new ArrayList<String>();
 
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
         for(Entity entity: main.getEntities()) {
