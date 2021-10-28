@@ -2,6 +2,9 @@ package dungeonmania;
 
 import dungeonmania.entities.*;
 import dungeonmania.entities.Character;
+import dungeonmania.entities.BuildableEntities.*;
+import dungeonmania.entities.CollectibleEntities.*;
+import dungeonmania.entities.RareCollectibleEntities.*;
 import dungeonmania.exceptions.InvalidActionException;
 import dungeonmania.response.models.AnimationQueue;
 import dungeonmania.response.models.DungeonResponse;
@@ -161,6 +164,46 @@ public class DungeonManiaController {
                         ZombieToastSpawner zombieToastSpawner = new ZombieToastSpawner(position, type, entityId, true);
                         main.addEntities(zombieToastSpawner);
                         break;
+                    case "key":
+                        main.setKeyCounter(main.getKeyCounter() + 1);
+                        Key key = new Key(position, type, entityId, true, main.getKeyCounter());
+                        main.addEntities(key);
+                        break;
+                    case "armour":
+                        Armour armour = new Armour(position, type, entityId, true);
+                        main.addEntities(armour);
+                        break;
+                    case "arrow":
+                        Arrows arrows = new Arrows(position, type, entityId, true);
+                        main.addEntities(arrows);
+                        break;
+                    case "bomb":
+                        Bomb bomb = new Bomb(position, type, entityId, true);
+                        main.addEntities(bomb);
+                        break;
+                    case "health_potion":
+                        HealthPotion healthPotion = new HealthPotion(position, type, entityId, true);
+                        main.addEntities(healthPotion);
+                        break;
+                    case "invincibility_potion":
+                        InvincibilityPotion invincibilityPotion = new InvincibilityPotion(position, type, entityId, true);
+                        main.addEntities(invincibilityPotion);
+                        break;
+                    case "invisibility_potion":
+                        InvisibilityPotion invisibilityPotion = new InvisibilityPotion(position, type, entityId, true);
+                        main.addEntities(invisibilityPotion);
+                        break;
+                    case "sword":
+                        Sword sword = new Sword(position, type, entityId, true);
+                        main.addEntities(sword);
+                        break;
+                    case "treasure":
+                        Treasure treasure = new Treasure(position, type, entityId, true);
+                        main.addEntities(treasure);
+                        break;
+                    case "wood":
+                        Wood wood = new Wood(position, type, entityId, true);
+                        main.addEntities(wood);
                     case "spider":
                         Spider spiderEntity = new Spider(position, type, entityId, true);
                         main.addEntities(spiderEntity);
@@ -249,6 +292,9 @@ public class DungeonManiaController {
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
 
         Dungeon main = null;
+        List<ItemResponse> inventory = new ArrayList<ItemResponse>();
+        List<String> buildables = new ArrayList<String>();
+        
         DungeonManiaController.tickCounter++;
         ZombieToast holder = null;
         int con = 0;
@@ -259,11 +305,13 @@ public class DungeonManiaController {
                 main = dungeon;
                 List<Entity> entities = dungeon.getEntities();
 
-
                 for (Entity entity : entities) {
-
                     // Character Movement
                     if (entity.getType().equals("player")) {
+                        // If the inital direction is NONE then an item has been used
+                        if (movementDirection == Direction.NONE) {
+                            
+                        }
                         MovingEntity temp = (MovingEntity) entity;
 
                         // Either the character moves or it doesnt.
@@ -279,11 +327,9 @@ public class DungeonManiaController {
                         temp.moveEntity(movementDirection);
 
                         // Check if it is empty square or an entity
-                        
-                        
                         if (intEntity != null) {
-                            // we have an interactable
-                            intEntity.entityFunction(entities, (Character) temp, movementDirection);
+                            // Adding item to inventory and checking for buildables
+                            addItem(intEntity, main, buildables, inventory);
                         }
 
                         if (main.getDungeonGoals().contains("exit")) {
@@ -354,9 +400,6 @@ public class DungeonManiaController {
         }
         
         if (con == 1) main.addEntities(holder);
-    
-        List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
-        List<String> emptyBuildables = new ArrayList<String>();
 
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
         for(Entity entity: main.getEntities()) {
@@ -365,7 +408,7 @@ public class DungeonManiaController {
         }
 
         DungeonResponse dr = new DungeonResponse(main.getDungeonId(), main.getDungeonName(),
-            erList, emptyInventory, emptyBuildables, main.getDungeonGoals());
+            erList, inventory, buildables, main.getDungeonGoals());
         return dr;
     }
 
@@ -463,8 +506,75 @@ public class DungeonManiaController {
         }
     }
 
+    public boolean keyChecker(List<ItemResponse> inventory) {
+        for (ItemResponse item: inventory) {
+            if (item.getType().equals("key")) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-
+    public void addItem(Entity intEntity, Dungeon main, List<String> buildables, List<ItemResponse> inventory) {
+        // Check if Entity is a collectible
+        if (intEntity.getClass().getSuperclass().getName().equals("CollectibleEntity")) {
+            // Checking to see if there is already an existing key
+            if (intEntity.getType().equals("key")) {
+                if (!keyChecker(inventory)) {
+                    return;
+                }
+            }
+            // Add the collectible to inventory
+            ItemResponse newItem = new ItemResponse(intEntity.getID(), intEntity.getType());
+            inventory.add(newItem);
+            // Remove the collectible from the map
+            main.removeEntities(intEntity);
+            // Check if buildable list already contains shield or bow
+            int bow = 0;
+            int shield = 0;
+            for (String buildable: buildables) {
+                if (buildable.equals("bow")) {
+                    bow = 1;
+                }
+                if (buildable.equals("shield")) {
+                    shield = 1;
+                }
+            }   
+            // Check if buildable can be made
+            int wood = 0;
+            int arrow = 0;
+            int key = 0;
+            int treasure = 0;
+            for (ItemResponse item: inventory) {
+                switch(item.getType()) {
+                    case "wood":
+                        wood++;
+                        break;
+                    case "arrow":
+                        arrow++;
+                        break;
+                    case "key":
+                        key++;
+                        break;
+                    case "treasure":
+                        treasure++;
+                        break;
+                }
+            }
+            // Creating a bow if bow does not already exist in buildables
+            if (wood == 1 && arrow == 3 && bow != 1) {
+                buildables.add("bow");
+            } 
+            // Creating a shield with treasure if shield does not already exist in buildables
+            if (wood == 2 && treasure == 1 && shield != 1) {
+                buildables.add("shield");
+            } 
+            // Creating a shield with key if shield does not already exist in buildables
+            else if (wood == 2 && key == 1 && shield != 1) {
+                buildables.add("shield");
+            } 
+        }
+    }
 
 
 }

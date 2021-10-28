@@ -14,11 +14,13 @@ public class Dungeon {
     private String dungeonName;
     private String dungeonId;
     private String dungeonGoals;
+    private int keyCounter;
 
     public Dungeon(String dungeonName, String dungeonId, String dungeonGoals) {
         this.dungeonName = dungeonName;
         this.dungeonId = dungeonId;
         this.dungeonGoals = dungeonGoals;
+        this.keyCounter = 0;
     }
     
     public String getDungeonGoals() {
@@ -53,12 +55,13 @@ public class Dungeon {
         this.dungeonId = dungeonId;
     }
 
-    
+    public int getKeyCounter() {
+        return this.keyCounter;
+    }
 
-
-
-
-
+    public void setKeyCounter(int keyCounter) {
+        this.keyCounter = keyCounter;
+    }
 
     /**
      * Adds an entity into the entities list
@@ -66,6 +69,14 @@ public class Dungeon {
      */
     public void addEntities(Entity entity) {
         entities.add(entity);
+    }
+
+    /**
+     * Removes an entity from the entities list
+     * @param entity
+     */
+    public void removeEntities(Entity entity) {
+        entities.remove(entity);
     }
 
 }
