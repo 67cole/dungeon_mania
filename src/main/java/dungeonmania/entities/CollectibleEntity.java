@@ -124,7 +124,7 @@ public abstract class CollectibleEntity implements Entity {
      */
 
     /**
-     * Searches for a key within inventory
+     * Searches for a key
      */
     public boolean keyChecker(List<ItemResponse> inventory) {
         for (ItemResponse item: inventory) {
