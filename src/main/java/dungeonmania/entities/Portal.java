@@ -4,6 +4,7 @@ import java.util.List;
 
 import dungeonmania.util.Direction;
 import dungeonmania.util.Position;
+import dungeonmania.Dungeon;
 
 public class Portal extends StaticEntity {
     private String colour;
@@ -24,7 +25,7 @@ public class Portal extends StaticEntity {
      * This entity function changes the players position into the corresponding portals position
      */
     @Override
-    public void entityFunction(List<Entity> entities, Character player, Direction direction) {  
+    public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {  
         String colour = null;
         for (Entity entity: entities) {
             //If the looped entity is a portal and that portal is in the same position as the player, obtain the colour of the portal

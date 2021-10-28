@@ -4,6 +4,7 @@ import dungeonmania.util.Position;
 
 import java.util.List;
 
+import dungeonmania.Dungeon;
 import dungeonmania.util.Direction;
 
 public abstract class MovingEntity implements Entity {
@@ -252,9 +253,8 @@ public abstract class MovingEntity implements Entity {
         return false;
     }
 
-
-    public void entityFunction(List<Entity> entities, Character player, Direction direction) {
-        System.out.println("entered 257");
+    @Override
+    public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {
     }
     
 
