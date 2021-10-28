@@ -338,7 +338,7 @@ public class DungeonManiaController {
                     }
 
                     // Spider spawner ticks
-                    if (entity.getType().equals("spider") && DungeonManiaController.tickCounter % 4 == 0) {
+                    if (entity.getType().equals("spider") && DungeonManiaController.tickCounter % 10 == 0) {
                         Position spiderSpawn = checkWhiteSpace(entity.getPosition(), entities);
                         String entityId =  String.format("entity%d", entityCounter);
                         entityCounter += 1;
