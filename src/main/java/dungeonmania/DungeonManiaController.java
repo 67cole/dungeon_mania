@@ -2,6 +2,8 @@ package dungeonmania;
 
 import dungeonmania.entities.*;
 import dungeonmania.entities.Character;
+import dungeonmania.entities.Spider;
+import dungeonmania.entities.MovingEntity;
 import dungeonmania.exceptions.InvalidActionException;
 import dungeonmania.response.models.AnimationQueue;
 import dungeonmania.response.models.DungeonResponse;
@@ -251,6 +253,8 @@ public class DungeonManiaController {
         Dungeon main = null;
         DungeonManiaController.tickCounter++;
         ZombieToast holder = null;
+        Spider spid = null;
+        int spiderSpawned = 0;
         int con = 0;
 
          
@@ -333,16 +337,75 @@ public class DungeonManiaController {
                         }
                     }
 
+                    // Spider spawner ticks
+                    if (entity.getType().equals("spider") && DungeonManiaController.tickCounter % 4 == 0) {
+                        Position spiderSpawn = checkWhiteSpace(entity.getPosition(), entities);
+                        String entityId =  String.format("entity%d", entityCounter);
+                        entityCounter += 1;
+                        Spider newSpider = new Spider(spiderSpawn, "spider", entityId, true);
+                        spid = newSpider;
+                        spiderSpawned = 1;
+                    }
+
                     // Spider Movement
                     if (entity.getType().equals("spider")) {
                         MovingEntity temp = (MovingEntity) entity;
 
-                        if (DungeonManiaController.tickCounter == 1) {
+                        MovingEntity spider = (Spider) entity;
+                        int loopPos = spider.getLoopPos();
+                        // if just spawned, move upward. do not need to check for
+                        // boulder above since cannot spawn below a boulder
+                        if (loopPos == 0) {
                             temp.moveUpward();
+                            // if finished a loop, reset
+                            if (loopPos == 9) {
+                                loopPos = 0;
+                            }
+                            spider.setLoopPos(loopPos + 1);
                             continue;
-                        }
+                        } else {
+                            // 1. get currLoop based on movement direction
+                            // 2. check if next pos is a boulder
+                            //      if boulder, setClockwise to opposite
+                            // 3. move
+                            List<Direction> posLoop = spider.getClockwiseLoop();
+                            List<Direction> negLoop = spider.getAnticlockwiseLoop();
 
-                        
+                            // get direction of movement based on whether moving clockwise
+                            Direction dir = posLoop.get(loopPos);
+                            if (spider.getClockwise() == false) {
+                                dir = negLoop.get(loopPos);
+                            }
+
+                            // if blocked, set dir to opposite
+                            if (spider.checkNext(dir, entities).getType().equals("boulder")) {
+                                spider.setClockwise(!spider.getClockwise());
+                                
+                            } 
+
+                            // double check if movement direction changed
+                            if (spider.getClockwise() == false) {
+                                dir = negLoop.get(loopPos);
+                            } else {
+                                dir = posLoop.get(loopPos);
+                            }
+
+                            spider.moveEntity(dir);
+
+                            // update loopPos
+                            if (spider.getClockwise() == true) {
+                                if (loopPos == 8) {
+                                    loopPos = 0;
+                                }
+                                spider.setLoopPos(loopPos + 1);
+                            } else {
+                                if (loopPos == 1) {
+                                    loopPos = 9;
+                                }
+                                spider.setLoopPos(loopPos - 1);
+                            }
+                            
+                        }
                     }
                 }
                 // update goals
@@ -354,6 +417,7 @@ public class DungeonManiaController {
         }
         
         if (con == 1) main.addEntities(holder);
+        if (spiderSpawned == 1) main.addEntities(spid);
     
         List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
         List<String> emptyBuildables = new ArrayList<String>();

@@ -14,6 +14,9 @@ Spider
     -   The spider's starting health is 1
     -   The spider's starting attack is 1
     -   Spiders can't spawn on edge of dungeon (?)
+    -   The spider cannot spawn on the outer edges of the wall
+    -   The max amount of spiders is 4
+    -   A spider cannot spawn on or under a boulder
 
 Portal 
     -   There will always be a corresponding portal to a portal given

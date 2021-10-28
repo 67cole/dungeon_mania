@@ -104,6 +104,48 @@ public abstract class MovingEntity implements Entity {
     }
 
     /**
+     * Getter for position in loop
+     */
+    public int getLoopPos() {
+        return 0;
+    }
+
+    /**
+     * Setter for position in loop
+     * @param alive
+     */
+    public void setLoopPos(int loopPos) {
+    }
+
+    /**
+     * Getter for clockwiseLoop
+     */
+    public List<Direction> getClockwiseLoop() {
+        return null;
+    }
+
+    /**
+     * Getter for anticlockwiseLoop
+     */
+    public List<Direction> getAnticlockwiseLoop() {
+        return null;
+    }
+
+    /**
+     * Getter for clockwise
+     */
+    public boolean getClockwise() {
+        return true;
+    }
+    
+    /**
+     * Setter for clockwise
+     * @param clockwise
+     */
+    public void setClockwise(boolean clockwise) {
+    }
+
+    /**
      * Get isInteractable
      */
     public boolean getIsInteractable() {
