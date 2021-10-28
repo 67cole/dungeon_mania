@@ -4,6 +4,7 @@ import java.util.List;
 
 import dungeonmania.util.Direction;
 import dungeonmania.util.Position;
+import dungeonmania.Dungeon;
 
 public class Boulder extends StaticEntity{
     public Boulder(Position position, String type, String ID, boolean isInteractable) {
@@ -11,7 +12,7 @@ public class Boulder extends StaticEntity{
     }
     
     @Override
-    public void entityFunction(List<Entity> entities, Character player, Direction direction) {
+    public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {
         // we need to move the boulder by the direction
         System.out.println("trying to move");
         switch(direction) {
