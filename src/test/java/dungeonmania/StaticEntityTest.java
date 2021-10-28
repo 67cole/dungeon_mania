@@ -21,5 +21,13 @@ public class StaticEntityTest {
         controller.tick(null, Direction.RIGHT);
     
     }
-    
+
+    @Test
+    public void testMercenarySpawn() {
+        DungeonManiaController controller = new DungeonManiaController();
+        controller.newGame("advanced", null);
+        for(int i =  0; i < 80; i++) {
+            controller.tick(null, Direction.RIGHT);
+        }   
+    }
 }

@@ -7,6 +7,7 @@ import dungeonmania.util.*;
 public class Character extends MovingEntity {
     private final static int STARTING_HEALTH = 10;
     private final static int ATTACK = 2;
+    private Position spawnPosition = null;
 
     /**
      * Health of character
@@ -35,6 +36,14 @@ public class Character extends MovingEntity {
         this.health = STARTING_HEALTH;
         this.attack = ATTACK;
         this.alive = true;
+    }
+
+
+    public Position getSpawn() {
+        return spawnPosition;
+    }
+    public void setSpawn(Position playerSpawn) {
+        spawnPosition = playerSpawn;
     }
 
     /**

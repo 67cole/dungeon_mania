@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.sql.DriverAction;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -130,6 +131,7 @@ public class DungeonManiaController {
                     case "player":
                         Character characterEntity = new Character(position, type, entityId , false);
                         main.addEntities(characterEntity);  
+                        characterEntity.setSpawn(position);
                         break;
                     case "wall":                       
                         Wall wallEntity = new Wall(position, type, entityId , false);
@@ -249,19 +251,29 @@ public class DungeonManiaController {
 
         Dungeon main = null;
         DungeonManiaController.tickCounter++;
-        ZombieToast holder = null;
+        ZombieToast zombieHolder = null;
+        Mercenary mercenaryHolder = null;
         int con = 0;
+        int con2 = 0;
+        int con3 = 0;
+
          
         for (Dungeon dungeon : dungeons) {
             if (dungeon.getDungeonId().equals(currDungeon)) {
+                Position playerSpawnPosition = null;
                 main = dungeon;
                 List<Entity> entities = dungeon.getEntities();
-
                 for (Entity entity : entities) {
+                    // Mercenary should only spawn if there is an enemy for the dungeon
+                    if (entity.getType().equals("zombie_toast") || entity.getType().equals("spider") || entity.getType().equals("mercenary")) {
+                        con3 = 1;
+                    }
 
                     // Character Movement
                     if (entity.getType().equals("player")) {
                         MovingEntity temp = (MovingEntity) entity;
+                        Character temp2  = (Character) entity;
+                        playerSpawnPosition = temp2.getSpawn();
 
                         // Either the character moves or it doesnt.
 
@@ -282,6 +294,10 @@ public class DungeonManiaController {
                             // we have an interactable
                             intEntity.entityFunction(entities, (Character) temp, movementDirection);
                         }
+
+                        if (main.getDungeonGoals().contains("exit")) {
+                            checkExitGoal(entities, main, temp);
+                        }
                     }
 
                     // Zombie Spawner Ticks
@@ -296,7 +312,7 @@ public class DungeonManiaController {
                         entityCounter += 1;
 
                         ZombieToast zombieToastEntity = new ZombieToast(zombieSpawn, "zombie_toast", entityId, true);
-                        holder = zombieToastEntity;
+                        zombieHolder = zombieToastEntity;
                         con = 1;
                     }
 
@@ -332,17 +348,28 @@ public class DungeonManiaController {
                         if (DungeonManiaController.tickCounter == 1) {
                             temp.moveUpward();
                             continue;
-                        }
-
-                        
-
+                        }   
                     }
                 }
-            }
+                // update goals
+                if (main.getDungeonGoals().contains("boulder")) {
+                    checkBoulderGoal(entities, main);
+                }
+                // Mercenary Spawn Ticks
+                // Every 35 ticks of the game causes a new mercenary to spawn
+                if (DungeonManiaController.tickCounter % 35 == 0 && con3 == 1) {
+                    String entityId =  String.format("entity%d", entityCounter);
+                    entityCounter += 1;
+                    Mercenary mercenaryEntity = new Mercenary(playerSpawnPosition, "mercenary", entityId, true);
+                    mercenaryHolder = mercenaryEntity;
+                    con2 = 1;
+                }
+            }     
         }
         
-        if (con == 1) main.addEntities(holder);
-    
+        if (con == 1) main.addEntities(zombieHolder);
+        if (con2 == 1) main.addEntities(mercenaryHolder);
+        
         List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
         List<String> emptyBuildables = new ArrayList<String>();
 
@@ -402,4 +429,66 @@ public class DungeonManiaController {
 
         return null;
     }
+
+    public void checkBoulderGoal(List<Entity> entities, Dungeon dungeon) {
+
+        HashMap<Position, Integer> map = new HashMap<Position, Integer>();
+        // key, value
+        
+        for (Entity entity : entities) {
+
+            if (entity.getType().equals("switch")) {
+                if (!map.containsKey(entity.getPosition())) {
+                    map.put(entity.getPosition(), 1);
+                }
+                else {
+                    map.put(entity.getPosition(), 2);
+                }
+            }
+            
+            if (entity.getType().equals("boulder")) {
+                if (!map.containsKey(entity.getPosition())) {
+                    map.put(entity.getPosition(), 1);
+                }
+                else {
+                    map.put(entity.getPosition(), 2);
+                }
+            }
+        }
+
+        for (Integer amt : map.values()) {
+            // even
+            if (amt != 2) {
+                return; // not finished with boulders goal 
+            }
+        }
+        dungeon.setDungeonGoals("");
+
+    }
+
+    public void checkExitGoal(List<Entity> entities, Dungeon dungeon, MovingEntity player) {
+
+        for (Entity entity : entities) {
+
+            if (entity.getType().equals("exit")) {
+                if (entity.getPosition().equals(player.getPosition())) {
+                    dungeon.setDungeonGoals("");
+                }
+            }
+        }
+    }
+
+    public Position getPlayerPosition(List<Entity> entities) {
+        for (Entity player: entities) {
+            if (player.getType().equals("player")) {
+                return player.getPosition();
+            } 
+        }
+        return null;
+    }
+
+
+
+
+
 }
