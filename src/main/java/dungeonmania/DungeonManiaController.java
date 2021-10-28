@@ -256,8 +256,6 @@ public class DungeonManiaController {
             if (dungeon.getDungeonId().equals(currDungeon)) {
                 main = dungeon;
                 List<Entity> entities = dungeon.getEntities();
-                System.out.println(DungeonManiaController.tickCounter);
-
 
                 for (Entity entity : entities) {
 
