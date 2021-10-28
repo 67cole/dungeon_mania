@@ -71,4 +71,12 @@ public class Dungeon {
         entities.add(entity);
     }
 
+    /**
+     * Removes an entity from the entities list
+     * @param entity
+     */
+    public void removeEntities(Entity entity) {
+        entities.remove(entity);
+    }
+
 }

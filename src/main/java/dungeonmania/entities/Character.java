@@ -105,7 +105,5 @@ public class Character extends MovingEntity {
                 break;
         }   
     }
-
-    @Override
-    public void entityFunction(List<Entity> entities, Character player) {}     
+ 
 }

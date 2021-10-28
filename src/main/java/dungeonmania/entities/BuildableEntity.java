@@ -1,4 +1,5 @@
 package dungeonmania.entities;
+import dungeonmania.util.Direction;
 import dungeonmania.util.Position;
 import java.util.List;
 
@@ -52,6 +53,6 @@ public class BuildableEntity implements Entity{
     }
 
     @Override
-    public void entityFunction(List<Entity> entities, Character player) {
+    public void entityFunction(List<Entity> entities, Character player, Direction direction) {
     }   
 }

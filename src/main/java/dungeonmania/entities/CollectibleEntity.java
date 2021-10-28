@@ -1,5 +1,6 @@
 package dungeonmania.entities;
 import dungeonmania.util.Position;
+import dungeonmania.util.Direction;
 import java.util.List;
 
 public abstract class CollectibleEntity implements Entity {
@@ -57,7 +58,6 @@ public abstract class CollectibleEntity implements Entity {
         return this.isInteractable;
     }
     @Override
-    public void entityFunction(List<Entity> entities, Character player) {
-        
+    public void entityFunction(List<Entity> entities, Character player , Direction direction) {
     }   
 }
