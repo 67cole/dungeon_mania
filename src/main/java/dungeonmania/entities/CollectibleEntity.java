@@ -64,6 +64,7 @@ public abstract class CollectibleEntity implements Entity {
         // Checking to see if there is already an existing key
         if (this.getType().equals("key")) {
             if (keyChecker(main.inventory)) {
+                return;
             }
         }
         // Add the collectible to inventory
