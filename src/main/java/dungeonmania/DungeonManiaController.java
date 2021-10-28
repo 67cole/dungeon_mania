@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.sql.DriverAction;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -251,12 +252,12 @@ public class DungeonManiaController {
         DungeonManiaController.tickCounter++;
         ZombieToast holder = null;
         int con = 0;
+
          
         for (Dungeon dungeon : dungeons) {
             if (dungeon.getDungeonId().equals(currDungeon)) {
                 main = dungeon;
                 List<Entity> entities = dungeon.getEntities();
-                System.out.println(DungeonManiaController.tickCounter);
 
 
                 for (Entity entity : entities) {
@@ -284,6 +285,11 @@ public class DungeonManiaController {
                             // we have an interactable
                             intEntity.entityFunction(entities, (Character) temp, movementDirection);
                         }
+
+                        if (main.getDungeonGoals().contains("exit")) {
+                            checkExitGoal(entities, main, temp);
+                        }
+
                     }
 
                     // Zombie Spawner Ticks
@@ -337,9 +343,13 @@ public class DungeonManiaController {
                         }
 
                         
-
                     }
                 }
+                // update goals
+                if (main.getDungeonGoals().contains("boulder")) {
+                    checkBoulderGoal(entities, main);
+                }
+
             }
         }
         
@@ -404,4 +414,57 @@ public class DungeonManiaController {
 
         return null;
     }
+
+    public void checkBoulderGoal(List<Entity> entities, Dungeon dungeon) {
+
+        HashMap<Position, Integer> map = new HashMap<Position, Integer>();
+        // key, value
+        
+        for (Entity entity : entities) {
+
+            if (entity.getType().equals("switch")) {
+                if (!map.containsKey(entity.getPosition())) {
+                    map.put(entity.getPosition(), 1);
+                }
+                else {
+                    map.put(entity.getPosition(), 2);
+                }
+            }
+            
+            if (entity.getType().equals("boulder")) {
+                if (!map.containsKey(entity.getPosition())) {
+                    map.put(entity.getPosition(), 1);
+                }
+                else {
+                    map.put(entity.getPosition(), 2);
+                }
+            }
+        }
+
+        for (Integer amt : map.values()) {
+            // even
+            if (amt != 2) {
+                return; // not finished with boulders goal 
+            }
+        }
+        dungeon.setDungeonGoals("");
+
+    }
+
+    public void checkExitGoal(List<Entity> entities, Dungeon dungeon, MovingEntity player) {
+
+        for (Entity entity : entities) {
+
+            if (entity.getType().equals("exit")) {
+                if (entity.getPosition().equals(player.getPosition())) {
+                    dungeon.setDungeonGoals("");
+                }
+            }
+        }
+    }
+
+
+
+
+
 }
