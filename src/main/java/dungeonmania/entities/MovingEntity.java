@@ -9,6 +9,21 @@ import dungeonmania.util.Direction;
 
 public abstract class MovingEntity implements Entity {
     /**
+     * Health of movingEntity
+     */
+    private int health;
+
+    /**
+     * Attack of movingEntity
+     */
+    private int attack;
+
+    /**
+     * Condition of movingEntity
+     */
+    private boolean alive;
+
+    /**
      * Position in the path
      */
     private Position position;
@@ -40,8 +55,10 @@ public abstract class MovingEntity implements Entity {
         this.type = type;
         this.ID = ID;
         this.isInteractable = isInteractable;
+        this.alive = true;
     }
 
+    
     /**
      * Move the entity around
      */
@@ -88,6 +105,44 @@ public abstract class MovingEntity implements Entity {
      */
     public void setPosition(Position position) {
         this.position = position;
+    }
+
+    /**
+     * Get Alive
+     */
+    public boolean isAlive() {
+        return this.alive;
+    }
+    /**
+     * Set Alive
+     */
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
+    /**
+     * Get Attack
+     */
+    public int getAttack() {
+        return this.attack;
+    }
+
+    /**
+     * Set Attack
+     */
+    public void setAttack(int attack) {
+        this.attack = attack;
+    }
+    /**
+     * Get Health
+     */
+    public int getHealth() {
+        return this.health;
+    }
+    /**
+     * Set Health
+     */
+    public void setHealth(int health) {
+        this.health = health;
     }
 
     /**
@@ -253,8 +308,51 @@ public abstract class MovingEntity implements Entity {
         return false;
     }
 
+    public boolean checkBS(int characterHealth, int enemyHealth) {
+        if (characterHealth <= 0) {
+            return false;
+        }
+        if (enemyHealth <= 0) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean checkAlive(int health) {
+        if (health <= 0) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {
+        while (checkBS(player.getHealth(), this.getHealth())) {
+            // Simulate a round of battle
+            int characterHealth = player.getHealth();
+            int characterAD = player.getAttack();
+            int enemyHealth = this.getHealth();
+            int enemyAD = this.getAttack();
+            int newCharacterHealth = characterHealth - ((enemyHealth * enemyAD) / 10);
+            int newEnemyHealth = enemyHealth - ((newCharacterHealth * characterAD) / 5);
+            // Check if character dies
+            if (!checkAlive(characterHealth)) {
+                player.setAlive(false);
+                player.setHealth(0);
+            }
+            else {
+                player.setHealth(newCharacterHealth);
+            }
+            // Check if enemy dies
+            if (!checkAlive(enemyHealth)) {
+               this.setAlive(false);
+               this.setHealth(0);
+            }
+            else {
+                this.setHealth(newEnemyHealth);
+            }
+            // If none are dead, repeat the round
+        }
     }
     
 

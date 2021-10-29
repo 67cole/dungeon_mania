@@ -116,22 +116,22 @@
       {
         "x": 0,
         "y": 2,
-        "type": "wall"
+        "type": "spider"
       },
       {
         "x": 3,
         "y": 2,
-        "type": "key"
+        "type": "spider"
       },
       {
         "x": 6,
         "y": 2,
-        "type": "key"
+        "type": "spider"
       },
       {
         "x": 7,
         "y": 2,
-        "type": "wall"
+        "type": "spider"
       },
       {
         "x": 8,
