@@ -3,8 +3,8 @@ package dungeonmania;
 import dungeonmania.entities.*;
 import dungeonmania.entities.Character;
 import dungeonmania.entities.BuildableEntities.*;
-import dungeonmania.entities.CollectibleEntities.*;
-import dungeonmania.entities.RareCollectibleEntities.*;
+import dungeonmania.entities.CollectableEntities.*;
+import dungeonmania.entities.RareCollectableEntities.*;
 import dungeonmania.exceptions.InvalidActionException;
 import dungeonmania.response.models.AnimationQueue;
 import dungeonmania.response.models.DungeonResponse;
@@ -50,6 +50,7 @@ public class DungeonManiaController {
     private int dungeonCounter = 0;
     private int entityCounter = 0;
     private static int tickCounter = 0;
+    private static boolean firstKey = true;
 
     public DungeonManiaController() {
     }
@@ -122,7 +123,7 @@ public class DungeonManiaController {
             JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
             JsonArray entitiesList = jsonObject.get("entities").getAsJsonArray();
             
-            for (int i = 0; i < entitiesList .size(); i++) {
+            for (int i = 0; i < entitiesList.size(); i++) {
                 JsonObject entity = entitiesList .get(i).getAsJsonObject();
                 String type = entity.get("type").getAsString();
                 int x = entity.get("x").getAsInt();
@@ -205,6 +206,7 @@ public class DungeonManiaController {
                     case "wood":
                         Wood wood = new Wood(position, type, entityId, true);
                         main.addEntities(wood);
+                        break;
                     case "spider":
                         Spider spiderEntity = new Spider(position, type, entityId, true);
                         main.addEntities(spiderEntity);
@@ -341,8 +343,18 @@ public class DungeonManiaController {
 
                         // Check if it is empty square or an entity
                         if (intEntity != null) {
+                            // EntityFunction that handles all interactions with player
                             intEntity.entityFunction(entities, (Character) temp, movementDirection, main);
-                            entityToBeRemoved = intEntity;
+                            // If the character is dead
+                            if (!temp.isAlive()) {
+                                entityToBeRemoved = temp;
+                                break;
+                            }
+                            // If the character isnt dead, then the enemy has to have died in the case of battle
+                            // Takes into the account of collectable item
+                            else {
+                                entityToBeRemoved = intEntity;
+                            }
                         }
 
                         if (main.getDungeonGoals().contains("exit")) {
@@ -408,11 +420,7 @@ public class DungeonManiaController {
         if (mercenaryAddedLater == 1) main.addEntities(mercenaryHolder);
 
         // Remove the collectible from the map
-        if (entityToBeRemoved != null) {
-            if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectibleEntity")) {
-                main.removeEntity(entityToBeRemoved);
-            }
-        }
+        entityRemover(entityToBeRemoved, main, firstKey);
 
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
         for(Entity entity: main.getEntities()) {
@@ -528,6 +536,9 @@ public class DungeonManiaController {
         return null;
     }
 
+    /**
+     * Moves the mercenary around
+     */
     public void mercenaryMovement(List<Entity> entities) {
         for (Entity entity : entities) {
             if (entity.getType().equals("mercenary")) {
@@ -538,4 +549,37 @@ public class DungeonManiaController {
         }
     }
 
+    /**
+     * Searches for a key
+     */
+    public boolean keyChecker(List<ItemResponse> inventory) {
+        for (ItemResponse item: inventory) {
+            if (item.getType().equals("key")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Removes an entity from Entities List
+     */
+    public void entityRemover(Entity entityToBeRemoved, Dungeon main, boolean firstKey) {
+        if (entityToBeRemoved != null) {
+            if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity")) {
+                if (entityToBeRemoved.getType().equals("key")) {
+                    if (firstKey) {
+                        DungeonManiaController.firstKey = false;
+                    }
+                    else if (keyChecker(main.inventory)) {
+                        return;
+                    }
+                }
+                main.removeEntity(entityToBeRemoved);
+            }
+            else if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
+                main.removeEntity(entityToBeRemoved);
+            }
+        }
+    }
 }

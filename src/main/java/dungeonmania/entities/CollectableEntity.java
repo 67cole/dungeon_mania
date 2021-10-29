@@ -5,7 +5,7 @@ import dungeonmania.response.models.ItemResponse;
 import dungeonmania.Dungeon;
 import java.util.List;
 
-public abstract class CollectibleEntity implements Entity {
+public abstract class CollectableEntity implements Entity {
     /**
      * Position in the path
      */
@@ -33,7 +33,7 @@ public abstract class CollectibleEntity implements Entity {
      * @param ID - the ID of entity
      * @param isInteractable - check if the entity is interactable
      */
-    public CollectibleEntity(Position position, String type, String ID, boolean isInteractable) {
+    public CollectableEntity(Position position, String type, String ID, boolean isInteractable) {
         this.position = position;
         this.type = type;
         this.ID = ID;
@@ -125,7 +125,7 @@ public abstract class CollectibleEntity implements Entity {
      */
 
     /**
-     * Searches for a key within inventory
+     * Searches for a key
      */
     public boolean keyChecker(List<ItemResponse> inventory) {
         for (ItemResponse item: inventory) {

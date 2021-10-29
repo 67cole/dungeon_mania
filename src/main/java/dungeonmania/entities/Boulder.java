@@ -14,10 +14,8 @@ public class Boulder extends StaticEntity{
     @Override
     public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {
         // we need to move the boulder by the direction
-        System.out.println("trying to move");
         switch(direction) {
             case UP:
-            System.out.println("trying to move up");
                 super.moveUpward();
                 break;
 
