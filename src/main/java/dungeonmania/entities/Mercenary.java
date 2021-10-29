@@ -10,21 +10,6 @@ public class Mercenary extends MovingEntity {
     private final static int STARTING_HEALTH = 3;
     private final static int ATTACK = 2;
 
-    /**
-     * Health of Mercenary
-     */
-    private int health;
-
-    /**
-     * Attack of Mercenary
-     */
-    private int attack;
-
-    /**
-     * Condition of mercenary
-     */
-    private boolean alive;
-
 
     /**
      * Creates the mercenary
@@ -35,50 +20,9 @@ public class Mercenary extends MovingEntity {
      */
     public Mercenary(Position position, String type, String ID, boolean isInteractable) {
         super(position, type, ID, isInteractable);
+        setHealth(STARTING_HEALTH);
+        setAttack(ATTACK);
     }
-    
-    /**
-     * Getter for health
-     */
-    public int getHealth() {
-        return health; 
-    }
-
-    /**
-     * Getter for attack
-     */
-    public int getAttack() {
-        return attack;
-    }
-
-    /**
-     * Getter for alive
-     */
-    public boolean getAliveStatus() {
-        return alive;
-    }
-
-    /**
-     * Setter for attack
-     * If the health is less than 1, i.e. <= 0, the character is dead
-     * @param health
-     */
-    public void setHealth(int health) {
-        this.health = Math.min(health, STARTING_HEALTH);
-
-        if (health < 1) {
-            this.setAlive(false);
-        }
-    }
-
-    /**
-     * Setter for character's condition
-     * @param alive
-     */
-    public void setAlive(boolean alive) {
-        this.alive = alive;
-    }
-
 
     /**
      * Moving the mercenary

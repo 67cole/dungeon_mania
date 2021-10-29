@@ -3,7 +3,8 @@ package dungeonmania.entities;
 import dungeonmania.util.Position;
 
 import java.util.List;
-
+import dungeonmania.entities.CollectableEntities.Sword;
+import dungeonmania.entities.CollectableEntities.Armour;
 import dungeonmania.Dungeon;
 import dungeonmania.util.Direction;
 
@@ -348,19 +349,38 @@ public abstract class MovingEntity implements Entity {
     public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {
         while (checkBS(player.getHealth(), this.getHealth())) {
             // Simulate a round of battle
+            int weaponAtk = 0;
+            boolean charArmour = false;
+            for (CollectableEntity item: main.inventory) {
+                if (item.getType().equals("sword")) {
+                    Sword sword = (Sword) item;
+                    weaponAtk = sword.getAttack();
+                    sword.reduceDurability();
+                }
+                if (item.getType().equals("armour")) {
+                    Armour armour = (Armour) item;
+                    charArmour = true;
+                    armour.reduceDurability();
+                }
+            }
             int characterHealth = player.getHealth();
             int characterAD = player.getAttack();
             int enemyHealth = this.getHealth();
             int enemyAD = this.getAttack();
-            int newCharacterHealth = characterHealth - ((enemyHealth * enemyAD) / 10);
-            int newEnemyHealth = enemyHealth - ((newCharacterHealth * characterAD) / 5);
+            if (charArmour) {
+                characterHealth = characterHealth - ((enemyHealth * (enemyAD / 2)) / 10);
+            }
+            else {
+                characterHealth = characterHealth - ((enemyHealth * (enemyAD)) / 10);
+            }
+            int newEnemyHealth = enemyHealth - ((characterHealth * (characterAD + weaponAtk)) / 5);
             // Check if character dies
             if (!checkAlive(characterHealth)) {
                 player.setAlive(false);
                 player.setHealth(0);
             }
             else {
-                player.setHealth(newCharacterHealth);
+                player.setHealth(characterHealth);
             }
             // Check if enemy dies
             if (!checkAlive(enemyHealth)) {

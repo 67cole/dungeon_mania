@@ -68,8 +68,7 @@ public abstract class CollectableEntity implements Entity {
             }
         }
         // Add the collectible to inventory
-        ItemResponse newItem = new ItemResponse(this.getID(), this.getType());
-        main.inventory.add(newItem);
+        main.inventory.add(this);
         
         // Check if buildable list already contains shield or bow
         int bow = 0;
@@ -87,7 +86,7 @@ public abstract class CollectableEntity implements Entity {
         int arrow = 0;
         int key = 0;
         int treasure = 0;
-        for (ItemResponse item: main.inventory) {
+        for (CollectableEntity item: main.inventory) {
             switch(item.getType()) {
                 case "wood":
                     wood++;
@@ -127,8 +126,8 @@ public abstract class CollectableEntity implements Entity {
     /**
      * Searches for a key
      */
-    public boolean keyChecker(List<ItemResponse> inventory) {
-        for (ItemResponse item: inventory) {
+    public boolean keyChecker(List<CollectableEntity> inventory) {
+        for (CollectableEntity item: inventory) {
             if (item.getType().equals("key")) {
                 return true;
             }
