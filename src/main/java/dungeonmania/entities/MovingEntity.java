@@ -167,6 +167,10 @@ public abstract class MovingEntity implements Entity {
         return isInteractable;
     }
 
+    /**
+     * checkMovement checks for the next square if it's a wall/boulder.
+     * This uses direction args.
+     */
     public boolean checkMovement(Direction direction, List<Entity> entities) {
         switch (direction) {
             case UP:
@@ -234,6 +238,21 @@ public abstract class MovingEntity implements Entity {
         // If it's a white square, you can move
         return true; 
     }
+
+    /**
+     * checkMovement checks for the next square if it's a wall/boulder.
+     * This gives a position already as an arg
+     */
+    public boolean checkMovement(Position position, List<Entity> entities) {
+        for (Entity entity : entities) {
+            if (entity.getPosition().equals(position) && !entity.getType().equals("door") && !entity.getType().equals("switch") && !entity.getType().equals("player")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 
     public Entity checkNext(Direction direction, List<Entity> entities) {
         switch (direction) {
