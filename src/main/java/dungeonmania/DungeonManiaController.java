@@ -209,6 +209,10 @@ public class DungeonManiaController {
                         Spider spiderEntity = new Spider(position, type, entityId, true);
                         main.addEntities(spiderEntity);
                         break;
+                    case "mercenary":
+                        Mercenary mercenaryEntity = new Mercenary(position, type, entityId, true);
+                        main.addEntities(mercenaryEntity);
+                        break;
                 }
             }
         } catch (Exception e) {
@@ -298,9 +302,9 @@ public class DungeonManiaController {
         DungeonManiaController.tickCounter++;
         ZombieToast zombieHolder = null;
         Mercenary mercenaryHolder = null;
-        int con = 0;
-        int con2 = 0;
-        int con3 = 0;
+        int zombieAddedLater = 0;
+        int mercenaryAddedLater = 0;
+        int EnemyCheck = 0;
 
          
         for (Dungeon dungeon : dungeons) {
@@ -308,10 +312,11 @@ public class DungeonManiaController {
                 Position playerSpawnPosition = null;
                 main = dungeon;
                 List<Entity> entities = dungeon.getEntities();
+
                 for (Entity entity : entities) {
                     // Mercenary should only spawn if there is an enemy for the dungeon
                     if (entity.getType().equals("zombie_toast") || entity.getType().equals("spider") || entity.getType().equals("mercenary")) {
-                        con3 = 1;
+                        EnemyCheck = 1;
                     }
 
                     // Character Movement
@@ -354,36 +359,19 @@ public class DungeonManiaController {
                         if (zombieSpawn == null) continue;
 
                         String entityId =  String.format("entity%d", entityCounter);
-                        entityCounter += 1;
+                        
 
                         ZombieToast zombieToastEntity = new ZombieToast(zombieSpawn, "zombie_toast", entityId, true);
                         zombieHolder = zombieToastEntity;
-                        con = 1;
+                        zombieAddedLater = 1;
                     }
 
-                    // Zombie Movement
+                    // Zombie Movement (moves the same for character but can't interact)
                     if (entity.getType().equals("zombie_toast")) {
-                        MovingEntity temp = (MovingEntity) entity;
+                        ZombieToast temp = (ZombieToast) entity;
+                        temp.moveEntity(entities);
 
-                        // Either the character moves or it doesnt.
-
-                        // Check if it it blocked by a wall, in which it doesnt move
-                        // or if theres 2 boulders next to each other
-                        if (!temp.checkMovement(movementDirection, entities)) continue;
-                        
-                        Entity intEntity = temp.checkNext(movementDirection, entities);
-                        // If it is here movement is allowed and
-                        // it might need to interact with an entity.
-
-                        if (intEntity.getType().equals("portal")) continue;
-
-                        temp.moveEntity(movementDirection);
-                        // Check if it is empty square or an entity
-                        
-                        if (intEntity != null) {
-                            // we have an interactable
-                            intEntity.entityFunction(entities, (Character) temp, movementDirection, main);
-                        }
+                        // CONDITION FOR DOOR SHOULD GO HERE
                     }
 
                     // Spider Movement
@@ -396,24 +384,28 @@ public class DungeonManiaController {
                         }   
                     }
                 }
+
+                // Mercenary Movement goes last
+                mercenaryMovement(entities);
+
                 // update goals
                 if (main.getDungeonGoals().contains("boulder")) {
                     checkBoulderGoal(entities, main);
                 }
                 // Mercenary Spawn Ticks
-                // Every 35 ticks of the game causes a new mercenary to spawn
-                if (DungeonManiaController.tickCounter % 35 == 0 && con3 == 1) {
+                // Every 75 ticks of the game causes a new mercenary to spawn
+                if (DungeonManiaController.tickCounter % 75 == 0 && EnemyCheck == 1) {
                     String entityId =  String.format("entity%d", entityCounter);
                     entityCounter += 1;
                     Mercenary mercenaryEntity = new Mercenary(playerSpawnPosition, "mercenary", entityId, true);
                     mercenaryHolder = mercenaryEntity;
-                    con2 = 1;
+                    mercenaryAddedLater = 1;
                 }
             }     
         }
         
-        if (con == 1) main.addEntities(zombieHolder);
-        if (con2 == 1) main.addEntities(mercenaryHolder);
+        if (zombieAddedLater == 1) main.addEntities(zombieHolder);
+        if (mercenaryAddedLater == 1) main.addEntities(mercenaryHolder);
 
         // Remove the collectible from the map
         if (entityToBeRemoved != null) {
@@ -536,8 +528,14 @@ public class DungeonManiaController {
         return null;
     }
 
-
-
-
+    public void mercenaryMovement(List<Entity> entities) {
+        for (Entity entity : entities) {
+            if (entity.getType().equals("mercenary")) {
+                Mercenary temp = (Mercenary) entity;
+                Position player = getPlayerPosition(entities);
+                temp.moveEntity(entities, player);
+            }
+        }
+    }
 
 }
