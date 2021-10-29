@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dungeonmania.response.models.ItemResponse;
+import dungeonmania.entities.CollectableEntity;
 import dungeonmania.entities.Entity;
 
 
@@ -11,7 +12,7 @@ public class Dungeon {
 
     // Keep track of all entities in the dungeon
     private List<Entity> entities = new ArrayList<Entity>();
-    public  List<ItemResponse> inventory = new ArrayList<ItemResponse>();
+    public  List<CollectableEntity> inventory = new ArrayList<CollectableEntity>();
     public  List<String> buildables = new ArrayList<String>();
 
     private String dungeonName;
@@ -66,7 +67,7 @@ public class Dungeon {
         this.keyCounter = keyCounter;
     }
 
-    public List<ItemResponse> getInventory() {
+    public List<CollectableEntity> getInventory() {
         return inventory;
     }
 
