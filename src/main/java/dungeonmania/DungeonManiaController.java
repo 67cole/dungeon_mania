@@ -298,6 +298,14 @@ public class DungeonManiaController {
 
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
 
+        if (!itemUsedInvalid(itemUsed)) {
+            throw new IllegalArgumentException("The item used is invalid.");
+        }
+
+        if (!itemUsedNotInInventory(itemUsed)) {
+            throw new InvalidActionException("The item is not in the inventory.");
+        }
+
         Dungeon main = null;
         Entity entityToBeRemoved = null;
         
@@ -314,6 +322,9 @@ public class DungeonManiaController {
                 Position playerSpawnPosition = null;
                 main = dungeon;
                 List<Entity> entities = dungeon.getEntities();
+
+                // Mercenary Movement goes last
+                mercenaryMovement(entities, movementDirection);
 
                 for (Entity entity : entities) {
                     // Mercenary should only spawn if there is an enemy for the dungeon
@@ -397,9 +408,6 @@ public class DungeonManiaController {
                     }
                 }
 
-                // Mercenary Movement goes last
-                mercenaryMovement(entities);
-
                 // update goals
                 if (main.getDungeonGoals().contains("boulder")) {
                     checkBoulderGoal(entities, main);
@@ -465,7 +473,7 @@ public class DungeonManiaController {
             int check = 0;
 
             for (Entity entity : entities) {
-                if (entity.getPosition().equals(temp)) {
+                if (entity.getPosition().equals(temp) && !entity.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity") && !entity.getClass().getSuperclass().getName().equals("dungeonmania.entities.BuildableEntity") && !entity.getClass().getSuperclass().getName().equals("dungeonmania.entities.RareEntity")) {
                     check = 1; 
                     break;
                 } 
@@ -539,11 +547,12 @@ public class DungeonManiaController {
     /**
      * Moves the mercenary around
      */
-    public void mercenaryMovement(List<Entity> entities) {
+    public void mercenaryMovement(List<Entity> entities, Direction direction) {
         for (Entity entity : entities) {
             if (entity.getType().equals("mercenary")) {
                 Mercenary temp = (Mercenary) entity;
                 Position player = getPlayerPosition(entities);
+                player = player.translateBy(direction);
                 temp.moveEntity(entities, player);
             }
         }
@@ -581,5 +590,17 @@ public class DungeonManiaController {
                 main.removeEntity(entityToBeRemoved);
             }
         }
+    }
+
+    public boolean itemUsedInvalid(String itemUsed) {
+        String[] items = {"bomb", "health_potion", "invincibility_potion", "invisibility_potion"};
+        List<String> itemAvailable = Arrays.asList(items);
+        itemAvailable.add(null);
+        
+        return itemAvailable.contains(itemUsed);
+    }
+
+    public boolean itemUsedNotInInventory(String itemUsed) {
+        for ()
     }
 }

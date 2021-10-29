@@ -7,15 +7,17 @@ Character
 Zombie
     -   The zombie's starting health is 3
     -   The zombie's starting attack is 1
-    -   The zombie spawner won't spawn anything if there is no avaiable white   space around it
+    -   The zombie spawner won't spawn anything if there is no avaiable white space around it
     -   The zombie spawns will check for any white spaces CLOCKWISE, thus zombies will spawn in a clockwise manner 
-    -   Zombies can't interact with anything (i.e. moving a boulder)
+    -   Zombies can spawn on collectable/buildable/rare
+    -   Zombies can't interact with anything, static/collectable/buildable/rare (i.e. moving a boulder)
 
 Spider
     -   The spider's starting health is 1
     -   The spider's starting attack is 1
     -   Spiders can't spawn on the edge of the dungeon
     -   A boulder can't spawn on top of the spider
+    
 
 Mercenary
     -   The mercenary's starting health is 3
@@ -23,6 +25,7 @@ Mercenary
     -   The mercenary would spawn every 75 ticks
     -   Mercenaries can't interact with anything (i.e. moving a boulder )
     -   Mercenaries will always have a valid spot to move to, it cannot be trapped
+    -   Mercenaries can't interact with anything, static/collectable/buildable/rare (i.e. moving a boulder)
 
 Portal 
     -   There will always be a corresponding portal to a portal given
@@ -33,3 +36,7 @@ Json
 Endings 
 
     -   Once the requirements for an ending is met the game will automatically end  
+
+One Ring
+    -   When respawned, the player keeps their inventory
+    -   The One Ring will have a 5% chance of spawning
