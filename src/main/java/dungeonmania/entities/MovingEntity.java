@@ -4,6 +4,7 @@ import dungeonmania.util.Position;
 
 import java.util.List;
 
+import dungeonmania.Dungeon;
 import dungeonmania.util.Direction;
 
 public abstract class MovingEntity implements Entity {
@@ -45,6 +46,8 @@ public abstract class MovingEntity implements Entity {
      * Move the entity around
      */
     public void moveEntity(Direction direction) {}
+
+    public void moveSpider(Position position) {}
 
     /**
      * Move the position by one square up
@@ -120,14 +123,14 @@ public abstract class MovingEntity implements Entity {
     /**
      * Getter for clockwiseLoop
      */
-    public List<Direction> getClockwiseLoop() {
+    public List<Position> getClockwiseLoop() {
         return null;
     }
 
     /**
      * Getter for anticlockwiseLoop
      */
-    public List<Direction> getAnticlockwiseLoop() {
+    public List<Position> getAnticlockwiseLoop() {
         return null;
     }
 
@@ -294,9 +297,8 @@ public abstract class MovingEntity implements Entity {
         return false;
     }
 
-
-    public void entityFunction(List<Entity> entities, Character player, Direction direction) {
-        System.out.println("entered 257");
+    @Override
+    public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {
     }
     
 

@@ -2,6 +2,7 @@ package dungeonmania.entities;
 
 import java.util.List;
 
+import dungeonmania.Dungeon;
 import dungeonmania.util.Position;
 import dungeonmania.util.Direction;
 
@@ -127,8 +128,7 @@ public abstract class StaticEntity implements Entity{
     public boolean getIsInteractable() {
         return this.isInteractable;
     }
-    
-    public void entityFunction(List<Entity> entities, Character player, Direction direction) {
-        System.out.println("entered 132");
+    @Override
+    public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {
     }   
 }

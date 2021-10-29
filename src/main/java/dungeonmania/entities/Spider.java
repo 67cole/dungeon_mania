@@ -8,24 +8,28 @@ import dungeonmania.util.*;
 public class Spider extends MovingEntity {
     private final static int STARTING_HEALTH = 1;
     private final static int ATTACK = 1;
-    List<Direction> clockwiseLoop = new ArrayList<Direction>();
-    List<Direction> anticlockwiseLoop = new ArrayList<Direction>();
+    List<Position> clockwiseLoop = new ArrayList<Position>();
+    List<Position> anticlockwiseLoop = new ArrayList<Position>();
     int loopPos = 0;
     boolean clockwise = true;
+    Position up = new Position(0, 1);
+    Position down = new Position(0, -1);
+    Position left = new Position(-1, 0);
+    Position right = new Position(1, 0);
 
 
     /**
-     * Health of character
+     * Health of spider
      */
     private int health;
 
     /**
-     * Attack of character
+     * Attack of spider
      */
     private int attack;
 
     /**
-     * Condition of zombie
+     * Condition of spider
      */
     private boolean alive;
 
@@ -68,7 +72,7 @@ public class Spider extends MovingEntity {
 
     /**
      * Setter for attack
-     * If the health is less than 1, i.e. <= 0, the character is dead
+     * If the health is less than 1, i.e. <= 0, the spider is dead
      * @param health
      */
     public void setHealth(int health) {
@@ -80,7 +84,7 @@ public class Spider extends MovingEntity {
     }
 
     /**
-     * Setter for character's condition
+     * Setter for spider's condition
      * @param alive
      */
     public void setAlive(boolean alive) {
@@ -110,7 +114,7 @@ public class Spider extends MovingEntity {
      * Getter for clockwiseLoop
      */
     @Override
-    public List<Direction> getClockwiseLoop() {
+    public List<Position> getClockwiseLoop() {
         return this.clockwiseLoop;
     }
 
@@ -118,10 +122,7 @@ public class Spider extends MovingEntity {
      * Creates the clockwiseloop
      */
     public void setClockwiseLoop() {
-        Direction up = Direction.UP;
-        Direction down = Direction.DOWN;
-        Direction left = Direction.LEFT;
-        Direction right = Direction.RIGHT;
+        clockwiseLoop.add(up);
         clockwiseLoop.add(right);
         clockwiseLoop.add(down);
         clockwiseLoop.add(down);
@@ -136,7 +137,7 @@ public class Spider extends MovingEntity {
      * Getter for anticlockwiseLoop
      */
     @Override
-    public List<Direction> getAnticlockwiseLoop() {
+    public List<Position> getAnticlockwiseLoop() {
         return this.anticlockwiseLoop;
     }
 
@@ -144,18 +145,16 @@ public class Spider extends MovingEntity {
      * Creates the anticlockwiseloop
      */
     public void setAnticlockwiseLoop() {
-        Direction up = Direction.UP;
-        Direction down = Direction.DOWN;
-        Direction left = Direction.LEFT;
-        Direction right = Direction.RIGHT;
-        clockwiseLoop.add(left);
-        clockwiseLoop.add(down);
-        clockwiseLoop.add(down);
-        clockwiseLoop.add(right);
-        clockwiseLoop.add(right);
-        clockwiseLoop.add(up);
-        clockwiseLoop.add(up);
-        clockwiseLoop.add(left);
+        
+        anticlockwiseLoop.add(up);
+        anticlockwiseLoop.add(left);
+        anticlockwiseLoop.add(down);
+        anticlockwiseLoop.add(down);
+        anticlockwiseLoop.add(right);
+        anticlockwiseLoop.add(right);
+        anticlockwiseLoop.add(up);
+        anticlockwiseLoop.add(up);
+        anticlockwiseLoop.add(left);
     }
 
     /**
@@ -180,25 +179,20 @@ public class Spider extends MovingEntity {
      * Movement for the spider
      */
     @Override
-    public void moveEntity(Direction direction) {
-        switch (direction) {
-            case UP:
-                super.moveUpward();
-                break;
-            case DOWN:
-                super.moveDownward();
-                break;
-            case LEFT:
-                super.moveLeft();
-                break;
-            case RIGHT:
-                super.moveRight();
-                break;
-            case NONE:
-                break;
-        }   
+    public void moveSpider(Position direction) {
+        if (direction.equals(up)) {
+            super.moveUpward();
+        } else if (direction.equals(down)) {
+            super.moveDownward();
+        } else if (direction.equals(left)) {
+            super.moveLeft();
+        } else if (direction.equals(right)) {
+            super.moveRight();
+        }
+    
     }
 
+    
 
 
 }

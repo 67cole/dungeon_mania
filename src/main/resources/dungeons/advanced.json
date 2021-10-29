@@ -121,12 +121,12 @@
       {
         "x": 3,
         "y": 2,
-        "type": "wall"
+        "type": "key"
       },
       {
         "x": 6,
         "y": 2,
-        "type": "wall"
+        "type": "key"
       },
       {
         "x": 7,

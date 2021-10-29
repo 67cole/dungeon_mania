@@ -18,5 +18,17 @@ Spider
     -   The max amount of spiders is 4
     -   A spider cannot spawn on or under a boulder
 
+Mercenary
+    -   The mercenary's starting health is 3
+    -   The mercenary's starting attack is 2
+    -   The mercenary would spawn every 35 ticks
+
 Portal 
     -   There will always be a corresponding portal to a portal given
+
+Json
+    -   The json files provided in testing would be correct
+
+Endings 
+
+    -   Once the requirements for an ending is met the game will automatically end  
