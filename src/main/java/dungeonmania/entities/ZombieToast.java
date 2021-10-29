@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class ZombieToast extends MovingEntity {
     private final static int STARTING_HEALTH = 3;
-    private final static int ATTACK = 500;
+    private final static int ATTACK = 1;
 
     /**
      * Creates the main zombie

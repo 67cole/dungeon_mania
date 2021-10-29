@@ -309,12 +309,16 @@ public class DungeonManiaController {
         int mercenaryAddedLater = 0;
         int EnemyCheck = 0;
 
+
          
         for (Dungeon dungeon : dungeons) {
             if (dungeon.getDungeonId().equals(currDungeon)) {
                 Position playerSpawnPosition = null;
                 main = dungeon;
                 List<Entity> entities = dungeon.getEntities();
+
+                // Mercenary Movement goes last
+                mercenaryMovement(entities, movementDirection);
 
                 for (Entity entity : entities) {
                     // Mercenary should only spawn if there is an enemy for the dungeon
@@ -368,8 +372,8 @@ public class DungeonManiaController {
                                 // Accounting for chance to receive TheOneRing
                                 if (intEntity.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
                                     Random random = new Random();
-                                    int chance = random.nextInt(21);
-                                    if (chance == 10) {
+                                    int chance = random.nextInt(1);
+                                    if (chance == 0) {
                                         String entityId =  String.format("entity%d", entityCounter);
                                         entityCounter += 1;
                                         // Position needs to be stated as checkNext requires a position to run
@@ -419,9 +423,6 @@ public class DungeonManiaController {
                         }   
                     }
                 }
-
-                // Mercenary Movement goes last
-                mercenaryMovement(entities);
 
                 // update goals
                 if (main.getDungeonGoals().contains("boulder")) {
@@ -568,11 +569,12 @@ public class DungeonManiaController {
     /**
      * Moves the mercenary around
      */
-    public void mercenaryMovement(List<Entity> entities) {
+    public void mercenaryMovement(List<Entity> entities, Direction direction) {
         for (Entity entity : entities) {
             if (entity.getType().equals("mercenary")) {
                 Mercenary temp = (Mercenary) entity;
                 Position player = getPlayerPosition(entities);
+                player = player.translateBy(direction);
                 temp.moveEntity(entities, player);
             }
         }
