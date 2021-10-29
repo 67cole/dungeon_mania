@@ -23,29 +23,35 @@ public class ZombieToast extends MovingEntity {
         setAttack(ATTACK);
     }
 
-    @Override
-    public void moveEntity(Direction direction) {
-
+    public void moveEntity(List<Entity> entities) {
         // For now, zombies travel randomely
         Random random = new Random();
         int randDirection = random.nextInt(5);
 
         switch(randDirection) {
             case 1:
-                super.moveUpward();
-                break;
+                if (checkMovement(super.getPosition().translateBy(0, -1), entities)) {
+                    super.moveUpward();
+                    break;
+                }
             
             case 2:
-                super.moveDownward();
-                break;
+                if (checkMovement(super.getPosition().translateBy(0, 1), entities)) {
+                    super.moveUpward();
+                    break;
+                }
             
             case 3:
-                super.moveLeft();
-                break;
+                if (checkMovement(super.getPosition().translateBy(-1, 0), entities)) {
+                    super.moveUpward();
+                    break;
+                }
             
             case 4:
-                super.moveRight();
-                break;
+                if (checkMovement(super.getPosition().translateBy(1, 0), entities)) {
+                    super.moveUpward();
+                    break;
+                }
         }   
     }
 
