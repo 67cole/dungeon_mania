@@ -305,11 +305,12 @@ public class DungeonManiaController {
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
 
         Dungeon main = null;
-        List<Entity> entityToBeRemoved = new ArrayList<Entity>();
+        List<Entity> entitiesToBeRemoved = new ArrayList<Entity>();
         
         DungeonManiaController.tickCounter++;
         ZombieToast zombieHolder = null;
         Mercenary mercenaryHolder = null;
+        Bomb bombHolder = null;
         int zombieAddedLater = 0;
         int mercenaryAddedLater = 0;
         int EnemyCheck = 0;
@@ -328,18 +329,21 @@ public class DungeonManiaController {
                     if (entity.getType().equals("zombie_toast") || entity.getType().equals("spider") || entity.getType().equals("mercenary")) {
                         EnemyCheck = 1;
                     }
-
                     // Character Movement
                     if (entity.getType().equals("player")) {
-                        // If the inital direction is NONE then an item has been used
-                        if (movementDirection == Direction.NONE) {                           
-                        }
-                        //Set temp as the entity
-                        //Also since this entity is the player, get the player's spawn position for use in mercenary 
                         MovingEntity temp = (MovingEntity) entity;
                         Character temp2  = (Character) entity;
                         playerSpawnPosition = temp2.getSpawn();
-
+                        // Potion Checker
+                        
+                        // If the inital direction is NONE then an item has been used
+                        if (movementDirection == Direction.NONE) {
+                            // Sets the status of player depending on potion
+                            useItem(temp2, main, itemUsed);
+                            // Sets the bomb 
+                            bombHolder = useBomb(temp2, main, itemUsed);
+                            continue;
+                        }
                         // Either the character moves or it doesnt.
                         // Check if its blocked by a wall, in which it doesnt move
                         // or if theres 2 boulders next to each other
@@ -355,10 +359,15 @@ public class DungeonManiaController {
                         }
 
                         Entity intEntity = temp.checkNext(movementDirection, entities);
+                        // Checking the bomb
+                        if (intEntity != null) {
+                            if (isBombActivated(intEntity)) {
+                                continue;
+                            }
+                        }
                         // If it is here movement is allowed and
                         // it might need to interact with an entity.
                         temp.moveEntity(movementDirection);
-
                         // Check if it is empty square or an entity
                         if (intEntity != null) {
                             // EntityFunction that handles all interactions with player
@@ -369,24 +378,28 @@ public class DungeonManiaController {
                                 for (CollectableEntity item : main.inventory) {
                                     if (item.getType().equals("one_ring")) {
                                         main.inventory.remove(item);
-                                        entityToBeRemoved.add(item);
+                                        entitiesToBeRemoved.add(item);
                                         Character respawnedCharacter = new Character(temp.getPosition(), temp.getType(), temp.getID(), temp.getIsInteractable());
                                         main.addEntities(respawnedCharacter);
                                         break;
                                     }
                                 }
-                                entityToBeRemoved.add(temp);
+                                entitiesToBeRemoved.add(temp);
                                 break;
+                            }
+                            // If the character is invisible
+                            else if (temp2.isInvisible()) {
+                                continue;
                             }
                             // If the character isnt dead, then the enemy has to have died in the case of battle
                             // Takes into the account of collectable item
                             else {
-                                entityToBeRemoved.add(intEntity);
+                                entitiesToBeRemoved.add(intEntity);
                                 // Accounting for chance to receive TheOneRing
                                 if (intEntity.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
                                     Random random = new Random();
-                                    int chance = random.nextInt(1);
-                                    if (chance == 0) {
+                                    int chance = random.nextInt(21);
+                                    if (chance == 10) {
                                         String entityId =  String.format("entity%d", entityCounter);
                                         entityCounter += 1;
                                         // Position needs to be stated as checkNext requires a position to run
@@ -457,7 +470,12 @@ public class DungeonManiaController {
         if (mercenaryAddedLater == 1) main.addEntities(mercenaryHolder);
 
         // Remove the collectible from the map
-        entityRemover(entityToBeRemoved, main);
+        entityRemover(entitiesToBeRemoved, main);
+        
+        // Adding the bomb to the map
+        if (bombHolder != null) {
+            main.addEntities(bombHolder);
+        }
 
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
         for(Entity entity: main.getEntities()) {
@@ -628,5 +646,51 @@ public class DungeonManiaController {
             }
         }
     }
+    public void useItem(Character player, Dungeon main, String itemUsed) {
+        if (itemUsed != null) {
+            for (CollectableEntity entity2: main.inventory) {
+                if (entity2.getID().equals(itemUsed)) {
+                    if (entity2.getType().equals("invisibility_potion")) {
+                        player.setIsInvisible(true);
+                        main.inventory.remove(entity2);
+                        return;
+                        
+                    }
+                    if (entity2.getType().equals("invincibility_potion")) {
+                        player.setIsInvincible(true);
+                        main.inventory.remove(entity2);
+                        return;
+                    }
+                }
+            }
+        }
+    }
 
+    public Bomb useBomb(Character player, Dungeon main, String itemUsed) {
+        if (itemUsed != null) {
+            for (CollectableEntity entity2: main.inventory) {
+                if (entity2.getID().equals(itemUsed)) {
+                    if (entity2.getType().equals("bomb")) {
+                        Bomb bomb = (Bomb) entity2;
+                        Bomb newBomb = new Bomb(player.getPosition(), bomb.getType(), bomb.getID(), bomb.getIsInteractable());
+                        newBomb.setActivated(true);
+                        main.inventory.remove(bomb);
+                        return newBomb;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean isBombActivated(Entity entity) {
+        if (entity.getType().equals("bomb")) {
+            Bomb bomb = (Bomb) entity;
+            if (bomb.isActivated()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
+
