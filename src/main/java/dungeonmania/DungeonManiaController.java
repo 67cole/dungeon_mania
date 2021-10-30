@@ -16,7 +16,8 @@ import dungeonmania.util.Direction;
 import dungeonmania.util.FileLoader;
 import dungeonmania.util.Position;
 
-
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -39,6 +40,8 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 
 public class DungeonManiaController {
@@ -49,9 +52,9 @@ public class DungeonManiaController {
 
     // This will be changed based on negame or loadgame
     private Dungeon currDungeon;
+    private DungeonResponse lastTick;
 
     private int dungeonCounter = 0;
-    private int entityCounter = 0;
     
 
     public DungeonManiaController() {
@@ -113,7 +116,7 @@ public class DungeonManiaController {
         }
         
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
-
+        lastTick = dr;
         
         return dr;
     }
@@ -131,8 +134,8 @@ public class DungeonManiaController {
                 int x = entity.get("x").getAsInt();
                 int y = entity.get("y").getAsInt();
                 Position position = new Position(x,y);;
-                String entityId =  String.format("entity%d", entityCounter);
-                entityCounter += 1;
+                String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
                 switch(type) {
                     case "player":
                         Character characterEntity = new Character(position, type, entityId , false);
@@ -288,8 +291,87 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse saveGame(String name) throws IllegalArgumentException {
-        return null;
+
+        // Edit database.json file
+        Gson gson = new Gson();
+        String json = gson.toJson(lastTick);
+        JsonArray jsonArray = new JsonArray();
+        JsonObject jsonObj = gson.fromJson(json, JsonElement.class).getAsJsonObject();
+
+        JsonArray jsonEntities = jsonObj.get("entities").getAsJsonArray();
+
+        // List of entities that have extra attributes
+        List<MovingEntity> mvList = new ArrayList<MovingEntity>();
+        for (Entity entity : currDungeon.getEntities()) {
+            if (entity.getType().equals("player") || entity.getType().equals("mercenary") ||
+            entity.getType().equals("spider") || entity.getType().equals("zombie")) {
+                MovingEntity mv = (MovingEntity) entity;
+                mvList.add(mv);
+            }
+        }
+
+        // Give any moving entities attack and health
+        for (int i = 0; i < jsonEntities.size(); i++) {
+            JsonObject jEntity = jsonEntities.get(i).getAsJsonObject();
+
+            if (jEntity.get("type").getAsString().equals("player")) {
+                for (MovingEntity mvEntity : mvList) {
+                    if (mvEntity.getType().equals("player")) {
+                        jEntity.addProperty("attack", mvEntity.getAttack());
+                        jEntity.addProperty("health", mvEntity.getHealth());
+                    }
+                }
+            }
+            else if (jEntity.get("type").getAsString().equals("mercenary")) {
+                for (MovingEntity mvEntity : mvList) {
+                    if (mvEntity.getType().equals("mercenary")) {
+                        jEntity.addProperty("attack", mvEntity.getAttack());
+                        jEntity.addProperty("health", mvEntity.getHealth());
+                    }
+                }
+            }
+            else if (jEntity.get("type").getAsString().equals("spider")) {
+                for (MovingEntity mvEntity : mvList) {
+                    if (mvEntity.getType().equals("spider")) {
+                        jEntity.addProperty("attack", mvEntity.getAttack());
+                        jEntity.addProperty("health", mvEntity.getHealth());
+                    }
+                }
+            }
+        }
+        
+
+        jsonArray.add(jsonObj);
+
+
+
+
+
+        String json2 = gson.toJson(jsonArray);
+
+        // JsonElement firstObject = jsonObj.get("entities");
+        // jsonObj.addProperty("booga", "booga");
+        // String json3 = gson.toJson(jsonObj);
+        // String json2 = gson.toJson(firstObject);
+
+        // JsonArray jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+        // JsonObject firstObject = jsonArray.get(i).getAsJsonObject();
+
+        String filename = "src\\main\\java\\dungeonmania\\database.json";
+
+
+        FileOutputStream fileOutputStream = null;
+
+        try {
+            fileOutputStream = new FileOutputStream(filename, false);
+            fileOutputStream.write(json2.getBytes());
+            fileOutputStream.close();
+        } catch (Exception e) {}
+
+
+        return lastTick;
     }
+
 
     public DungeonResponse loadGame(String name) throws IllegalArgumentException {
         return null;
@@ -400,8 +482,8 @@ public class DungeonManiaController {
                             Random random = new Random();
                             int chance = random.nextInt(21);
                             if (chance == 10) {
-                                String entityId =  String.format("entity%d", entityCounter);
-                                entityCounter += 1;
+                                String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                                currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
                                 // Position needs to be stated as checkNext requires a position to run
                                 Position tempPos = new Position(-1, -1);
                                 TheOneRing oneRing = new TheOneRing(tempPos, "one_ring", entityId, true);
@@ -421,7 +503,7 @@ public class DungeonManiaController {
                 // If there is no white space around zombie spawner, don't spawn zombie
                 if (zombieSpawn == null) continue;
 
-                String entityId =  String.format("entity%d", entityCounter);
+                String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
                 ZombieToast zombieToastEntity = new ZombieToast(zombieSpawn, "zombie_toast", entityId, true);
                 zombieHolder = zombieToastEntity;
                 zombieAddedLater = 1;
@@ -500,8 +582,8 @@ public class DungeonManiaController {
         // Mercenary Spawn Ticks
         // Every 75 ticks of the game causes a new mercenary to spawn
         if (currDungeon.getTickCounter() % 75 == 0 && EnemyCheck == 1) {
-            String entityId =  String.format("entity%d", entityCounter);
-            entityCounter += 1;
+            String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+            currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
 
             Mercenary mercenaryEntity = new Mercenary(playerSpawnPosition, "mercenary", entityId, true);
             mercenaryHolder = mercenaryEntity;
@@ -511,8 +593,8 @@ public class DungeonManiaController {
         // Spider spawner ticks
         if ((checkMaxSpiders(entities) == false) && (currDungeon.getTickCounter() % 10 == 0)) {
             Position spiderSpawn = getSpiderSpawn(entities);
-            String entityId =  String.format("entity%d", entityCounter);
-            entityCounter += 1;
+            String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+            currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
             Spider newSpider = new Spider(spiderSpawn, "spider", entityId, true);                   
             spid = newSpider;
             spiderSpawned = 1;
@@ -544,6 +626,8 @@ public class DungeonManiaController {
 
         DungeonResponse dr = new DungeonResponse(currDungeon.getDungeonId(), currDungeon.getDungeonName(),
             erList, irList, currDungeon.buildables, currDungeon.getDungeonGoals());
+
+        lastTick = dr;
         return dr;
     }
 
