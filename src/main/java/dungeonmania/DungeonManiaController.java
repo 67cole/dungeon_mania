@@ -397,7 +397,7 @@ public class DungeonManiaController {
                    
                     // Spider Movement
                     if (entity.getType().equals("spider")) {
-                        System.out.printf("Moving %s with id %s, tick is %d\n", entity.getType(), entity.getID(), DungeonManiaController.tickCounter);
+                        // System.out.printf("Moving %s with id %s, tick is %d\n", entity.getType(), entity.getID(), DungeonManiaController.tickCounter);
                         MovingEntity temp = (MovingEntity) entity;
 
                         MovingEntity spider = (Spider) entity;
@@ -411,7 +411,7 @@ public class DungeonManiaController {
                                 loopPos = 0;
                             }
                             spider.setLoopPos(loopPos + 1);
-                            System.out.println("incrementing loop pos #1");
+                            // System.out.println("incrementing loop pos #1");
                         } else {
                             // 1. get currLoop based on movement direction
                             // 2. check if next pos is a boulder
@@ -421,7 +421,7 @@ public class DungeonManiaController {
                             List<Position> negLoop = spider.getAnticlockwiseLoop();
 
                             // get direction of movement based on whether moving clockwise
-                            System.out.printf("position in loop: %d, tick no: %d\n", loopPos, DungeonManiaController.tickCounter);
+                            // System.out.printf("position in loop: %d, tick no: %d\n", loopPos, DungeonManiaController.tickCounter);
                             Position dir = posLoop.get(loopPos);
                             
                             if (spider.getClockwise() == false) {
@@ -458,13 +458,13 @@ public class DungeonManiaController {
                                     loopPos = 0;
                                 }
                                 spider.setLoopPos(loopPos + 1);
-                                System.out.println("incrementing loop pos #2");
+                                // System.out.println("incrementing loop pos #2");
                             } else {
                                 if (loopPos == 1) {
                                     loopPos = 9;
                                 }
                                 spider.setLoopPos(loopPos - 1);
-                                System.out.println("decrementing loop pos");
+                                // System.out.println("decrementing loop pos");
                             }
                             
                         }
@@ -488,8 +488,8 @@ public class DungeonManiaController {
                 if ((checkMaxSpiders(entities) == false) && (DungeonManiaController.tickCounter % 10 == 0)) {
                     Position spiderSpawn = getSpiderSpawn(entities);
 
-                    System.out.printf("%b, %d    ", checkMaxSpiders(entities), DungeonManiaController.tickCounter);
-                    System.out.printf("x: %d, y: %d\n", spiderSpawn.getX(), spiderSpawn.getY());
+                    // System.out.printf("%b, %d    ", checkMaxSpiders(entities), DungeonManiaController.tickCounter);
+                    // System.out.printf("x: %d, y: %d\n", spiderSpawn.getX(), spiderSpawn.getY());
 
                     String entityId =  String.format("entity%d", entityCounter);
                     // for (Entity entity : entities) {
@@ -509,7 +509,7 @@ public class DungeonManiaController {
         if (con2 == 1) main.addEntities(mercenaryHolder);
         if (spiderSpawned == 1) {
             main.addEntities(spid);
-            System.out.println("Spawned spider");
+            // System.out.println("Spawned spider");
         }
 
         // Remove the collectible from the map
@@ -520,7 +520,7 @@ public class DungeonManiaController {
         }
         
         if (con == 1) main.addEntities(holder);
-        if (spiderSpawned == 1) main.addEntities(spid);
+        
     
         List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
         List<String> emptyBuildables = new ArrayList<String>();
