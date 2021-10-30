@@ -356,7 +356,9 @@ public class DungeonManiaController {
                         // Check if its blocked by a wall, in which it doesnt move
                         // or if theres 2 boulders next to each other
                         
-                        if (!temp.checkMovement(movementDirection, entities)) continue;
+                        if (!temp.checkMovement(movementDirection, entities)) {
+                            movementDirection = Direction.NONE;
+                        }
 
                         // If its netiher a wall nor a boulder, check if its a door
                         Door doorEntity = temp.checkDoor(movementDirection, entities); 
@@ -365,7 +367,7 @@ public class DungeonManiaController {
                             if(!temp.checkDoorLock(doorEntity, entities, main)) continue;
 
                         }
-
+                        
                         Entity intEntity = temp.checkNext(movementDirection, entities);
                         // Checking the bomb
                         if (intEntity != null) {
@@ -373,13 +375,16 @@ public class DungeonManiaController {
                                 continue;
                             }
                         }
+                        
                         // If it is here movement is allowed and
                         // it might need to interact with an entity.
                         temp.moveEntity(movementDirection);
+
                         // Check if it is empty square or an entity
                         if (intEntity != null) {
                             // EntityFunction that handles all interactions with player
                             intEntity.entityFunction(entities, (Character) temp, movementDirection, main);
+                            
                             // If the character is dead
                             if (!temp.isAlive()) {
                                 // Checking for the One-Ring
@@ -422,6 +427,7 @@ public class DungeonManiaController {
                         if (main.getDungeonGoals().contains("exit")) {
                             checkExitGoal(entities, main, temp);
                         }
+                        
                     }
                     
                     // Zombie Spawner Ticks

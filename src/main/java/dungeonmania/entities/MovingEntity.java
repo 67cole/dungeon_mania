@@ -438,7 +438,18 @@ public abstract class MovingEntity implements Entity {
                 break; 
 
             case NONE:
-                return null;
+                Position noMove = position;
+                Entity spider5 = checkSpider(direction, entities, noMove);
+                if (spider5 != null) {
+                    return spider5;
+                } 
+                for (Entity entity : entities) {
+                    if (entity.getType().equals("player")) continue;
+                    if (!entity.getType().equals("switch") && entity.getPosition().equals(noMove)) {
+                        return entity;
+                    }
+                }
+                break; 
         }
 
         // If it's a white square, you can move
