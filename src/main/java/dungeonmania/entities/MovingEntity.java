@@ -5,8 +5,10 @@ import dungeonmania.util.Position;
 import java.util.List;
 import dungeonmania.entities.CollectableEntities.Sword;
 import dungeonmania.entities.CollectableEntities.Armour;
+import dungeonmania.entities.CollectableEntities.Key;
 import dungeonmania.entities.CollectableEntities.Bomb;
 import dungeonmania.Dungeon;
+import dungeonmania.DungeonManiaController;
 import dungeonmania.util.Direction;
 
 public abstract class MovingEntity implements Entity {
@@ -293,10 +295,12 @@ public abstract class MovingEntity implements Entity {
      * This gives a position already as an arg
      */
     public boolean checkMovement(Position position, List<Entity> entities) {
+        
         for (Entity entity : entities) {
             if (entity.getPosition().equals(position) && !entity.getType().equals("door") && !entity.getType().equals("switch") && !entity.getType().equals("player")) {
                 return false;
-            }
+            // If the square contains a door, check if its locked or not
+            } 
         }
         return true;
     }
@@ -326,6 +330,56 @@ public abstract class MovingEntity implements Entity {
         }
 
         return null;
+    /* 
+    * checkMovement checks for the next square if it's a door. If the door is locked,
+     * it should check for the specific key inside the characters inventory and open the door 
+     * if the key matches the door. Returns true if the door is open and false if not
+     */
+    public boolean checkDoorLock(Door entityDoor, List<Entity> entities, Dungeon main) {
+
+        // If the door is locked, look for the key inside the inventory. Unlock the door if its found
+        if (entityDoor.getLocked() == true) {
+            int keyType = entityDoor.getKeyType();
+            int keyNum = 0;
+            int remove = 0;
+            CollectableEntity itemKey = null;
+
+            for (CollectableEntity item : main.inventory) {
+                if (item.getType().equals("key")) {
+                    Key key = (Key) item;
+                    keyNum =  key.getKeyNum();
+                    //If the key and door match, open the door
+                    if (keyType == keyNum) {
+                        entityDoor.setLocked(false);
+                        remove = 1;
+                        itemKey = item;
+                    }
+                }
+            }
+            if (remove == 1) {
+                main.inventory.remove(itemKey);
+                main.setKeyStatus(true);
+                return true;
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    //Checks if the position to be moved in is a door, if it is, return that door
+    public Door checkDoor(Direction movementDirection, List<Entity> entities) {
+        Position entityPosition = position.translateBy(movementDirection);
+
+        Door entityDoor = null;
+        for (Entity entity: entities) {
+            if (entity.getPosition().equals(entityPosition) && entity.getType().equals("door")) {
+                entityDoor = (Door) entity;
+                return entityDoor;
+            }
+        }
+        return entityDoor;
+
     }
 
     public Entity checkNext(Direction direction, List<Entity> entities) {
@@ -395,7 +449,6 @@ public abstract class MovingEntity implements Entity {
         if (entity.getType().equals("boulder") && entity.getPosition().equals(attemptedMove)) {
             
             StaticEntity main = (StaticEntity) entity;
-            System.out.println("entered here");
 
             if (main.checkNext(direction, entities) == null) {
                 return false;
@@ -403,8 +456,7 @@ public abstract class MovingEntity implements Entity {
 
             if (main.checkNext(direction, entities).getType().equals("boulder") ||
                 main.checkNext(direction, entities).getType().equals("wall")) {
-                
-                System.out.println("entered here2");
+            
                 // Next entity is a wall or boulder. Must block it.
                 return true;
             }

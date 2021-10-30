@@ -53,7 +53,11 @@ public class DungeonManiaController {
     private int dungeonCounter = 0;
     private int entityCounter = 0;
     private static int tickCounter = 0;
-    private static boolean firstKey = true;
+    
+
+
+
+
 
     public DungeonManiaController() {
     }
@@ -157,7 +161,8 @@ public class DungeonManiaController {
                         main.addEntities(switchEntity);
                         break;
                     case "door":
-                        Door doorEntity = new Door(position, type, entityId, true);
+                        int keyType = entity.get("key").getAsInt();
+                        Door doorEntity = new Door(position, type, entityId, true, keyType, true);
                         main.addEntities(doorEntity);
                         break;
                     case "portal":
@@ -314,13 +319,13 @@ public class DungeonManiaController {
         int zombieAddedLater = 0;
         int mercenaryAddedLater = 0;
         int EnemyCheck = 0;
+
          
         for (Dungeon dungeon : dungeons) {
             if (dungeon.getDungeonId().equals(currDungeon)) {
                 Position playerSpawnPosition = null;
                 main = dungeon;
                 List<Entity> entities = dungeon.getEntities();
-
                 // Mercenary Movement goes last
                 mercenaryMovement(entities, movementDirection);
 
@@ -348,10 +353,19 @@ public class DungeonManiaController {
                             continue;
                         }
                         // Either the character moves or it doesnt.
-
-                        // Check if it it blocked by a wall, in which it doesnt move
+                        // Check if its blocked by a wall, in which it doesnt move
                         // or if theres 2 boulders next to each other
+                        
                         if (!temp.checkMovement(movementDirection, entities)) continue;
+
+                        // If its netiher a wall nor a boulder, check if its a door
+                        Door doorEntity = temp.checkDoor(movementDirection, entities); 
+                        if (doorEntity != null) {
+                            //If it is a door, check if its locked or not
+                            if(!temp.checkDoorLock(doorEntity, entities, main)) continue;
+
+                        }
+
                         Entity intEntity = temp.checkNext(movementDirection, entities);
                         // Checking the bomb
                         if (intEntity != null) {
@@ -431,7 +445,6 @@ public class DungeonManiaController {
                         ZombieToast temp = (ZombieToast) entity;
                         temp.moveEntity(entities);
 
-                        // CONDITION FOR DOOR SHOULD GO HERE
                     }
 
                                    
@@ -507,6 +520,7 @@ public class DungeonManiaController {
                 if (DungeonManiaController.tickCounter % 75 == 0 && EnemyCheck == 1) {
                     String entityId =  String.format("entity%d", entityCounter);
                     entityCounter += 1;
+
                     Mercenary mercenaryEntity = new Mercenary(playerSpawnPosition, "mercenary", entityId, true);
                     mercenaryHolder = mercenaryEntity;
                     mercenaryAddedLater = 1;
@@ -529,7 +543,7 @@ public class DungeonManiaController {
         if (spiderSpawned == 1) main.addEntities(spid);
 
         // Remove the collectible from the map
-        entityRemover(entitiesToBeRemoved, main, firstKey);
+        entityRemover(entitiesToBeRemoved, main);
         
         // Adding the bomb to the map
         if (bombHolder != null) {
@@ -736,13 +750,13 @@ public class DungeonManiaController {
     /**
      * Removes an entity from Entities List
      */
-     public void entityRemover(List<Entity> entityList, Dungeon main, boolean firstKey) {
+     public void entityRemover(List<Entity> entityList, Dungeon main) {
         for (Entity entityToBeRemoved : entityList) {
             if (entityToBeRemoved != null) {
                 if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity")) {
                     if (entityToBeRemoved.getType().equals("key")) {
-                        if (firstKey) {
-                            DungeonManiaController.firstKey = false;
+                        if (main.getKeyStatus()) {
+                            main.setKeyStatus(false);;
                         }
                         else if (keyChecker(main.inventory)) {
                             return;
