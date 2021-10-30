@@ -12,8 +12,8 @@ public class Spider extends MovingEntity {
     List<Position> anticlockwiseLoop = new ArrayList<Position>();
     int loopPos = 0;
     boolean clockwise = true;
-    Position up = new Position(0, 1);
-    Position down = new Position(0, -1);
+    Position up = new Position(0, -1);
+    Position down = new Position(0, 1);
     Position left = new Position(-1, 0);
     Position right = new Position(1, 0);
 

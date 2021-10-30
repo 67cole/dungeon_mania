@@ -483,6 +483,15 @@ public class DungeonManiaController {
                             }
                             
                         }
+                        // for (Entity e : entities) {
+                        //     if (e.getType().equals("player")) {
+                        //         if (e.getPosition().equals(entity.getPosition())) {
+                                    
+                        //             spider.setAlive(false);
+                        //             spider.setHealth(0);
+                        //         }
+                        //     }
+                        // }
                     }
                 }
 

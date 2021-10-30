@@ -306,15 +306,18 @@ public abstract class MovingEntity implements Entity {
     public Entity checkSpider(Direction direction, List<Entity> entities, Position attemptedMove) {
         for (Entity entity : entities) {
             if (entity.getType().equals("spider")) {
-
+                
                 MovingEntity spider = (Spider) entity;
-                List<Position> loop = spider.getAnticlockwiseLoop();
-                if (spider.getClockwise() == (true)) {
-                    loop = spider.getClockwiseLoop();
+                List<Position> loop = spider.getClockwiseLoop();
+                if (spider.getClockwise() == false) {
+                    loop = spider.getAnticlockwiseLoop();
                 } 
                 int loopPos = spider.getLoopPos();
                 Position dir = loop.get(loopPos);
-                if (spider.getPosition().translateBy(dir).equals(attemptedMove)) {
+                Position newSpiderPos = spider.getPosition().translateBy(dir);
+                // System.out.printf("SpiderPos: %d,%d | movement direction: %dx,%dy | square: %d,%d\n", spider.getPosition().getX(), spider.getPosition().getY(), dir.getX(), dir.getY(), attemptedMove.getX(), attemptedMove.getY());
+                if (newSpiderPos.equals(attemptedMove)) {
+                    // System.out.println("Spider found in spot");
                     return spider;
                 }
             }

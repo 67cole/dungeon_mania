@@ -17,6 +17,7 @@ Spider
     -   Spiders can't spawn on edge of dungeon 
     -   The max amount of spiders is 8
     -   A spider cannot spawn on or under a boulder
+    -   If a spider moves onto a player the player does not kill it
 
 Mercenary
     -   The mercenary's starting health is 3
@@ -34,3 +35,5 @@ Json
 Endings 
 
     -   Once the requirements for an ending is met the game will automatically end  
+
+
