@@ -18,6 +18,8 @@ public class Dungeon {
     private String dungeonName;
     private String dungeonId;
     private String dungeonGoals;
+    private int tickCounter;
+    private int entityCounter;
     private int keyCounter;
 
     public Dungeon(String dungeonName, String dungeonId, String dungeonGoals) {
@@ -26,7 +28,31 @@ public class Dungeon {
         this.dungeonGoals = dungeonGoals;
         this.keyCounter = 0;
     }
+
     
+    
+    public int getTickCounter() {
+        return tickCounter;
+    }
+
+    public void setTickCounter(int tickCounter) {
+        this.tickCounter = tickCounter;
+    }
+
+
+
+    public int getEntityCounter() {
+        return entityCounter;
+    }
+
+
+
+    public void setEntityCounter(int entityCounter) {
+        this.entityCounter = entityCounter;
+    }
+
+
+
     public String getDungeonGoals() {
         return dungeonGoals;
     }
