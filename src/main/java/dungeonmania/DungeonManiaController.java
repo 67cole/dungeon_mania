@@ -14,8 +14,9 @@ import dungeonmania.util.Direction;
 import dungeonmania.util.FileLoader;
 import dungeonmania.util.Position;
 
-
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -37,6 +38,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 
 public class DungeonManiaController {
@@ -44,13 +46,14 @@ public class DungeonManiaController {
     // List to store information about dungeons 
     
     private List<Dungeon> dungeons = new ArrayList<Dungeon>();
+    private List<DungeonResponse> savedGames = new ArrayList<DungeonResponse>();
+    private DungeonResponse lastTick;
 
     // This will be changed based on negame or loadgame
     private String currDungeon;
+    private Dungeon currDungeonObject;
 
     private int dungeonCounter = 0;
-    private int entityCounter = 0;
-    private static int tickCounter = 0;
     private static boolean firstKey = true;
 
     public DungeonManiaController() {
@@ -97,6 +100,7 @@ public class DungeonManiaController {
         Dungeon main = new Dungeon(dungeonName, dungeonId, goals);
         dungeons.add(main);
         currDungeon = dungeonId;
+        currDungeonObject = main;
 
         addEntitiesToList(dungeonName, main);
         
@@ -130,8 +134,8 @@ public class DungeonManiaController {
                 int x = entity.get("x").getAsInt();
                 int y = entity.get("y").getAsInt();
                 Position position = new Position(x,y);;
-                String entityId =  String.format("entity%d", entityCounter);
-                entityCounter += 1;
+                String entityId =  String.format("entity%d", main.getEntityCounter());
+                main.setEntityCounter(main.getEntityCounter() + 1);
                 switch(type) {
                     case "player":
                         Character characterEntity = new Character(position, type, entityId , false);
@@ -286,10 +290,56 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse saveGame(String name) throws IllegalArgumentException {
-        return null;
+
+        // Save the dungeon response object into json
+        // System.out.println(response);
+
+        // Test adding stuff into the json list database
+        String filename = "src\\main\\java\\dungeonmania\\database.json";
+        String jsonStr = "";
+        JSONObject dungeons = new JSONObject();
+        try {
+            // Need a json array for entity and inventory
+            JSONArray entityArray = new JSONArray();
+
+            for (EntityResponse entity : lastTick.getEntities()) {
+                JSONObject jsonEntity = new JSONObject();
+                jsonEntity.put("id", entity.getId());
+                jsonEntity.put("type", entity.getType());
+                jsonEntity.put("position", entity.getPosition());
+                jsonEntity.put("isInteractable", entity.isInteractable());
+                entityArray.put(jsonEntity);
+            }
+            dungeons.put("entities", entityArray);
+
+            dungeons.put("dungeonId", lastTick.getDungeonId());
+            dungeons.put("dungeonName", lastTick.getDungeonName());
+            dungeons.put("tickCounter", currDungeonObject.getTickCounter());
+            dungeons.put("entityCounter", currDungeonObject.getEntityCounter());
+
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.put(dungeons);
+            JSONObject dungeonObj = new JSONObject();
+            dungeonObj.put("Dungeons", jsonArray);
+            jsonStr = dungeonObj.toString();
+            System.out.println(jsonStr);
+        } catch (Exception e) {}
+
+        FileOutputStream fileOutputStream = null;
+
+        try {
+            fileOutputStream = new FileOutputStream(filename, true);
+            fileOutputStream.write(jsonStr.getBytes());
+            fileOutputStream.close();
+        } catch (Exception e) {}
+
+        return lastTick;
     }
 
     public DungeonResponse loadGame(String name) throws IllegalArgumentException {
+
+
+
         return null;
     }
 
@@ -302,15 +352,13 @@ public class DungeonManiaController {
         Dungeon main = null;
         List<Entity> entityToBeRemoved = new ArrayList<Entity>();
         
-        DungeonManiaController.tickCounter++;
+        currDungeonObject.setTickCounter(currDungeonObject.getTickCounter() + 1);
         ZombieToast zombieHolder = null;
         Mercenary mercenaryHolder = null;
         int zombieAddedLater = 0;
         int mercenaryAddedLater = 0;
         int EnemyCheck = 0;
-
-
-         
+   
         for (Dungeon dungeon : dungeons) {
             if (dungeon.getDungeonId().equals(currDungeon)) {
                 Position playerSpawnPosition = null;
@@ -374,8 +422,8 @@ public class DungeonManiaController {
                                     Random random = new Random();
                                     int chance = random.nextInt(1);
                                     if (chance == 0) {
-                                        String entityId =  String.format("entity%d", entityCounter);
-                                        entityCounter += 1;
+                                        String entityId =  String.format("entity%d", currDungeonObject.getEntityCounter());
+                                        main.setEntityCounter(main.getEntityCounter() + 1);
                                         // Position needs to be stated as checkNext requires a position to run
                                         Position tempPos = new Position(-1, -1);
                                         TheOneRing oneRing = new TheOneRing(tempPos, "one_ring", entityId, true);
@@ -391,14 +439,14 @@ public class DungeonManiaController {
                     }
                     
                     // Zombie Spawner Ticks
-                    if (entity.getType().equals("zombie_toast_spawner") && DungeonManiaController.tickCounter % 20 == 0) {
+                    if (entity.getType().equals("zombie_toast_spawner") && main.getTickCounter() % 20 == 0) {
                         Position zombieSpawn = checkWhiteSpace(entity.getPosition(), entities);
 
 
                         // If there is no white space around zombie spawner, don't spawn zombie
                         if (zombieSpawn == null) continue;
 
-                        String entityId =  String.format("entity%d", entityCounter);
+                        String entityId =  String.format("entity%d", main.getEntityCounter());
                         
 
                         ZombieToast zombieToastEntity = new ZombieToast(zombieSpawn, "zombie_toast", entityId, true);
@@ -417,7 +465,7 @@ public class DungeonManiaController {
                     if (entity.getType().equals("spider")) {
                         MovingEntity temp = (MovingEntity) entity;
 
-                        if (DungeonManiaController.tickCounter == 1) {
+                        if (main.getTickCounter() == 1) {
                             temp.moveUpward();
                             continue;
                         }   
@@ -430,9 +478,9 @@ public class DungeonManiaController {
                 }
                 // Mercenary Spawn Ticks
                 // Every 75 ticks of the game causes a new mercenary to spawn
-                if (DungeonManiaController.tickCounter % 75 == 0 && EnemyCheck == 1) {
-                    String entityId =  String.format("entity%d", entityCounter);
-                    entityCounter += 1;
+                if (main.getTickCounter() % 75 == 0 && EnemyCheck == 1) {
+                    String entityId =  String.format("entity%d", main.getEntityCounter());
+                    main.setEntityCounter(main.getEntityCounter() + 1);
                     Mercenary mercenaryEntity = new Mercenary(playerSpawnPosition, "mercenary", entityId, true);
                     mercenaryHolder = mercenaryEntity;
                     mercenaryAddedLater = 1;
@@ -460,6 +508,9 @@ public class DungeonManiaController {
 
         DungeonResponse dr = new DungeonResponse(main.getDungeonId(), main.getDungeonName(),
             erList, irList, main.buildables, main.getDungeonGoals());
+
+        // Store it to saveGame
+        lastTick = dr;
         return dr;
     }
 
