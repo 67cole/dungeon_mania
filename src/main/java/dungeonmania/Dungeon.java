@@ -19,6 +19,10 @@ public class Dungeon {
     private String dungeonId;
     private String dungeonGoals;
     private int keyCounter;
+    private boolean keyStatus = true;
+
+
+
 
     public Dungeon(String dungeonName, String dungeonId, String dungeonGoals) {
         this.dungeonName = dungeonName;
@@ -91,5 +95,11 @@ public class Dungeon {
     public void removeEntity(Entity entity) {
         entities.remove(entity);
     }
-
+    
+    public boolean getKeyStatus() {
+        return this.keyStatus;
+    }
+    public void setKeyStatus(boolean keyStatus) {
+        this.keyStatus = keyStatus;
+    }
 }
