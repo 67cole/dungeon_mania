@@ -330,6 +330,7 @@ public abstract class MovingEntity implements Entity {
         }
 
         return null;
+    }
     /* 
     * checkMovement checks for the next square if it's a door. If the door is locked,
      * it should check for the specific key inside the characters inventory and open the door 
