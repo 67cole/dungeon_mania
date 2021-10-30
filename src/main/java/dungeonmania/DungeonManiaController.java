@@ -2,6 +2,8 @@ package dungeonmania;
 
 import dungeonmania.entities.*;
 import dungeonmania.entities.Character;
+import dungeonmania.entities.Spider;
+import dungeonmania.entities.MovingEntity;
 import dungeonmania.entities.BuildableEntities.*;
 import dungeonmania.entities.CollectableEntities.*;
 import dungeonmania.entities.RareCollectableEntities.*;
@@ -308,6 +310,9 @@ public class DungeonManiaController {
         List<Entity> entitiesToBeRemoved = new ArrayList<Entity>();
         
         DungeonManiaController.tickCounter++;
+        ZombieToast holder = null;
+        Spider spid = null;
+        int spiderSpawned = 0;
         ZombieToast zombieHolder = null;
         Mercenary mercenaryHolder = null;
         Bomb bombHolder = null;
@@ -323,6 +328,9 @@ public class DungeonManiaController {
                 List<Entity> entities = dungeon.getEntities();
                 // Mercenary Movement goes last
                 mercenaryMovement(entities, movementDirection);
+
+                
+                
 
                 for (Entity entity : entities) {
                     // Mercenary should only spawn if there is an enemy for the dungeon
@@ -438,14 +446,68 @@ public class DungeonManiaController {
                         temp.moveEntity(entities);
 
                     }
+
+                                   
                     // Spider Movement
                     if (entity.getType().equals("spider")) {
                         MovingEntity temp = (MovingEntity) entity;
-
-                        if (DungeonManiaController.tickCounter == 1) {
+                        MovingEntity spider = (Spider) entity;
+                        int loopPos = spider.getLoopPos();
+                        // if just spawned, move upward. do not need to check for
+                        // boulder above since cannot spawn below a boulder
+                        if (loopPos == 0) {
                             temp.moveUpward();
-                            continue;
-                        }   
+                            // if finished a loop, reset
+                            if (loopPos == 9) {
+                                loopPos = 0;
+                            }
+                            spider.setLoopPos(loopPos + 1);
+                        } else {
+                            // 1. get currLoop based on movement direction
+                            // 2. check if next pos is a boulder
+                            //      if boulder, setClockwise to opposite
+                            // 3. move
+                            List<Position> posLoop = spider.getClockwiseLoop();
+                            List<Position> negLoop = spider.getAnticlockwiseLoop();
+
+                            // get direction of movement based on whether moving clockwise
+                            Position dir = posLoop.get(loopPos);                           
+                            if (spider.getClockwise() == false) {
+                                dir = negLoop.get(loopPos);
+                            }
+
+                            // if blocked, set dir to opposite
+                            for (Entity currEnt: entities) {
+                                Position nextPos = spider.getPosition().translateBy(dir);
+
+                                if (currEnt.getPosition().equals(nextPos) && currEnt.getType().equals("boulder")) {
+                                    spider.setClockwise(!spider.getClockwise());
+                                }
+                            }
+
+                            // double check if movement direction changed
+                            if (spider.getClockwise() == false) {
+                                dir = negLoop.get(loopPos);
+                            } else {
+                                dir = posLoop.get(loopPos);
+                            }
+
+                            spider.moveSpider(dir);
+
+                            // update loopPos
+                            if (spider.getClockwise() == true) {
+                                if (loopPos == 8) {
+                                    loopPos = 0;
+                                }
+                                spider.setLoopPos(loopPos + 1);
+                            } else {
+                                if (loopPos == 1) {
+                                    loopPos = 9;
+                                }
+                                spider.setLoopPos(loopPos - 1);
+                            }
+                            
+                        }
                     }
                 }
 
@@ -463,11 +525,22 @@ public class DungeonManiaController {
                     mercenaryHolder = mercenaryEntity;
                     mercenaryAddedLater = 1;
                 }
+
+                // Spider spawner ticks
+                if ((checkMaxSpiders(entities) == false) && (DungeonManiaController.tickCounter % 10 == 0)) {
+                    Position spiderSpawn = getSpiderSpawn(entities);
+                    String entityId =  String.format("entity%d", entityCounter);
+                    entityCounter += 1;
+                    Spider newSpider = new Spider(spiderSpawn, "spider", entityId, true);                   
+                    spid = newSpider;
+                    spiderSpawned = 1;
+                }
             }     
         }
         
         if (zombieAddedLater == 1) main.addEntities(zombieHolder);
         if (mercenaryAddedLater == 1) main.addEntities(mercenaryHolder);
+        if (spiderSpawned == 1) main.addEntities(spid);
 
         // Remove the collectible from the map
         entityRemover(entitiesToBeRemoved, main);
@@ -538,6 +611,55 @@ public class DungeonManiaController {
         }   
 
         return null;
+    }
+
+    public boolean checkMaxSpiders(List<Entity> entities) {
+        int noSpiders = 0;
+        for (Entity entity: entities) {
+            if (entity.getType().equals("spider")) {
+                noSpiders += 1;
+            }
+        }
+        if (noSpiders < 8) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public Position getSpiderSpawn(List<Entity> entities) {
+
+        boolean posFound = false;
+        while (posFound == false) {
+            int x = getRandomNumber(1, 16);
+            int y = getRandomNumber(1, 14);
+            int check = 0;
+            Position pos = new Position(x, y);
+            Position posAbove = new Position(x, y + 1);
+            for (Entity entity : entities) {
+                // if the square is a boulder
+                if ((entity.getPosition().equals(pos)) && (entity.getType().equals("boulder"))) {
+                    check = 1;
+                    break;
+                } else if ((entity.getPosition().equals(posAbove)) && (entity.getType().equals("boulder"))) {
+                    check = 1;
+                    break;
+                }
+            }
+            if (check == 0) {
+                return pos;
+            }
+            // check if the square is a bouldeer
+            // check if the square above is a boulder
+        }
+        
+
+
+        return null;
+    }
+
+    public int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
     }
 
     public void checkBoulderGoal(List<Entity> entities, Dungeon dungeon) {
@@ -611,6 +733,8 @@ public class DungeonManiaController {
         }
     }
 
+    
+    
     /**
      * Searches for a key
      */

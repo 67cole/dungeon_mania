@@ -68,6 +68,8 @@ public abstract class MovingEntity implements Entity {
      */
     public void moveEntity(Direction direction) {}
 
+    public void moveSpider(Position position) {}
+
     /**
      * Move the position by one square up
      */
@@ -161,6 +163,48 @@ public abstract class MovingEntity implements Entity {
      */
     public String getID() {
         return ID;
+    }
+
+    /**
+     * Getter for position in loop
+     */
+    public int getLoopPos() {
+        return 0;
+    }
+
+    /**
+     * Setter for position in loop
+     * @param alive
+     */
+    public void setLoopPos(int loopPos) {
+    }
+
+    /**
+     * Getter for clockwiseLoop
+     */
+    public List<Position> getClockwiseLoop() {
+        return null;
+    }
+
+    /**
+     * Getter for anticlockwiseLoop
+     */
+    public List<Position> getAnticlockwiseLoop() {
+        return null;
+    }
+
+    /**
+     * Getter for clockwise
+     */
+    public boolean getClockwise() {
+        return true;
+    }
+    
+    /**
+     * Setter for clockwise
+     * @param clockwise
+     */
+    public void setClockwise(boolean clockwise) {
     }
 
     /**
@@ -262,7 +306,33 @@ public abstract class MovingEntity implements Entity {
     }
 
     /**
-     * checkMovement checks for the next square if it's a door. If the door is locked,
+     * Checks if there is a spider in the attempted move position
+     * @param direction
+     * @param entities
+     * @param attemptedMove
+     * @return Entity
+     */
+    public Entity checkSpider(Direction direction, List<Entity> entities, Position attemptedMove) {
+        for (Entity entity : entities) {
+            if (entity.getType().equals("spider")) {
+
+                MovingEntity spider = (Spider) entity;
+                List<Position> loop = spider.getAnticlockwiseLoop();
+                if (spider.getClockwise() == (true)) {
+                    loop = spider.getClockwiseLoop();
+                } 
+                int loopPos = spider.getLoopPos();
+                Position dir = loop.get(loopPos);
+                if (spider.getPosition().translateBy(dir).equals(attemptedMove)) {
+                    return spider;
+                }
+            }
+        }
+
+        return null;
+    }
+    /* 
+    * checkMovement checks for the next square if it's a door. If the door is locked,
      * it should check for the specific key inside the characters inventory and open the door 
      * if the key matches the door. Returns true if the door is open and false if not
      */
@@ -317,7 +387,10 @@ public abstract class MovingEntity implements Entity {
         switch (direction) {
             case UP:
                 Position attemptedMove = position.translateBy(0, -1);
-            
+                Entity spider = checkSpider(direction, entities, attemptedMove);
+                if (spider != null) {
+                    return spider;
+                } 
                 for (Entity entity : entities) {
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove)) {
                         return entity;
@@ -327,7 +400,10 @@ public abstract class MovingEntity implements Entity {
 
             case DOWN:
                 Position attemptedMove1 = position.translateBy(0, 1);
-
+                Entity spider2 = checkSpider(direction, entities, attemptedMove1);
+                if (spider2 != null) {
+                    return spider2;
+                } 
                 for (Entity entity : entities) {
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove1)) {
                         return entity;
@@ -337,7 +413,10 @@ public abstract class MovingEntity implements Entity {
 
             case LEFT:
                 Position attemptedMove2 = position.translateBy(-1, 0);
-
+                Entity spider3 = checkSpider(direction, entities, attemptedMove2);
+                if (spider3 != null) {
+                    return spider3;
+                } 
                 for (Entity entity : entities) {
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove2)) {
                         return entity;
@@ -347,7 +426,10 @@ public abstract class MovingEntity implements Entity {
 
             case RIGHT:
                 Position attemptedMove3 = position.translateBy(1, 0);
-
+                Entity spider4 = checkSpider(direction, entities, attemptedMove3);
+                if (spider4 != null) {
+                    return spider4;
+                } 
                 for (Entity entity : entities) {
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove3)) {
                         return entity;

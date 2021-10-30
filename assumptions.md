@@ -14,8 +14,9 @@ Zombie
 Spider
     -   The spider's starting health is 1
     -   The spider's starting attack is 1
-    -   Spiders can't spawn on the edge of the dungeon
-    -   A boulder can't spawn on top of the spider
+    -   Spiders can't spawn on edge of dungeon 
+    -   The max amount of spiders is 8
+    -   A spider cannot spawn on or under a boulder
 
 Mercenary
     -   The mercenary's starting health is 3
