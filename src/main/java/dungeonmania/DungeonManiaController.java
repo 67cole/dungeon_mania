@@ -153,7 +153,8 @@ public class DungeonManiaController {
                         main.addEntities(switchEntity);
                         break;
                     case "door":
-                        Door doorEntity = new Door(position, type, entityId, true);
+                        int keyType = entity.get("key").getAsInt();
+                        Door doorEntity = new Door(position, type, entityId, true, keyType);
                         main.addEntities(doorEntity);
                         break;
                     case "portal":
@@ -208,6 +209,10 @@ public class DungeonManiaController {
                     case "spider":
                         Spider spiderEntity = new Spider(position, type, entityId, true);
                         main.addEntities(spiderEntity);
+                        break;
+                    case "mercenary":
+                        Mercenary mercenaryEntity = new Mercenary(position, type, entityId, true);
+                        main.addEntities(mercenaryEntity);
                         break;
                 }
             }
@@ -317,15 +322,15 @@ public class DungeonManiaController {
                     // Character Movement
                     if (entity.getType().equals("player")) {
                         // If the inital direction is NONE then an item has been used
-                        if (movementDirection == Direction.NONE) {
-                            
+                        if (movementDirection == Direction.NONE) {                           
                         }
+                        //Set temp as the entity
+                        //Also since this entity is the player, get the player's spawn position for use in mercenary 
                         MovingEntity temp = (MovingEntity) entity;
                         Character temp2  = (Character) entity;
                         playerSpawnPosition = temp2.getSpawn();
 
                         // Either the character moves or it doesnt.
-
                         // Check if it it blocked by a wall, in which it doesnt move
                         // or if theres 2 boulders next to each other
                         if (!temp.checkMovement(movementDirection, entities)) continue;
@@ -401,10 +406,11 @@ public class DungeonManiaController {
                     checkBoulderGoal(entities, main);
                 }
                 // Mercenary Spawn Ticks
-                // Every 35 ticks of the game causes a new mercenary to spawn
-                if (DungeonManiaController.tickCounter % 35 == 0 && con3 == 1) {
+                // Every 75 ticks of the game causes a new mercenary to spawn
+                if (DungeonManiaController.tickCounter % 75 == 0 && con3 == 1) {
                     String entityId =  String.format("entity%d", entityCounter);
                     entityCounter += 1;
+
                     Mercenary mercenaryEntity = new Mercenary(playerSpawnPosition, "mercenary", entityId, true);
                     mercenaryHolder = mercenaryEntity;
                     con2 = 1;

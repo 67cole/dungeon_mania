@@ -234,7 +234,6 @@ public abstract class MovingEntity implements Entity {
         if (entity.getType().equals("boulder") && entity.getPosition().equals(attemptedMove)) {
             
             StaticEntity main = (StaticEntity) entity;
-            System.out.println("entered here");
 
             if (main.checkNext(direction, entities) == null) {
                 return false;
@@ -242,8 +241,7 @@ public abstract class MovingEntity implements Entity {
 
             if (main.checkNext(direction, entities).getType().equals("boulder") ||
                 main.checkNext(direction, entities).getType().equals("wall")) {
-                
-                System.out.println("entered here2");
+            
                 // Next entity is a wall or boulder. Must block it.
                 return true;
             }

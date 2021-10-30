@@ -18,7 +18,7 @@ Spider
 Mercenary
     -   The mercenary's starting health is 3
     -   The mercenary's starting attack is 2
-    -   The mercenary would spawn every 35 ticks
+    -   The mercenary would spawn every 75 ticks
 
 Portal 
     -   There will always be a corresponding portal to a portal given
