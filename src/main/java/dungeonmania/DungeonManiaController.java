@@ -302,20 +302,28 @@ public class DungeonManiaController {
             // Need a json array for entity and inventory
             JSONArray entityArray = new JSONArray();
 
-            for (EntityResponse entity : lastTick.getEntities()) {
-                JSONObject jsonEntity = new JSONObject();
-                jsonEntity.put("id", entity.getId());
-                jsonEntity.put("type", entity.getType());
-                jsonEntity.put("position", entity.getPosition());
-                jsonEntity.put("isInteractable", entity.isInteractable());
-                entityArray.put(jsonEntity);
-            }
-            dungeons.put("entities", entityArray);
-
             dungeons.put("dungeonId", lastTick.getDungeonId());
             dungeons.put("dungeonName", lastTick.getDungeonName());
             dungeons.put("tickCounter", currDungeonObject.getTickCounter());
             dungeons.put("entityCounter", currDungeonObject.getEntityCounter());
+
+            for (Entity entity : currDungeonObject.getEntities()) {
+                JSONObject jsonEntity = new JSONObject();
+                jsonEntity.put("id", entity.getID());
+                jsonEntity.put("type", entity.getType());
+                jsonEntity.put("position", entity.getPosition());
+                jsonEntity.put("isInteractable", entity.getIsInteractable());
+
+                if (entity.getType().equals("player") || entity.getType().equals("mercenary") ||
+                    entity.getType().equals("spider") || entity.getType().equals("zombie")) {
+                    
+                    MovingEntity mv = (MovingEntity) entity;
+                    jsonEntity.put("health", mv.getHealth());
+                    jsonEntity.put("attack", mv.getAttack());
+                }
+                entityArray.put(jsonEntity);
+            }
+            dungeons.put("entities", entityArray);
 
             JSONArray jsonArray = new JSONArray();
             jsonArray.put(dungeons);
@@ -328,7 +336,7 @@ public class DungeonManiaController {
         FileOutputStream fileOutputStream = null;
 
         try {
-            fileOutputStream = new FileOutputStream(filename, true);
+            fileOutputStream = new FileOutputStream(filename, false);
             fileOutputStream.write(jsonStr.getBytes());
             fileOutputStream.close();
         } catch (Exception e) {}
@@ -337,7 +345,10 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse loadGame(String name) throws IllegalArgumentException {
-
+        
+        // Load game from a dungeon response
+        // will need to reset currDungeonObject
+        
 
 
         return null;
