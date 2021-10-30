@@ -19,21 +19,6 @@ public class Spider extends MovingEntity {
 
 
     /**
-     * Health of spider
-     */
-    private int health;
-
-    /**
-     * Attack of spider
-     */
-    private int attack;
-
-    /**
-     * Condition of spider
-     */
-    private boolean alive;
-
-    /**
      * Creates the main zombie
      * @param position - the current position in the dungeon
      * @param type - the type of entity
@@ -42,53 +27,10 @@ public class Spider extends MovingEntity {
      */
     public Spider(Position position, String type, String ID, boolean isInteractable) {
         super(position, type, ID, isInteractable);
-        this.health = STARTING_HEALTH;
-        this.attack = ATTACK;
-        this.alive = true;
+        setHealth(STARTING_HEALTH);
+        setAttack(ATTACK);
         setClockwiseLoop();
-        
-    }
-
-    /**
-     * Getter for health
-     */
-    public int getHealth() {
-        return health; 
-    }
-
-    /**
-     * Getter for attack
-     */
-    public int getAttack() {
-        return attack;
-    }
-
-    /**
-     * Getter for alive
-     */
-    public boolean getAliveStatus() {
-        return alive;
-    }
-
-    /**
-     * Setter for attack
-     * If the health is less than 1, i.e. <= 0, the spider is dead
-     * @param health
-     */
-    public void setHealth(int health) {
-        this.health = Math.min(health, STARTING_HEALTH);
-
-        if (health < 1) {
-            this.setAlive(false);
-        }
-    }
-
-    /**
-     * Setter for spider's condition
-     * @param alive
-     */
-    public void setAlive(boolean alive) {
-        this.alive = alive;
+        setAnticlockwiseLoop();
     }
 
 

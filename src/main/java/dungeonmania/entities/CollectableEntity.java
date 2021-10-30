@@ -5,7 +5,7 @@ import dungeonmania.response.models.ItemResponse;
 import dungeonmania.Dungeon;
 import java.util.List;
 
-public abstract class CollectibleEntity implements Entity {
+public abstract class CollectableEntity implements Entity {
     /**
      * Position in the path
      */
@@ -33,7 +33,7 @@ public abstract class CollectibleEntity implements Entity {
      * @param ID - the ID of entity
      * @param isInteractable - check if the entity is interactable
      */
-    public CollectibleEntity(Position position, String type, String ID, boolean isInteractable) {
+    public CollectableEntity(Position position, String type, String ID, boolean isInteractable) {
         this.position = position;
         this.type = type;
         this.ID = ID;
@@ -68,8 +68,7 @@ public abstract class CollectibleEntity implements Entity {
             }
         }
         // Add the collectible to inventory
-        ItemResponse newItem = new ItemResponse(this.getID(), this.getType());
-        main.inventory.add(newItem);
+        main.inventory.add(this);
         
         // Check if buildable list already contains shield or bow
         int bow = 0;
@@ -87,7 +86,7 @@ public abstract class CollectibleEntity implements Entity {
         int arrow = 0;
         int key = 0;
         int treasure = 0;
-        for (ItemResponse item: main.inventory) {
+        for (CollectableEntity item: main.inventory) {
             switch(item.getType()) {
                 case "wood":
                     wood++;
@@ -125,10 +124,10 @@ public abstract class CollectibleEntity implements Entity {
      */
 
     /**
-     * Searches for a key within inventory
+     * Searches for a key
      */
-    public boolean keyChecker(List<ItemResponse> inventory) {
-        for (ItemResponse item: inventory) {
+    public boolean keyChecker(List<CollectableEntity> inventory) {
+        for (CollectableEntity item: inventory) {
             if (item.getType().equals("key")) {
                 return true;
             }

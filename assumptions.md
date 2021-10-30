@@ -9,19 +9,21 @@ Zombie
     -   The zombie's starting attack is 1
     -   The zombie spawner won't spawn anything if there is no avaiable white   space around it
     -   The zombie spawns will check for any white spaces CLOCKWISE, thus zombies will spawn in a clockwise manner 
+    -   Zombies can't interact with anything (i.e. moving a boulder)
 
 Spider
     -   The spider's starting health is 1
     -   The spider's starting attack is 1
-    -   Spiders can't spawn on edge of dungeon (?)
-    -   The spider cannot spawn on the outer edges of the wall
-    -   The max amount of spiders is 4
+    -   Spiders can't spawn on edge of dungeon 
+    -   The max amount of spiders is 8
     -   A spider cannot spawn on or under a boulder
 
 Mercenary
     -   The mercenary's starting health is 3
     -   The mercenary's starting attack is 2
-    -   The mercenary would spawn every 35 ticks
+    -   The mercenary would spawn every 75 ticks
+    -   Mercenaries can't interact with anything (i.e. moving a boulder )
+    -   Mercenaries will always have a valid spot to move to, it cannot be trapped
 
 Portal 
     -   There will always be a corresponding portal to a portal given

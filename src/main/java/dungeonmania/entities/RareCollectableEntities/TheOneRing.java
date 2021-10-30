@@ -1,9 +1,9 @@
-package dungeonmania.entities.RareCollectibleEntities;
+package dungeonmania.entities.RareCollectableEntities;
 
-import dungeonmania.entities.CollectibleEntity;
+import dungeonmania.entities.CollectableEntity;
 import dungeonmania.util.Position;
 
-public class TheOneRing extends CollectibleEntity{
+public class TheOneRing extends CollectableEntity{
     public TheOneRing(Position position, String type, String ID, boolean IsInteractable) {
         super(position,type, ID, IsInteractable);
     }
