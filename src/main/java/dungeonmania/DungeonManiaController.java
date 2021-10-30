@@ -393,7 +393,7 @@ public class DungeonManiaController {
                     }
 
                     
-
+                    System.out.printf("Going thru entities, tick: %d\n", DungeonManiaController.tickCounter);
                    
                     // Spider Movement
                     if (entity.getType().equals("spider")) {
@@ -507,10 +507,7 @@ public class DungeonManiaController {
         
         if (con == 1) main.addEntities(zombieHolder);
         if (con2 == 1) main.addEntities(mercenaryHolder);
-        if (spiderSpawned == 1) {
-            main.addEntities(spid);
-            System.out.println("Spawned spider");
-        }
+        
 
         // Remove the collectible from the map
         if (entityToBeRemoved != null) {
