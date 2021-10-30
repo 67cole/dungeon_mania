@@ -11,21 +11,6 @@ public class ZombieToast extends MovingEntity {
     private final static int ATTACK = 1;
 
     /**
-     * Health of zombie
-     */
-    private int health;
-
-    /**
-     * Attack of zombie
-     */
-    private int attack;
-
-    /**
-     * Condition of zombie
-     */
-    private boolean alive;
-
-    /**
      * Creates the main zombie
      * @param position - the current position in the dungeon
      * @param type - the type of entity
@@ -34,76 +19,39 @@ public class ZombieToast extends MovingEntity {
      */
     public ZombieToast(Position position, String type, String ID, boolean isInteractable) {
         super(position, type, ID, isInteractable);
-        this.health = STARTING_HEALTH;
-        this.attack = ATTACK;
-        this.alive = true;
+        setHealth(STARTING_HEALTH);
+        setAttack(ATTACK);
     }
 
-    /**
-     * Getter for health
-     */
-    public int getHealth() {
-        return health; 
-    }
-
-    /**
-     * Getter for attack
-     */
-    public int getAttack() {
-        return attack;
-    }
-
-    /**
-     * Getter for alive
-     */
-    public boolean getAliveStatus() {
-        return alive;
-    }
-
-    /**
-     * Setter for attack
-     * If the health is less than 1, i.e. <= 0, the character is dead
-     * @param health
-     */
-    public void setHealth(int health) {
-        this.health = Math.min(health, STARTING_HEALTH);
-
-        if (health < 1) {
-            this.setAlive(false);
-        }
-    }
-
-    /**
-     * Setter for character's condition
-     * @param alive
-     */
-    public void setAlive(boolean alive) {
-        this.alive = alive;
-    }
-
-    @Override
-    public void moveEntity(Direction direction) {
-
+    public void moveEntity(List<Entity> entities) {
         // For now, zombies travel randomely
         Random random = new Random();
         int randDirection = random.nextInt(5);
 
         switch(randDirection) {
             case 1:
-                super.moveUpward();
-                break;
+                if (checkMovement(super.getPosition().translateBy(0, -1), entities)) {
+                    super.moveUpward();
+                    break;
+                }
             
             case 2:
-                super.moveDownward();
-                break;
+                if (checkMovement(super.getPosition().translateBy(0, 1), entities)) {
+                    super.moveUpward();
+                    break;
+                }
             
             case 3:
-                super.moveLeft();
-                break;
+                if (checkMovement(super.getPosition().translateBy(-1, 0), entities)) {
+                    super.moveUpward();
+                    break;
+                }
             
             case 4:
-                super.moveRight();
-                break;
+                if (checkMovement(super.getPosition().translateBy(1, 0), entities)) {
+                    super.moveUpward();
+                    break;
+                }
         }   
     }
 
