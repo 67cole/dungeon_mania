@@ -9,6 +9,9 @@ public class Character extends MovingEntity {
     private final static int ATTACK = 2;
     private Position spawnPosition = null;
 
+    private boolean invincible;
+    private boolean invisible;
+
     /**
      * Creates the main character
      * @param position - the current position in the dungeon
@@ -20,6 +23,8 @@ public class Character extends MovingEntity {
         super(position, type, ID, isInteractable);
         setHealth(STARTING_HEALTH);
         setAttack(ATTACK);
+        this.invincible = false;
+        this.invisible = false;
     }
 
     public Position getSpawn() {
@@ -27,6 +32,22 @@ public class Character extends MovingEntity {
     }
     public void setSpawn(Position playerSpawn) {
         spawnPosition = playerSpawn;
+    }
+
+    public boolean isInvincible() {
+        return this.invincible;
+    }
+
+    public void setIsInvincible(boolean isInvincible) {
+        this.invincible = isInvincible;
+    }
+
+    public boolean isInvisible() {
+        return this.invisible;
+    }
+
+    public void setIsInvisible(boolean isInvisible) {
+        this.invisible = isInvisible;
     }
 
     /**
