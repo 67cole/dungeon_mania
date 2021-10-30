@@ -5,6 +5,7 @@ import dungeonmania.util.Position;
 import java.util.List;
 import dungeonmania.entities.CollectableEntities.Sword;
 import dungeonmania.entities.CollectableEntities.Armour;
+import dungeonmania.entities.CollectableEntities.Bomb;
 import dungeonmania.Dungeon;
 import dungeonmania.util.Direction;
 
@@ -185,6 +186,7 @@ public abstract class MovingEntity implements Entity {
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove)) {
                         return false;
                     }
+
                 }
                 break;
 
@@ -199,6 +201,7 @@ public abstract class MovingEntity implements Entity {
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove1)) {
                         return false;
                     }
+
                 }
                 break;
 
@@ -213,6 +216,7 @@ public abstract class MovingEntity implements Entity {
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove2)) {
                         return false;
                     }
+
                 }
                 break;
 
@@ -228,6 +232,7 @@ public abstract class MovingEntity implements Entity {
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove3)) {
                         return false;
                     }
+
                 }
                 break; 
 
@@ -348,6 +353,15 @@ public abstract class MovingEntity implements Entity {
     @Override
     public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {
         while (checkBS(player.getHealth(), this.getHealth())) {
+            // If character is invincible, set enemy dead, return.
+            if (player.isInvincible()) {
+                this.setAlive(false);
+                return;
+            }
+            // If character is invisible, return.
+            if (player.isInvisible()) {
+                return;
+            }
             // Simulate a round of battle
             int weaponAtk = 0;
             boolean charArmour = false;
