@@ -329,9 +329,6 @@ public class DungeonManiaController {
                 // Mercenary Movement goes last
                 mercenaryMovement(entities, movementDirection);
 
-                
-                
-
                 for (Entity entity : entities) {
                     // Mercenary should only spawn if there is an enemy for the dungeon
                     if (entity.getType().equals("zombie_toast") || entity.getType().equals("spider") || entity.getType().equals("mercenary")) {
@@ -339,6 +336,7 @@ public class DungeonManiaController {
                     }
                     // Character Movement
                     if (entity.getType().equals("player")) {
+
                         MovingEntity temp = (MovingEntity) entity;
                         Character temp2  = (Character) entity;
                         playerSpawnPosition = temp2.getSpawn();
@@ -762,7 +760,7 @@ public class DungeonManiaController {
                 if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity")) {
                     if (entityToBeRemoved.getType().equals("key")) {
                         if (main.getKeyStatus()) {
-                            main.setKeyStatus(false);;
+                            main.setKeyStatus(false);
                         }
                         else if (keyChecker(main.inventory)) {
                             return;
