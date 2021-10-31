@@ -12,6 +12,14 @@ public abstract class StaticEntity implements Entity{
     private String ID;
     private boolean isInteractable;
 
+    /**
+     * Constructor for Static Entity
+     * @param position
+     * @param type
+     * @param ID
+     * @param IsInteractable
+     */
+
     StaticEntity(Position position, String type, String ID, boolean isInteractable) {
         this.position = position;
         this.type = type; 
