@@ -146,6 +146,10 @@ public class DungeonManiaController {
         jsonObj.addProperty("entityCounter", currDungeon.getEntityCounter());
         jsonObj.addProperty("tickCounter", currDungeon.getTickCounter());
         jsonObj.addProperty("keyStatus", currDungeon.getKeyStatus());
+        jsonObj.addProperty("width", currDungeon.getWidth());
+        jsonObj.addProperty("height", currDungeon.getHeight());
+        jsonObj.addProperty("invisibilityPotionCounter", currDungeon.getInvisibilityPotionCounter());
+        jsonObj.addProperty("invincibilityPotionCounter", currDungeon.getInvincibilityPotionCounter());
 
         JsonArray jsonEntities = jsonObj.get("entities").getAsJsonArray();
         JsonArray jsonInventory = jsonObj.get("inventory").getAsJsonArray();
@@ -337,6 +341,17 @@ public class DungeonManiaController {
 
     public DungeonResponse loadGame(String name) throws IllegalArgumentException {
 
+        boolean nameChecker = false;
+        for (String game : allGames()) {
+            if (game.equals(name)) {
+                nameChecker = true;
+            }
+        }
+        // Exception as reqd in the spec
+        if (nameChecker == false) {
+            throw new IllegalArgumentException("Id is not a valid saved game");
+        }
+
         String filename = "src\\main\\java\\dungeonmania\\database.json";
         JsonObject dungeon;
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
@@ -352,6 +367,12 @@ public class DungeonManiaController {
                     main.setTickCounter(dungeon.get("tickCounter").getAsInt());
                     main.setEntityCounter(dungeon.get("entityCounter").getAsInt());
                     main.setKeyStatus(dungeon.get("keyStatus").getAsBoolean());
+                    main.setWidth(dungeon.get("width").getAsInt());
+                    main.setHeight(dungeon.get("height").getAsInt());
+                    main.setInvincibilityCounter(dungeon.get("invincibilityPotionCounter").getAsInt());
+                    main.setInvisibilityPotionCounter(dungeon.get("invisibilityPotionCounter").getAsInt());
+
+
                     currDungeon = main;
                     JsonArray entitiesList = dungeon.get("entities").getAsJsonArray();
                     JsonArray inventoryList = dungeon.get("inventory").getAsJsonArray();
@@ -792,13 +813,16 @@ public class DungeonManiaController {
                     if (spider.getClockwise() == false) {
                         dir = negLoop.get(loopPos);
                     }
-
+                    int spiderBlocked = 0;
                     // if blocked, set dir to opposite
                     for (Entity currEnt: entities) {
                         Position nextPos = spider.getPosition().translateBy(dir);
 
                         if (currEnt.getPosition().equals(nextPos) && currEnt.getType().equals("boulder")) {
                             spider.setClockwise(!spider.getClockwise());
+                            
+                            spiderBlocked = 1;
+                            
                         }
                     }
 
@@ -808,9 +832,8 @@ public class DungeonManiaController {
                     } else {
                         dir = posLoop.get(loopPos);
                     }
-
-                    spider.moveSpider(dir);
-
+                    if (spiderBlocked == 0) spider.moveEntity(dir);
+                    
                     // update loopPos
                     if (spider.getClockwise() == true) {
                         if (loopPos == 8) {
@@ -823,6 +846,7 @@ public class DungeonManiaController {
                         }
                         spider.setLoopPos(loopPos - 1);
                     }
+
                 }
             }
         }
@@ -947,8 +971,10 @@ public class DungeonManiaController {
 
         boolean posFound = false;
         while (posFound == false) {
-            int x = getRandomNumber(1, 16);
-            int y = getRandomNumber(1, 14);
+            int maxWidth = currDungeon.getWidth();
+            int maxHeight = currDungeon.getHeight();
+            int x = getRandomNumber(0, maxWidth - 1);
+            int y = getRandomNumber(0, maxHeight - 1);
             int check = 0;
             Position pos = new Position(x, y);
             Position posAbove = new Position(x, y + 1);
@@ -996,7 +1022,7 @@ public class DungeonManiaController {
             
             if (entity.getType().equals("boulder")) {
                 if (!map.containsKey(entity.getPosition())) {
-                    map.put(entity.getPosition(), 1);
+                    map.put(entity.getPosition(), 3);
                 }
                 else {
                     map.put(entity.getPosition(), 2);
@@ -1006,7 +1032,7 @@ public class DungeonManiaController {
 
         for (Integer amt : map.values()) {
             // even
-            if (amt != 2) {
+            if (amt != 1) {
                 return; // not finished with boulders goal 
             }
         }
@@ -1100,7 +1126,7 @@ public class DungeonManiaController {
                 if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity")) {
                     if (entityToBeRemoved.getType().equals("key")) {
                         if (main.getKeyStatus()) {
-                            main.setKeyStatus(false);;
+                            main.setKeyStatus(false);
                         }
                         else if (keyChecker(main.inventory)) {
                             return;
@@ -1229,6 +1255,9 @@ public class DungeonManiaController {
         String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
         try {
             JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
+            currDungeon.setHeight(jsonObject.get("height").getAsInt());
+            currDungeon.setWidth(jsonObject.get("width").getAsInt());
+            
             JsonArray entitiesList = jsonObject.get("entities").getAsJsonArray();
             
             for (int i = 0; i < entitiesList.size(); i++) {
