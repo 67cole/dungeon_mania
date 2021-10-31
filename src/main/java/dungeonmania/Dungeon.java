@@ -22,6 +22,8 @@ public class Dungeon {
     private boolean keyStatus = true;
     private int tickCounter;
     private int entityCounter;
+    private int invisibilityPotionCounter;
+    private int invincibilityPotionCounter;
 
     public Dungeon(String dungeonName, String dungeonId, String dungeonGoals) {
         this.dungeonName = dungeonName;
@@ -37,6 +39,22 @@ public class Dungeon {
 
     public void setEntityCounter(int entityCounter) {
         this.entityCounter = entityCounter;
+    }
+
+    public int getInvincibilityPotionCounter() {
+        return invincibilityPotionCounter;
+    }
+
+    public void setInvincibilityCounter(int invincibilityPotionCounter) {
+        this.invincibilityPotionCounter = invincibilityPotionCounter;
+    }
+
+    public int getInvisibilityPotionCounter() {
+        return invisibilityPotionCounter;
+    }
+
+    public void setInvisibilityPotionCounter(int invisibilityPotionCounter) {
+        this.invisibilityPotionCounter = invisibilityPotionCounter;
     }
 
     public int getTickCounter() {
