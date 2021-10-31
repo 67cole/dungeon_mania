@@ -8,6 +8,15 @@ import dungeonmania.Dungeon;
 
 public class Portal extends StaticEntity {
     private String colour;
+
+    /**
+     * Constructor for portal
+     * @param position
+     * @param type
+     * @param ID
+     * @param IsInteractable
+     * @param colour
+     */
     public Portal(Position position, String type, String ID, boolean IsInteractable, String colour) {
         super(position,type, ID, IsInteractable);
         this.colour = colour;
@@ -18,11 +27,11 @@ public class Portal extends StaticEntity {
     }
     
     /**
-     * @param position_of_player
+     * This function teleports the character onto the position of the corresponding portal
      * @param entities
-     * 
-     * 
-     * This entity function changes the players position into the corresponding portals position
+     * @param player
+     * @param direction
+     * @param main
      */
     @Override
     public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {  

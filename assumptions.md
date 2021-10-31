@@ -10,6 +10,7 @@ Zombie
     -   The zombie spawner won't spawn anything if there is no avaiable white   space around it
     -   The zombie spawns will check for any white spaces CLOCKWISE, thus zombies will spawn in a clockwise manner 
     -   Zombies can't interact with anything (i.e. moving a boulder)
+    -   10 percent chance of spawning with armour
 
 Spider
     -   The spider's starting health is 1
@@ -24,6 +25,7 @@ Mercenary
     -   The mercenary would spawn every 75 ticks
     -   Mercenaries can't interact with anything (i.e. moving a boulder )
     -   Mercenaries will always have a valid spot to move to, it cannot be trapped
+    -   10 percent chance of spawning with armour
 
 Portal 
     -   There will always be a corresponding portal to a portal given
@@ -34,3 +36,13 @@ Json
 Endings 
 
     -   Once the requirements for an ending is met the game will automatically end  
+
+TheOneRing
+    -   Assumes the inventory is kept after respawn
+    -   5 percent chance to receive after a successfull battle
+
+InvincibilityPotion
+    -   Assumes durability is not affected
+
+Armour
+    -   20 percent chance to receive after a successfull battle
