@@ -304,6 +304,7 @@ public class DungeonManiaController {
         jsonObj.addProperty("tickCounter", currDungeon.getTickCounter());
 
         JsonArray jsonEntities = jsonObj.get("entities").getAsJsonArray();
+        JsonArray jsonInventory = jsonObj.get("inventory").getAsJsonArray();
 
         // List of entities that have extra attributes
         List<MovingEntity> mvList = new ArrayList<MovingEntity>();
@@ -366,7 +367,7 @@ public class DungeonManiaController {
                     if (coEntity.getType().equals("sword")) {
                         Sword temp = (Sword) coEntity;
                         jEntity.addProperty("attack", temp.getAttack());
-                        jEntity.addProperty("health", temp.getDurability());
+                        jEntity.addProperty("durability", temp.getDurability());
                     }
                 }
             }
@@ -417,6 +418,47 @@ public class DungeonManiaController {
                 }
             }
         }
+
+        for (int i = 0; i < jsonInventory.size(); i++) {
+            JsonObject jEntity = jsonInventory.get(i).getAsJsonObject();
+
+            if (jEntity.get("type").getAsString().equals("sword")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("sword")) {
+                        Sword temp = (Sword) coEntity;
+                        jEntity.addProperty("attack", temp.getAttack());
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("key")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("key")) {
+                        Key temp = (Key) coEntity;
+                        jEntity.addProperty("keyNum", temp.getKeyNum());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("armour")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("armour")) {
+                        Armour temp = (Armour) coEntity;
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("bomb")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("bomb")) {
+                        Bomb temp = (Bomb) coEntity;
+                        jEntity.addProperty("activated", temp.isActivated());
+                    }
+                }
+            }
+        }
         
         File newFile = new File(filename);
 
@@ -454,29 +496,28 @@ public class DungeonManiaController {
         String filename = "src\\main\\java\\dungeonmania\\database.json";
         JsonObject dungeon;
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
-
+        List<ItemResponse> irList= new ArrayList<ItemResponse>();
         try {
             JsonArray jsonArray = JsonParser.parseReader(new FileReader(filename)).getAsJsonArray();
-            
             for (int i = 0; i < jsonArray.size(); i++) {
                 dungeon = jsonArray.get(i).getAsJsonObject();
                 if (dungeon.get("saveName").getAsString().equals(name)) {
-                    
                     // in the correct dungeon object
                     Dungeon main = new Dungeon(dungeon.get("dungeonName").getAsString()
                     , dungeon.get("dungeonId").getAsString(), dungeon.get("goals").getAsString());
-
                     main.setTickCounter(dungeon.get("tickCounter").getAsInt());
                     main.setEntityCounter(dungeon.get("entityCounter").getAsInt());
-
                     currDungeon = main;
                     JsonArray entitiesList = dungeon.get("entities").getAsJsonArray();
                     JsonArray inventoryList = dungeon.get("inventory").getAsJsonArray();
                     addEntitiesInventory(main, entitiesList, inventoryList);
-
                     for(Entity entity: main.getEntities()) {
                         EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
                         erList.add(er);
+                    }
+                    for(CollectableEntity coEntity: main.getInventory()) {
+                        ItemResponse ir = new ItemResponse(coEntity.getID(), coEntity.getType());
+                        irList.add(ir);
                     }
                 }
             }
@@ -485,7 +526,6 @@ public class DungeonManiaController {
         } catch (Exception e) {}
 
         // TO DO inventory attributes e..g., armor durability
-        List<ItemResponse> irList= new ArrayList<ItemResponse>();
 
         DungeonResponse newGame = new DungeonResponse(currDungeon.getDungeonId(), currDungeon.getDungeonName(),
         erList, irList, currDungeon.getBuildables(), currDungeon.getDungeonGoals());
@@ -591,9 +631,9 @@ public class DungeonManiaController {
                     break;
                 case "sword":
                     Sword sword = new Sword(position, type, entityId, true);
+                    main.addEntities(sword);
                     sword.setAttack(entity.get("attack").getAsInt());
                     sword.setDurability(entity.get("durability").getAsInt());
-                    main.addEntities(sword);
                     break;
                 case "treasure":
                     Treasure treasure = new Treasure(position, type, entityId, true);
@@ -619,15 +659,70 @@ public class DungeonManiaController {
                     Mercenary mercenaryEntity = new Mercenary(position, type, entityId, true);
                     mercenaryEntity.setAttack(entity.get("attack").getAsInt());
                     mercenaryEntity.setHealth(entity.get("health").getAsInt());
-                    
+                
                     main.addEntities(mercenaryEntity);
                     break;
                 
             }
         }
 
-
-
+        for (int i = 0; i < inventoryList.size(); i++) {
+            JsonObject entity = inventoryList.get(i).getAsJsonObject();
+            String type = entity.get("type").getAsString();
+            String entityId = entity.get("id").getAsString();
+            Position position = new Position(-1, -1);
+            switch (type) {
+                case "sword":
+                    Sword sword = new Sword(position, type, entityId, true);
+                    main.inventory.add(sword);
+                    sword.setAttack(entity.get("attack").getAsInt());
+                    sword.setDurability(entity.get("durability").getAsInt());
+                    break;
+                case "bomb":
+                    Bomb bomb = new Bomb(position, type, entityId, true);
+                    bomb.setActivated(entity.get("activated").getAsBoolean());
+                    main.inventory.add(bomb);
+                    break;
+                case "health_potion":
+                    HealthPotion healthPotion = new HealthPotion(position, type, entityId, true);
+                    main.inventory.add(healthPotion);
+                    break;
+                case "invincibility_potion":
+                    InvincibilityPotion invincibilityPotion = new InvincibilityPotion(position, type, entityId, true);
+                    main.inventory.add(invincibilityPotion);
+                    break;
+                case "invisibility_potion":
+                    InvisibilityPotion invisibilityPotion = new InvisibilityPotion(position, type, entityId, true);
+                    main.inventory.add(invisibilityPotion);
+                    break;
+                case "armour":
+                    Armour armour = new Armour(position, type, entityId, true);
+                    armour.setDurability(entity.get("durability").getAsInt());
+                    main.inventory.add(armour);
+                    break;
+                case "key":
+                    int keyNum = entity.get("keyNum").getAsInt();
+                    Key key = new Key(position, type, entityId, true, keyNum);
+                    main.inventory.add(key);
+                    break;
+                case "treasure":
+                    Treasure treasure = new Treasure(position, type, entityId, true);
+                    main.inventory.add(treasure);
+                    break;
+                case "wood":
+                    Wood wood = new Wood(position, type, entityId, true);
+                    main.inventory.add(wood);
+                    break;
+                case "arrow":
+                    Arrows arrows = new Arrows(position, type, entityId, true);
+                    main.inventory.add(arrows);
+                    break;
+                case "one_ring":
+                    TheOneRing one = new TheOneRing(position, type, entityId, true);
+                    main.inventory.add(one);
+                    break;
+            }
+        }
 
     }
 
