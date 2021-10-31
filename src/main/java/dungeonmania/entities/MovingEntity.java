@@ -48,6 +48,11 @@ public abstract class MovingEntity implements Entity {
     private boolean isInteractable;
 
     /**
+     * Armour of the entity
+     */
+    private boolean armour = false;
+
+    /**
      * Creates a moving entity that can be moved up, down, left and right into cardinally adjacent square
      * @param position - the current position in the dungeon
      * @param type - the type of entity
@@ -128,6 +133,22 @@ public abstract class MovingEntity implements Entity {
     @Override
     public boolean getIsInteractable() {
         return isInteractable;
+    }
+
+    /**
+     * Getting the armour status of entity
+     * @return boolean
+     */
+    public boolean getArmour() {
+        return this.armour;
+    }
+
+    /**
+     * Setting the armour status of entity
+     * @return boolean
+     */
+    public void setArmour(boolean armour) {
+        this.armour = armour;
     }
 
     /**
@@ -515,6 +536,10 @@ public abstract class MovingEntity implements Entity {
             // Simulate a round of battle
             int weaponAtk = 0;
             boolean charArmour = false;
+            boolean enemyArmour = false;
+            if (this.getArmour()) {
+                enemyArmour = true;
+            }
             Sword swordHolder = null;
             Armour armourHolder = null;
             for (CollectableEntity item: main.inventory) {
@@ -551,7 +576,12 @@ public abstract class MovingEntity implements Entity {
             else {
                 characterHealth = characterHealth - ((enemyHealth * (enemyAD)) / 10);
             }
-            int newEnemyHealth = enemyHealth - ((characterHealth * (characterAD + weaponAtk)) / 5);
+            if (enemyArmour) {
+                enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+            }
+            else {
+                enemyHealth = enemyHealth - ((characterHealth * (characterAD + weaponAtk)) / 5);
+            }
             // Check if character dies
             if (!checkAlive(characterHealth)) {
                 player.setAlive(false);
@@ -566,7 +596,7 @@ public abstract class MovingEntity implements Entity {
                this.setHealth(0);
             }
             else {
-                this.setHealth(newEnemyHealth);
+                this.setHealth(enemyHealth);
             }
             // If none are dead, repeat the round
         }

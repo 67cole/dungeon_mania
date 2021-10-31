@@ -125,6 +125,7 @@ public abstract class CollectableEntity implements Entity {
 
     /**
      * Searches for a key
+     * @param inventory - inventory of the player
      */
     public boolean keyChecker(List<CollectableEntity> inventory) {
         for (CollectableEntity item: inventory) {

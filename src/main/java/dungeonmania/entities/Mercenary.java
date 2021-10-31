@@ -3,13 +3,13 @@ package dungeonmania.entities;
 import dungeonmania.util.Position;
 
 import java.util.List;
+import java.util.Random;
 import java.lang.Math;
 import java.util.ArrayList;
 
 public class Mercenary extends MovingEntity {
     private final static int STARTING_HEALTH = 3;
     private final static int ATTACK = 2;
-
 
     /**
      * Creates the mercenary
@@ -22,6 +22,11 @@ public class Mercenary extends MovingEntity {
         super(position, type, ID, isInteractable);
         setHealth(STARTING_HEALTH);
         setAttack(ATTACK);
+        Random random = new Random();
+        int chance = random.nextInt(6);
+        if (chance == 3) {
+            setArmour(true);
+        }
     }
 
     /**
