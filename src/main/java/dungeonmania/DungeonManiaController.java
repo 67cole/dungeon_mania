@@ -132,14 +132,6 @@ public class DungeonManiaController {
 
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
 
-        if (!itemUsedInvalid(itemUsed)) {
-            throw new IllegalArgumentException("The item used is invalid.");
-        }
-
-        if (!itemUsedNotInInventory(itemUsed)) {
-            throw new InvalidActionException("The item is not in the inventory.");
-        }
-
         Dungeon main = null;
         List<Entity> entitiesToBeRemoved = new ArrayList<Entity>();
 
@@ -194,72 +186,72 @@ public class DungeonManiaController {
                     if(!temp.checkDoorLock(doorEntity, entities, main)) continue;
                 }
                 
-                Entity interactingEntity = temp.checkNext(movementDirection, entities);
+                List<Entity> interactingEntities = temp.checkNext(movementDirection, entities);
                 // Checking the bomb
-                if (interactingEntity != null) {
-                    if (isBombActivated(interactingEntity)) {
-                        continue;
-                    }
+                boolean bombStatus = checkBomb(interactingEntities);
+                if (bombStatus) {
+                    continue;
                 }
                 
                 // If it is here movement is allowed and
                 // it might need to interact with an entity.
                 temp.moveEntity(movementDirection);
-
-                // Check if it is empty square or an entity
-                if (interactingEntity != null) {
-                    // EntityFunction that handles all interactions with player
-                    interactingEntity.entityFunction(entities, (Character) temp, movementDirection, main);
-                    
-                    // If the character is dead
-                    if (!temp.isAlive()) {
-                        // Checking for the One-Ring
-                        for (CollectableEntity item : main.inventory) {
-                            if (item.getType().equals("one_ring")) {
-                                main.inventory.remove(item);
-                                entitiesToBeRemoved.add(item);
-                                Character respawnedCharacter = new Character(temp.getPosition(), temp.getType(), temp.getID(), temp.getIsInteractable());
-                                main.addEntities(respawnedCharacter);
-                                break;
+                for (Entity interactingEntity: interactingEntities) {
+                    // Check if it is empty square or an entity
+                    if (interactingEntity != null) {
+                        // EntityFunction that handles all interactions with player
+                        interactingEntity.entityFunction(entities, (Character) temp, movementDirection, main);
+                        
+                        // If the character is dead
+                        if (!temp.isAlive()) {
+                            // Checking for the One-Ring
+                            for (CollectableEntity item : main.inventory) {
+                                if (item.getType().equals("one_ring")) {
+                                    main.inventory.remove(item);
+                                    entitiesToBeRemoved.add(item);
+                                    Character respawnedCharacter = new Character(temp.getPosition(), temp.getType(), temp.getID(), temp.getIsInteractable());
+                                    main.addEntities(respawnedCharacter);
+                                    break;
+                                }
                             }
+                            entitiesToBeRemoved.add(temp);
+                            break;
                         }
-                        entitiesToBeRemoved.add(temp);
-                        break;
-                    }
-                    // If the character is invisible
-                    else if (temp2.isInvisible()) {
-                        continue;
-                    }
-                    // If the character isnt dead, then the enemy has to have died in the case of battle
-                    // Takes into the account of collectable item
-                    else {
-                        entitiesToBeRemoved.add(interactingEntity);
-                        // Accounting for chance to receive TheOneRing
-                        if (interactingEntity.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
-                            Random random = new Random();
-                            int chance = random.nextInt(21);
-                            if (chance == 10) {
-                                String entityId =  String.format("entity%d", entityCounter);
-                                entityCounter += 1;
-                                // Position needs to be stated as checkNext requires a position to run
-                                Position tempPos = new Position(-1, -1);
-                                TheOneRing oneRing = new TheOneRing(tempPos, "one_ring", entityId, true);
-                                main.inventory.add(oneRing);
-                            }
+                        // If the character is invisible
+                        else if (temp2.isInvisible()) {
+                            continue;
                         }
-                        // Accounting for chance to receive armour
-                        if (interactingEntity.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
-                            MovingEntity mob = (MovingEntity) interactingEntity;
-                            if (mob.getArmour()) {
+                        // If the character isnt dead, then the enemy has to have died in the case of battle
+                        // Takes into the account of collectable item
+                        else {
+                            entitiesToBeRemoved.add(interactingEntity);
+                            // Accounting for chance to receive TheOneRing
+                            if (interactingEntity.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
                                 Random random = new Random();
-                                int chance = random.nextInt(11);
-                                if (chance == 5) {
+                                int chance = random.nextInt(21);
+                                if (chance == 10) {
                                     String entityId =  String.format("entity%d", entityCounter);
                                     entityCounter += 1;
                                     // Position needs to be stated as checkNext requires a position to run
                                     Position tempPos = new Position(-1, -1);
-                                    Armour armour = new Armour(tempPos, "armour", entityId, true);
-                                    main.inventory.add(armour);
+                                    TheOneRing oneRing = new TheOneRing(tempPos, "one_ring", entityId, true);
+                                    main.inventory.add(oneRing);
+                                }
+                            }
+                            // Accounting for chance to receive armour
+                            if (interactingEntity.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
+                                MovingEntity mob = (MovingEntity) interactingEntity;
+                                if (mob.getArmour()) {
+                                    Random random = new Random();
+                                    int chance = random.nextInt(11);
+                                    if (chance == 5) {
+                                        String entityId =  String.format("entity%d", entityCounter);
+                                        entityCounter += 1;
+                                        // Position needs to be stated as checkNext requires a position to run
+                                        Position tempPos = new Position(-1, -1);
+                                        Armour armour = new Armour(tempPos, "armour", entityId, true);
+                                        main.inventory.add(armour);
+                                    }
                                 }
                             }
                         }
@@ -891,6 +883,16 @@ public class DungeonManiaController {
         }     
         return false;
 
+    }
+    public boolean checkBomb(List<Entity> interactingEntities) {
+        for (Entity interactingEntity: interactingEntities) {
+            if (interactingEntity != null) {
+                if (isBombActivated(interactingEntity)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 
