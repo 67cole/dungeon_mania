@@ -20,9 +20,7 @@ public class Dungeon {
     private String dungeonGoals;
     private int keyCounter;
     private boolean keyStatus = true;
-
-
-
+    private int tickCounter;
 
     public Dungeon(String dungeonName, String dungeonId, String dungeonGoals) {
         this.dungeonName = dungeonName;
@@ -30,7 +28,15 @@ public class Dungeon {
         this.dungeonGoals = dungeonGoals;
         this.keyCounter = 0;
     }
-    
+
+    public int getTickCounter() {
+        return tickCounter;
+    }
+
+    public void setTickCounter(int tickCounter) {
+        this.tickCounter = tickCounter;
+    }
+
     public String getDungeonGoals() {
         return dungeonGoals;
     }
