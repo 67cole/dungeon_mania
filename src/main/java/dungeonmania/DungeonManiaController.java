@@ -782,13 +782,16 @@ public class DungeonManiaController {
                     if (spider.getClockwise() == false) {
                         dir = negLoop.get(loopPos);
                     }
-
+                    int spiderBlocked = 0;
                     // if blocked, set dir to opposite
                     for (Entity currEnt: entities) {
                         Position nextPos = spider.getPosition().translateBy(dir);
 
                         if (currEnt.getPosition().equals(nextPos) && currEnt.getType().equals("boulder")) {
                             spider.setClockwise(!spider.getClockwise());
+                            
+                            spiderBlocked = 1;
+                            
                         }
                     }
 
@@ -798,9 +801,8 @@ public class DungeonManiaController {
                     } else {
                         dir = posLoop.get(loopPos);
                     }
-
-                    spider.moveSpider(dir);
-
+                    if (spiderBlocked == 0) spider.moveEntity(dir);
+                    
                     // update loopPos
                     if (spider.getClockwise() == true) {
                         if (loopPos == 8) {
@@ -813,6 +815,7 @@ public class DungeonManiaController {
                         }
                         spider.setLoopPos(loopPos - 1);
                     }
+
                 }
             }
         }
@@ -937,8 +940,10 @@ public class DungeonManiaController {
 
         boolean posFound = false;
         while (posFound == false) {
-            int x = getRandomNumber(1, 16);
-            int y = getRandomNumber(1, 14);
+            int maxWidth = currDungeon.getWidth();
+            int maxHeight = currDungeon.getHeight();
+            int x = getRandomNumber(0, maxWidth - 1);
+            int y = getRandomNumber(0, maxHeight - 1);
             int check = 0;
             Position pos = new Position(x, y);
             Position posAbove = new Position(x, y + 1);
@@ -1090,7 +1095,7 @@ public class DungeonManiaController {
                 if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity")) {
                     if (entityToBeRemoved.getType().equals("key")) {
                         if (main.getKeyStatus()) {
-                            main.setKeyStatus(false);;
+                            main.setKeyStatus(false);
                         }
                         else if (keyChecker(main.inventory)) {
                             return;

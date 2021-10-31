@@ -73,8 +73,8 @@ public abstract class MovingEntity implements Entity {
      * Move the entity around
      */
     public void moveEntity(Direction direction) {}
-
-    public void moveSpider(Position position) {}
+    
+    public void moveEntity(Position direction) {}
 
     /**
      * Move the position by one square up

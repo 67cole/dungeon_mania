@@ -90,12 +90,14 @@ public class Spider extends MovingEntity {
         
         anticlockwiseLoop.add(up);
         anticlockwiseLoop.add(left);
-        anticlockwiseLoop.add(down);
-        anticlockwiseLoop.add(down);
-        anticlockwiseLoop.add(right);
-        anticlockwiseLoop.add(right);
         anticlockwiseLoop.add(up);
         anticlockwiseLoop.add(up);
+        
+        anticlockwiseLoop.add(right);
+        anticlockwiseLoop.add(right);
+        anticlockwiseLoop.add(down);
+        anticlockwiseLoop.add(down);
+        
         anticlockwiseLoop.add(left);
     }
 
@@ -121,7 +123,7 @@ public class Spider extends MovingEntity {
      * Movement for the spider
      */
     @Override
-    public void moveSpider(Position direction) {
+    public void moveEntity(Position direction) {
         if (direction.equals(up)) {
             super.moveUpward();
         } else if (direction.equals(down)) {
