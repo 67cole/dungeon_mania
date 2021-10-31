@@ -34,6 +34,15 @@ public class Sword extends CollectableEntity{
     public int getDurability() {
         return this.durability;
     }
+
+    public void setDurability(int durability) {
+        this.durability = durability;
+    }
+
+    public void setAttack(int attack) {
+        this.attack = attack;
+    }
+
     /**
      * Reduces durability by 1
      */

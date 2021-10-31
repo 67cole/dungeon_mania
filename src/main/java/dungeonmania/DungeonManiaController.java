@@ -16,7 +16,8 @@ import dungeonmania.util.Direction;
 import dungeonmania.util.FileLoader;
 import dungeonmania.util.Position;
 
-
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -39,6 +40,8 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 
 public class DungeonManiaController {
@@ -49,9 +52,9 @@ public class DungeonManiaController {
 
     // This will be changed based on newgame or loadgame
     private Dungeon currDungeon;
+    private DungeonResponse lastTick;
 
     private int dungeonCounter = 0;
-    private int entityCounter = 0;
     
 
     public DungeonManiaController() {
@@ -113,22 +116,449 @@ public class DungeonManiaController {
         }
         
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
-
+        lastTick = dr;
         
         return dr;
     }
 
     public DungeonResponse saveGame(String name) throws IllegalArgumentException {
-        return null;
+
+        // Edit database.json file
+        String filename = "src\\main\\java\\dungeonmania\\database.json";
+        Gson gson = new Gson();
+        String json = gson.toJson(lastTick);
+        JsonObject jsonObj = gson.fromJson(json, JsonElement.class).getAsJsonObject();
+
+        // Add loadName
+        jsonObj.addProperty("saveName", name);
+        jsonObj.addProperty("entityCounter", currDungeon.getEntityCounter());
+        jsonObj.addProperty("tickCounter", currDungeon.getTickCounter());
+        jsonObj.addProperty("keyStatus", currDungeon.getKeyStatus());
+
+        JsonArray jsonEntities = jsonObj.get("entities").getAsJsonArray();
+        JsonArray jsonInventory = jsonObj.get("inventory").getAsJsonArray();
+
+        // List of entities that have extra attributes
+        List<MovingEntity> mvList = new ArrayList<MovingEntity>();
+        for (Entity entity : currDungeon.getEntities()) {
+            if (entity.getType().equals("player") || entity.getType().equals("mercenary") ||
+            entity.getType().equals("spider") || entity.getType().equals("zombie_toast")) {
+                MovingEntity mv = (MovingEntity) entity;
+                mvList.add(mv);
+            }
+        }
+
+        List<CollectableEntity> collectableList = new ArrayList<CollectableEntity>();
+        for (Entity entity : currDungeon.getEntities()) {
+            if (entity.getType().equals("sword") || entity.getType().equals("key") ||
+            entity.getType().equals("armour") || entity.getType().equals("bomb")) {
+                CollectableEntity mv = (CollectableEntity) entity;
+                collectableList.add(mv);
+            }
+        }
+
+        List<StaticEntity> staticList = new ArrayList<StaticEntity>();
+        for (Entity entity : currDungeon.getEntities()) {
+            if (entity.getType().equals("door") || entity.getType().equals("portal")) {
+                StaticEntity mv = (StaticEntity) entity;
+                staticList.add(mv);
+            }
+        }
+
+        // Give any moving entities attack and health
+        for (int i = 0; i < jsonEntities.size(); i++) {
+            JsonObject jEntity = jsonEntities.get(i).getAsJsonObject();
+
+            if (jEntity.get("type").getAsString().equals("player")) {
+                for (MovingEntity mvEntity : mvList) {
+                    if (mvEntity.getType().equals("player")) {
+                        jEntity.addProperty("attack", mvEntity.getAttack());
+                        jEntity.addProperty("health", mvEntity.getHealth());
+                    }
+                }
+            }
+            else if (jEntity.get("type").getAsString().equals("mercenary")) {
+                for (MovingEntity mvEntity : mvList) {
+                    if (mvEntity.getType().equals("mercenary")) {
+                        jEntity.addProperty("attack", mvEntity.getAttack());
+                        jEntity.addProperty("health", mvEntity.getHealth());
+                    }
+                }
+            }
+            else if (jEntity.get("type").getAsString().equals("spider")) {
+                for (MovingEntity mvEntity : mvList) {
+                    if (mvEntity.getType().equals("spider")) {
+                        jEntity.addProperty("attack", mvEntity.getAttack());
+                        jEntity.addProperty("health", mvEntity.getHealth());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("sword")) {
+                for (CollectableEntity coEntity : collectableList) {
+                    if (coEntity.getType().equals("sword")) {
+                        Sword temp = (Sword) coEntity;
+                        jEntity.addProperty("attack", temp.getAttack());
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("key")) {
+                for (CollectableEntity coEntity : collectableList) {
+                    if (coEntity.getID().equals(jEntity.get("id").getAsString())) {
+                        Key temp = (Key) coEntity;
+                        jEntity.addProperty("keyNum", temp.getKeyNum());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("armour")) {
+                for (CollectableEntity coEntity : collectableList) {
+                    if (coEntity.getType().equals("armour")) {
+                        Armour temp = (Armour) coEntity;
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("bomb")) {
+                for (CollectableEntity coEntity : collectableList) {
+                    if (coEntity.getType().equals("bomb")) {
+                        Bomb temp = (Bomb) coEntity;
+                        jEntity.addProperty("activated", temp.isActivated());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("door")) {
+                for (StaticEntity stEntity : staticList) {
+                    if (stEntity.getID().equals(jEntity.get("id").getAsString())) {
+                        Door temp = (Door) stEntity;
+                        jEntity.addProperty("keyType", temp.getKeyType());
+                        jEntity.addProperty("locked", temp.getLocked());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("portal")) {
+                for (StaticEntity stEntity : staticList) {
+                    if (stEntity.getType().equals("portal")) {
+                        Portal temp = (Portal) stEntity;
+                        jEntity.addProperty("colour", temp.getColour());
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < jsonInventory.size(); i++) {
+            JsonObject jEntity = jsonInventory.get(i).getAsJsonObject();
+
+            if (jEntity.get("type").getAsString().equals("sword")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("sword")) {
+                        Sword temp = (Sword) coEntity;
+                        jEntity.addProperty("attack", temp.getAttack());
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("key")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("key")) {
+                        Key temp = (Key) coEntity;
+                        jEntity.addProperty("keyNum", temp.getKeyNum());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("armour")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("armour")) {
+                        Armour temp = (Armour) coEntity;
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("bomb")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("bomb")) {
+                        Bomb temp = (Bomb) coEntity;
+                        jEntity.addProperty("activated", temp.isActivated());
+                    }
+                }
+            }
+        }
+        
+        File newFile = new File(filename);
+
+        String json2 = "";
+
+        if (newFile.length() == 0) {
+            JsonArray jsonArray = new JsonArray();
+            jsonArray.add(jsonObj);
+            json2 = gson.toJson(jsonArray);
+        }
+
+        else {
+            try {
+                JsonArray jsonArray = JsonParser.parseReader(new FileReader(filename)).getAsJsonArray();
+                jsonArray.add(jsonObj);
+                json2 = gson.toJson(jsonArray);
+            } catch (Exception e) {}
+        }
+
+        FileOutputStream fileOutputStream = null;
+
+        try {
+            fileOutputStream = new FileOutputStream(filename, false);
+            fileOutputStream.write(json2.getBytes());
+            fileOutputStream.close();
+        } catch (Exception e) {}
+
+
+        return lastTick;
     }
 
+
     public DungeonResponse loadGame(String name) throws IllegalArgumentException {
-        return null;
+
+        String filename = "src\\main\\java\\dungeonmania\\database.json";
+        JsonObject dungeon;
+        List<EntityResponse> erList= new ArrayList<EntityResponse>();
+        List<ItemResponse> irList= new ArrayList<ItemResponse>();
+        try {
+            JsonArray jsonArray = JsonParser.parseReader(new FileReader(filename)).getAsJsonArray();
+            for (int i = 0; i < jsonArray.size(); i++) {
+                dungeon = jsonArray.get(i).getAsJsonObject();
+                if (dungeon.get("saveName").getAsString().equals(name)) {
+                    // in the correct dungeon object
+                    Dungeon main = new Dungeon(dungeon.get("dungeonName").getAsString()
+                    , dungeon.get("dungeonId").getAsString(), dungeon.get("goals").getAsString());
+                    main.setTickCounter(dungeon.get("tickCounter").getAsInt());
+                    main.setEntityCounter(dungeon.get("entityCounter").getAsInt());
+                    main.setKeyStatus(dungeon.get("keyStatus").getAsBoolean());
+                    currDungeon = main;
+                    JsonArray entitiesList = dungeon.get("entities").getAsJsonArray();
+                    JsonArray inventoryList = dungeon.get("inventory").getAsJsonArray();
+                    addEntitiesInventory(main, entitiesList, inventoryList);
+                    for(Entity entity: main.getEntities()) {
+                        EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
+                        erList.add(er);
+                    }
+                    for(CollectableEntity coEntity: main.getInventory()) {
+                        ItemResponse ir = new ItemResponse(coEntity.getID(), coEntity.getType());
+                        irList.add(ir);
+                    }
+                }
+            }
+        
+        
+        } catch (Exception e) {}
+
+        // TO DO inventory attributes e..g., armor durability
+
+        DungeonResponse newGame = new DungeonResponse(currDungeon.getDungeonId(), currDungeon.getDungeonName(),
+        erList, irList, currDungeon.getBuildables(), currDungeon.getDungeonGoals());
+
+        lastTick = newGame;
+
+        return newGame;
     }
 
     public List<String> allGames() {
-        return new ArrayList<>();
+
+        String filename = "src\\main\\java\\dungeonmania\\database.json";
+        List<String> games = new ArrayList<String>();
+
+        try {
+            JsonArray jsonArray = JsonParser.parseReader(new FileReader(filename)).getAsJsonArray();
+            // go into dungeons
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JsonObject dungeon = jsonArray.get(i).getAsJsonObject();
+                games.add(dungeon.get("saveName").getAsString());
+            }
+        } catch (Exception e) {}
+
+        return games;
     }
+
+    public void addEntitiesInventory(Dungeon main, JsonArray entitiesList, JsonArray inventoryList) {
+
+        for (int i = 0; i < entitiesList.size(); i++) {
+            JsonObject entity = entitiesList.get(i).getAsJsonObject();
+            String type = entity.get("type").getAsString();
+            String entityId = entity.get("id").getAsString();
+            JsonObject posObj = entity.get("position").getAsJsonObject();
+            int x = posObj.get("x").getAsInt();
+            int y = posObj.get("y").getAsInt();
+            Position position = new Position(x,y);
+            switch (type) {
+                case "player":
+                    Character characterEntity = new Character(position, type, entityId , false);
+                    main.addEntities(characterEntity);  
+                    characterEntity.setAttack(entity.get("attack").getAsInt());
+                    characterEntity.setHealth(entity.get("health").getAsInt());
+                    characterEntity.setSpawn(position);
+                    break;
+                case "wall":                       
+                    Wall wallEntity = new Wall(position, type, entityId , false);
+                    main.addEntities(wallEntity);  
+                    break;
+                case "exit":
+                    Exit exitEntity = new Exit(position, type, entityId, true);
+                    main.addEntities(exitEntity);
+                    break;
+                case "boulder":
+                    Boulder boulderEntity= new Boulder(position, type, entityId, true);
+                    main.addEntities(boulderEntity);
+                    break;
+                case "switch":
+                    Switch switchEntity = new Switch(position, type, entityId, true);
+                    main.addEntities(switchEntity);
+                    break;
+                case "door":    
+                    int keyType = entity.get("keyType").getAsInt();
+                    boolean locked = entity.get("locked").getAsBoolean();
+
+                    Door doorEntity = new Door(position, type, entityId, true, keyType, locked);
+
+                    main.addEntities(doorEntity);
+                    break;
+                case "portal":
+                    String colour = entity.get("colour").getAsString();
+                    Portal portalEntity = new Portal(position, type, entityId, true, colour);
+                    main.addEntities(portalEntity);
+                    break;
+                case "zombie_toast_spawner":
+                    ZombieToastSpawner zombieToastSpawner = new ZombieToastSpawner(position, type, entityId, true);
+                    main.addEntities(zombieToastSpawner);
+                    break;
+                case "key":
+                    int keyNum = entity.get("keyNum").getAsInt();
+                    Key key = new Key(position, type, entityId, true, keyNum);
+                    main.addEntities(key);
+                    break;
+                case "arrow":
+                    Arrows arrows = new Arrows(position, type, entityId, true);
+                    main.addEntities(arrows);
+                    break;
+                case "bomb":
+                    Bomb bomb = new Bomb(position, type, entityId, true);
+                    bomb.setActivated(entity.get("activated").getAsBoolean());
+                    main.addEntities(bomb);
+                    break;
+                case "health_potion":
+                    HealthPotion healthPotion = new HealthPotion(position, type, entityId, true);
+                    main.addEntities(healthPotion);
+                    break;
+                case "invincibility_potion":
+                    InvincibilityPotion invincibilityPotion = new InvincibilityPotion(position, type, entityId, true);
+                    main.addEntities(invincibilityPotion);
+                    break;
+                case "invisibility_potion":
+                    InvisibilityPotion invisibilityPotion = new InvisibilityPotion(position, type, entityId, true);
+                    main.addEntities(invisibilityPotion);
+                    break;
+                case "sword":
+                    Sword sword = new Sword(position, type, entityId, true);
+                    main.addEntities(sword);
+                    sword.setAttack(entity.get("attack").getAsInt());
+                    sword.setDurability(entity.get("durability").getAsInt());
+                    break;
+                case "treasure":
+                    Treasure treasure = new Treasure(position, type, entityId, true);
+                    main.addEntities(treasure);
+                    break;
+                case "wood":
+                    Wood wood = new Wood(position, type, entityId, true);
+                    main.addEntities(wood);
+                    break;
+                case "spider":
+                    Spider spiderEntity = new Spider(position, type, entityId, true);
+                    spiderEntity.setAttack(entity.get("attack").getAsInt());
+                    spiderEntity.setHealth(entity.get("health").getAsInt());
+                    main.addEntities(spiderEntity);
+                    break;
+                case "zombie_toast":
+                    ZombieToast zombieToast = new ZombieToast(position, type, entityId, true);
+                    zombieToast.setAttack(entity.get("attack").getAsInt());
+                    zombieToast.setHealth(entity.get("health").getAsInt());
+                    main.addEntities(zombieToast);
+                    break;
+                case "mercenary":
+                    Mercenary mercenaryEntity = new Mercenary(position, type, entityId, true);
+                    mercenaryEntity.setAttack(entity.get("attack").getAsInt());
+                    mercenaryEntity.setHealth(entity.get("health").getAsInt());
+                
+                    main.addEntities(mercenaryEntity);
+                    break;
+                
+            }
+        }
+
+        for (int i = 0; i < inventoryList.size(); i++) {
+            JsonObject entity = inventoryList.get(i).getAsJsonObject();
+            String type = entity.get("type").getAsString();
+            String entityId = entity.get("id").getAsString();
+            Position position = new Position(-1, -1);
+            switch (type) {
+                case "sword":
+                    Sword sword = new Sword(position, type, entityId, true);
+                    main.inventory.add(sword);
+                    sword.setAttack(entity.get("attack").getAsInt());
+                    sword.setDurability(entity.get("durability").getAsInt());
+                    break;
+                case "bomb":
+                    Bomb bomb = new Bomb(position, type, entityId, true);
+                    bomb.setActivated(entity.get("activated").getAsBoolean());
+                    main.inventory.add(bomb);
+                    break;
+                case "health_potion":
+                    HealthPotion healthPotion = new HealthPotion(position, type, entityId, true);
+                    main.inventory.add(healthPotion);
+                    break;
+                case "invincibility_potion":
+                    InvincibilityPotion invincibilityPotion = new InvincibilityPotion(position, type, entityId, true);
+                    main.inventory.add(invincibilityPotion);
+                    break;
+                case "invisibility_potion":
+                    InvisibilityPotion invisibilityPotion = new InvisibilityPotion(position, type, entityId, true);
+                    main.inventory.add(invisibilityPotion);
+                    break;
+                case "armour":
+                    Armour armour = new Armour(position, type, entityId, true);
+                    armour.setDurability(entity.get("durability").getAsInt());
+                    main.inventory.add(armour);
+                    break;
+                case "key":
+                    int keyNum = entity.get("keyNum").getAsInt();
+                    Key key = new Key(position, type, entityId, true, keyNum);
+                    main.inventory.add(key);
+                    break;
+                case "treasure":
+                    Treasure treasure = new Treasure(position, type, entityId, true);
+                    main.inventory.add(treasure);
+                    break;
+                case "wood":
+                    Wood wood = new Wood(position, type, entityId, true);
+                    main.inventory.add(wood);
+                    break;
+                case "arrow":
+                    Arrows arrows = new Arrows(position, type, entityId, true);
+                    main.inventory.add(arrows);
+                    break;
+                case "one_ring":
+                    TheOneRing one = new TheOneRing(position, type, entityId, true);
+                    main.inventory.add(one);
+                    break;
+            }
+        }
+
+    }
+
 
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
 
@@ -230,8 +660,8 @@ public class DungeonManiaController {
                                 Random random = new Random();
                                 int chance = random.nextInt(21);
                                 if (chance == 10) {
-                                    String entityId =  String.format("entity%d", entityCounter);
-                                    entityCounter += 1;
+                                    String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                                    currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
                                     // Position needs to be stated as checkNext requires a position to run
                                     Position tempPos = new Position(-1, -1);
                                     TheOneRing oneRing = new TheOneRing(tempPos, "one_ring", entityId, true);
@@ -245,8 +675,8 @@ public class DungeonManiaController {
                                     Random random = new Random();
                                     int chance = random.nextInt(11);
                                     if (chance == 5) {
-                                        String entityId =  String.format("entity%d", entityCounter);
-                                        entityCounter += 1;
+                                        String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                                        currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
                                         // Position needs to be stated as checkNext requires a position to run
                                         Position tempPos = new Position(-1, -1);
                                         Armour armour = new Armour(tempPos, "armour", entityId, true);
@@ -268,7 +698,7 @@ public class DungeonManiaController {
                 // If there is no white space around zombie spawner, don't spawn zombie
                 if (zombieSpawn == null) continue;
 
-                String entityId =  String.format("entity%d", entityCounter);
+                String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
                 ZombieToast zombieToastEntity = new ZombieToast(zombieSpawn, "zombie_toast", entityId, true);
                 zombieHolder = zombieToastEntity;
                 zombieAddedLater = 1;
@@ -347,8 +777,8 @@ public class DungeonManiaController {
         // Mercenary Spawn Ticks
         // Every 75 ticks of the game causes a new mercenary to spawn
         if (currDungeon.getTickCounter() % 75 == 0 && EnemyCheck == 1) {
-            String entityId =  String.format("entity%d", entityCounter);
-            entityCounter += 1;
+            String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+            currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
 
             Mercenary mercenaryEntity = new Mercenary(playerSpawnPosition, "mercenary", entityId, true);
             mercenaryHolder = mercenaryEntity;
@@ -358,8 +788,8 @@ public class DungeonManiaController {
         // Spider spawner ticks
         if ((checkMaxSpiders(entities) == false) && (currDungeon.getTickCounter() % 10 == 0)) {
             Position spiderSpawn = getSpiderSpawn(entities);
-            String entityId =  String.format("entity%d", entityCounter);
-            entityCounter += 1;
+            String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+            currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
             Spider newSpider = new Spider(spiderSpawn, "spider", entityId, true);                   
             spid = newSpider;
             spiderSpawned = 1;
@@ -391,6 +821,8 @@ public class DungeonManiaController {
 
         DungeonResponse dr = new DungeonResponse(currDungeon.getDungeonId(), currDungeon.getDungeonName(),
             erList, irList, currDungeon.buildables, currDungeon.getDungeonGoals());
+
+        lastTick = dr;
         return dr;
     }
 
@@ -717,8 +1149,8 @@ public class DungeonManiaController {
                 int x = entity.get("x").getAsInt();
                 int y = entity.get("y").getAsInt();
                 Position position = new Position(x,y);;
-                String entityId =  String.format("entity%d", entityCounter);
-                entityCounter += 1;
+                String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
                 switch(type) {
                     case "player":
                         Character characterEntity = new Character(position, type, entityId , false);
