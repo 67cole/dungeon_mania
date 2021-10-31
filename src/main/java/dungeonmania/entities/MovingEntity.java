@@ -324,7 +324,7 @@ public abstract class MovingEntity implements Entity {
     public boolean checkMovement(Position position, List<Entity> entities) {
         
         for (Entity entity : entities) {
-            if (entity.getPosition().equals(position) && !entity.getType().equals("door") && !entity.getType().equals("switch") && !entity.getType().equals("player")) {
+            if (entity.getPosition().equals(position) && !entity.getType().equals("door") && !entity.getType().equals("switch") && !entity.getType().equals("player") && !entity.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
                 return false;
             // If the square contains a door, check if its locked or not
             } 
@@ -359,7 +359,7 @@ public abstract class MovingEntity implements Entity {
         return null;
     }
     /* 
-    * checkMovement checks for the next square if it's a door. If the door is locked,
+     * checkDoorLock checks for the next square if it's a door. If the door is locked,
      * it should check for the specific key inside the characters inventory and open the door 
      * if the key matches the door. Returns true if the door is open and false if not
      */

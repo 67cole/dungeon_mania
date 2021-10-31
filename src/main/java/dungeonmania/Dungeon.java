@@ -22,6 +22,8 @@ public class Dungeon {
     private boolean keyStatus = true;
     private int tickCounter;
     private int entityCounter;
+    private boolean peaceful;
+    private boolean hard; 
     private int height;
     private int width;
     private int invisibilityPotionCounter;
@@ -139,6 +141,22 @@ public class Dungeon {
 
     public List<String> getBuildables() {
         return buildables;
+    }
+
+    public boolean getPeaceful() {
+        return peaceful; 
+    }
+
+    public void setPeaceful(boolean peaceful) {
+        this.peaceful = peaceful;
+    }
+
+    public boolean getHard() {
+        return hard;
+    }
+
+    public void setHard(boolean hard) {
+        this.hard = hard;
     }
 
 

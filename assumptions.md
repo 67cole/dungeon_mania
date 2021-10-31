@@ -23,6 +23,7 @@ Spider
     -   A spider cannot spawn on or under a boulder
     -   When the player drinks an invincibility potion, the spiders will break out of the cycle and run as far as it can. Once invincibility potion ends, it will begin the cycle again at its new location
     -   The spider can run outside the map whilst invincibility is still active
+    -   Spiders spawn every 25 ticks
 
 Mercenary
 
@@ -46,16 +47,21 @@ Endings
     -   Once the requirements for an ending is met the game will automatically end  
 
 TheOneRing
+
     -   Assumes the inventory is kept after respawn
     -   5 percent chance to receive after a successfull battle
 
 InvincibilityPotion
+
     -   Assumes durability is not affected
     -   The invincibility potion will last for 10 ticks
 
 InvisibilityPotion
-    -   The invisibility potion will last for 10 ticks
+
+    -   The invisibility potion will last for 15 ticks
     -   If the invincibility potion is taken during invisibility phase, the invisibility phase should take priority
 
 Armour
-    -   20 percent chance to receive after a successfull battle
+
+    -   20 percent chance to receive after a successful battle
+

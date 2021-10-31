@@ -85,13 +85,20 @@ public class DungeonManiaController {
         }
     }
 
-    public DungeonResponse newGame(String dungeonName, String gameMode) throws IllegalArgumentException {
+    public DungeonResponse newGame(String dungeonName, String gameMode) throws IllegalArgumentException {    
+        // INCOMPLETE *********
+        if (!dungeonNotValid(dungeonName)) {
+            throw new IllegalArgumentException("This dungeon does not exist.");
+        }
+
+        if (!gameModeNotValid(gameMode)) {
+            throw new IllegalArgumentException("This gamemode is not valid.");
+        }
 
         List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
         List<String> emptyBuildables = new ArrayList<String>();
-        // Plan
-        // First: Have to create a new dungeon by using the json file in the dungeons folder, and inserting the entitys on to the map.
-        
+      
+
         // Create the unique identifier for the new dungeon
         String dungeonId = String.format("dungeon%d", dungeonCounter);
         dungeonCounter += 1;
@@ -102,15 +109,20 @@ public class DungeonManiaController {
         dungeons.add(main);
         currDungeon = main;
 
+        switch (gameMode) {
+            case "Peaceful":
+                currDungeon.setPeaceful(true);
+                break;
+
+            case "Hard":
+                currDungeon.setHard(true);
+                break;
+        }
+
         addEntitiesToList(dungeonName, main);
         
-
-        // To do: Inventory, Entities, Buildables, Goals
-        // Need a way to add the entity position location from the json into the dungeon object.
-        //Open up the json file and obtain information on x,y, and type. Depending on the type, we will create that corresponding
-        //Class and add it into the entities list for the dungeon.
         List<EntityResponse> erList = new ArrayList<EntityResponse>();
-        for(Entity entity: main.getEntities()) {
+        for (Entity entity: main.getEntities()) {
             EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
             erList.add(er);
         }
@@ -421,7 +433,14 @@ public class DungeonManiaController {
                     Character characterEntity = new Character(position, type, entityId , false);
                     main.addEntities(characterEntity);  
                     characterEntity.setAttack(entity.get("attack").getAsInt());
-                    characterEntity.setHealth(entity.get("health").getAsInt());
+                    
+                    if (currDungeon.getHard()) {
+                        characterEntity.setHealth((entity.get("health").getAsInt()) - 4);
+                    }
+                    else {
+                        characterEntity.setHealth(entity.get("health").getAsInt());
+                    }
+                    
                     characterEntity.setSpawn(position);
                     break;
                 case "wall":                       
@@ -513,7 +532,6 @@ public class DungeonManiaController {
                     Mercenary mercenaryEntity = new Mercenary(position, type, entityId, true);
                     mercenaryEntity.setAttack(entity.get("attack").getAsInt());
                     mercenaryEntity.setHealth(entity.get("health").getAsInt());
-                
                     main.addEntities(mercenaryEntity);
                     break;
                 
@@ -581,15 +599,18 @@ public class DungeonManiaController {
     }
 
 
-    public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
+    public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {    
+        // Get entity list
+        List<Entity> entities = currDungeon.getEntities();
 
-        // if (!itemUsedInvalid(itemUsed)) {
-        //     throw new IllegalArgumentException("The item used is invalid.");
-        // }
 
-        // if (!itemUsedNotInInventory(itemUsed)) {
-        //     throw new InvalidActionException("The item is not in the inventory.");
-        // }
+        if (!itemUsedInvalid(itemUsed, entities)) {
+            throw new IllegalArgumentException("The item used is invalid.");
+        }
+        
+        if (!itemUsedNotInInventory(itemUsed)) {
+            throw new InvalidActionException("The item is not in the inventory.");
+        }
         
         Dungeon main = null;
         List<Entity> entitiesToBeRemoved = new ArrayList<Entity>();
@@ -607,7 +628,6 @@ public class DungeonManiaController {
 
         Position playerSpawnPosition = null;
         main = currDungeon;
-        List<Entity> entities = currDungeon.getEntities();
 
         // Get the character class
         Character character = getCharacter(entities);
@@ -615,6 +635,13 @@ public class DungeonManiaController {
         // Check potion duration and set it off if it expires
         potionTickAdder(character);
         potionChecker(character);
+
+        // If the gamemode is peaceful, act as if the character has invisibility
+        if (currDungeon.getPeaceful()) character.setIsInvisible(true);
+
+        // If the gamemode is hard, always turn off invincibility
+        if (currDungeon.getHard()) character.setIsInvincible(false);
+
 
         // Checks if the character is invincible, then move the enemies
         if (character.isInvincible()) {
@@ -736,17 +763,21 @@ public class DungeonManiaController {
             }
             
             // Zombie Spawner Ticks
-            if (entity.getType().equals("zombie_toast_spawner") && currDungeon.getTickCounter() % 20 == 0) {
-                Position zombieSpawn = checkWhiteSpace(entity.getPosition(), entities);
-                // If there is no white space around zombie spawner, don't spawn zombie
-                if (zombieSpawn == null) continue;
+            if (entity.getType().equals("zombie_toast_spawner")) {
+                if ((currDungeon.getHard() && currDungeon.getTickCounter() % 15 == 0) || (!currDungeon.getHard() && currDungeon.getTickCounter() % 20 == 0)) {
+                    Position zombieSpawn = checkWhiteSpace(entity.getPosition(), entities);
 
-                String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
-                ZombieToast zombieToastEntity = new ZombieToast(zombieSpawn, "zombie_toast", entityId, true);
-                zombieHolder = zombieToastEntity;
-                zombieAddedLater = 1;
+                    // If there is no white space around zombie spawner, don't spawn zombie
+                    if (zombieSpawn == null) continue;
+
+                    String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                    currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
+
+                    ZombieToast zombieToastEntity = new ZombieToast(zombieSpawn, "zombie_toast", entityId, true);
+                    zombieHolder = zombieToastEntity;
+                    zombieAddedLater = 1;
+                }
             }
-
 
             // Zombie Movement (moves the same for character but can't interact)
             if (entity.getType().equals("zombie_toast") && !invincibilityActive) {
@@ -836,7 +867,7 @@ public class DungeonManiaController {
         }
 
         // Spider spawner ticks
-        if ((checkMaxSpiders(entities) == false) && (currDungeon.getTickCounter() % 10 == 0)) {
+        if ((checkMaxSpiders(entities) == false) && (currDungeon.getTickCounter() % 25 == 0)) {
             Position spiderSpawn = getSpiderSpawn(entities);
             String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
             currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
@@ -1179,21 +1210,32 @@ public class DungeonManiaController {
 
     /**
      * This function checks whether or not the item given in tick is valid
-     * @param itemUsed
+     * @param itemUsed - string of the id of the item used
+     * @param entities - the list of all the entities in the dungeon
      */
-    public boolean itemUsedInvalid(String itemUsed) {
+    public boolean itemUsedInvalid(String itemUsed, List<Entity> entities) {
+        if (itemUsed == null) return true;
+
         String[] items = {"bomb", "health_potion", "invincibility_potion", "invisibility_potion"};
         List<String> itemAvailable = Arrays.asList(items);
-        itemAvailable.add(null);
+
+        for (Entity entity : entities) {
+            if (itemAvailable.contains(entity.getType())) {
+                if (entity.getID().equals(itemUsed)) return true;
+            }
+        }
         
-        return itemAvailable.contains(itemUsed);
+        return false;
     }
 
     /**
      * This function checks whether or not the item given in tick is in the inventory
-     * @param itemUsed
+     * @param itemUsed - string of the id of the item used
+     * @param entities - the list of all the entities in the dungeon
      */
     public boolean itemUsedNotInInventory(String itemUsed) {    
+        if (itemUsed == null) return true;
+
         List<CollectableEntity> inventory = currDungeon.getInventory();
 
         for (CollectableEntity collectable : inventory) {
@@ -1444,5 +1486,30 @@ public class DungeonManiaController {
             character.setIsInvincible(false);
         }
     }
+
+    /**
+     * This function checks whether the dungeon exists
+     * @param dungeonName - this is the dungeon name
+     */
+    public boolean dungeonNotValid(String dungeonName) {
+       
+
+
+        
+        return true;
+    }
+
+    /**
+     * This function checks whether the gamemode is valid
+     * @param gameMode - this is the gameMode
+     */
+    public boolean gameModeNotValid(String gameMode) {
+        for (String gamemodeState : getGameModes()) {
+            if (gamemodeState.equals(gameMode)) return true;
+        }
+
+        return false;
+    }
 }
+
 
