@@ -329,6 +329,17 @@ public class DungeonManiaController {
 
     public DungeonResponse loadGame(String name) throws IllegalArgumentException {
 
+        boolean nameChecker = false;
+        for (String game : allGames()) {
+            if (game.equals(name)) {
+                nameChecker = true;
+            }
+        }
+        // Exception as reqd in the spec
+        if (nameChecker == false) {
+            throw new IllegalArgumentException("Id is not a valid saved game");
+        }
+
         String filename = "src\\main\\java\\dungeonmania\\database.json";
         JsonObject dungeon;
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
