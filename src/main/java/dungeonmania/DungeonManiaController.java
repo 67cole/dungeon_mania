@@ -132,6 +132,14 @@ public class DungeonManiaController {
 
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
 
+        if (!itemUsedInvalid(itemUsed)) {
+            throw new IllegalArgumentException("The item used is invalid.");
+        }
+
+        if (!itemUsedNotInInventory(itemUsed)) {
+            throw new InvalidActionException("The item is not in the inventory.");
+        }
+
         Dungeon main = null;
         List<Entity> entitiesToBeRemoved = new ArrayList<Entity>();
 
@@ -641,7 +649,32 @@ public class DungeonManiaController {
         return false;
     }
 
-       
+    /**
+     * This function checks whether or not the item given in tick is valid
+     * @param itemUsed
+     */
+    public boolean itemUsedInvalid(String itemUsed) {
+        String[] items = {"bomb", "health_potion", "invincibility_potion", "invisibility_potion"};
+        List<String> itemAvailable = Arrays.asList(items);
+        itemAvailable.add(null);
+        
+        return itemAvailable.contains(itemUsed);
+    }
+
+    /**
+     * This function checks whether or not the item given in tick is in the inventory
+     * @param itemUsed
+     */
+    public boolean itemUsedNotInInventory(String itemUsed) {    
+        List<CollectableEntity> inventory = currDungeon.getInventory();
+
+        for (CollectableEntity collectable : inventory) {
+            if (collectable.getType().equals(itemUsed)) return true;
+        }
+            
+        return false;
+    }
+    
     /**
      * Helper Function that takes in the json file and adds all entities into entities list
      * @param dungeonName
