@@ -753,6 +753,7 @@ public class DungeonManiaController {
                                         main.inventory.add(armour);
                                     }
                                 }
+                                mercenaryBattleRadiusChecker(temp, entities);
                             }
                         }
                     }
@@ -1510,6 +1511,24 @@ public class DungeonManiaController {
         }
 
         return false;
+    }
+
+    /**
+     * This function checks whether there are any players in the mercenary's battle radius
+     * @param character - the player
+     */
+    public void mercenaryBattleRadiusChecker(MovingEntity character, List<Entity> entities) {
+        for (Entity entity : entities) {
+            if (entity.getType().equals("mercenary")) {
+                Position vector = Position.calculatePositionBetween(character.getPosition(), entity.getPosition());
+                double distance = Math.sqrt(Math.pow(vector.getX(), 2) + Math.pow(vector.getY(), 2));
+
+                if (distance < 4) {
+                    Mercenary temp = (Mercenary) entity;
+                    temp.moveEntity(entities, character.getPosition());
+                }
+            }
+        }
     }
 }
 
