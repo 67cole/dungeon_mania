@@ -90,12 +90,14 @@ public class Spider extends MovingEntity {
         
         anticlockwiseLoop.add(up);
         anticlockwiseLoop.add(left);
-        anticlockwiseLoop.add(down);
-        anticlockwiseLoop.add(down);
-        anticlockwiseLoop.add(right);
-        anticlockwiseLoop.add(right);
         anticlockwiseLoop.add(up);
         anticlockwiseLoop.add(up);
+        
+        anticlockwiseLoop.add(right);
+        anticlockwiseLoop.add(right);
+        anticlockwiseLoop.add(down);
+        anticlockwiseLoop.add(down);
+        
         anticlockwiseLoop.add(left);
     }
 
