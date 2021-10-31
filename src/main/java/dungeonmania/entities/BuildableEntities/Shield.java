@@ -38,7 +38,7 @@ public class Shield extends BuildableEntity{
     }
     /**
      * Checks durability of shield
-     * @return Sword
+     * @return Shield
      */
     public Shield checkDurability() {
         if (this.durability == 0) {
