@@ -654,6 +654,7 @@ public class DungeonManiaController {
                         // EntityFunction that handles all interactions with player
                         interactingEntity.entityFunction(entities, (Character) temp, movementDirection, main);
                         
+                        
                         // If the character is dead
                         if (!temp.isAlive()) {
                             // Checking for the One-Ring
@@ -919,10 +920,8 @@ public class DungeonManiaController {
 
         boolean posFound = false;
         while (posFound == false) {
-            int maxWidth = currDungeon.getWidth();
-            int maxHeight = currDungeon.getHeight();
-            int x = getRandomNumber(0, maxWidth - 1);
-            int y = getRandomNumber(0, maxHeight - 1);
+            int x = getRandomNumber(0, 16);
+            int y = getRandomNumber(0, 16);
             int check = 0;
             Position pos = new Position(x, y);
             Position posAbove = new Position(x, y + 1);

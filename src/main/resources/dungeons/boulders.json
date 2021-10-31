@@ -59,6 +59,11 @@
         "type": "switch"
       },
       {
+        "x": 2,
+        "y": 2,
+        "type": "bomb"
+      },
+      {
         "x": 6,
         "y": 2,
         "type": "wall"
@@ -84,6 +89,11 @@
         "type": "switch"
       },
       {
+        "x": 5,
+        "y": 4,
+        "type": "bomb"
+      },
+      {
         "x": 6,
         "y": 3,
         "type": "wall"
@@ -167,6 +177,11 @@
         "x": 4,
         "y": 7,
         "type": "switch"
+      },
+      {
+        "x": 5,
+        "y": 7,
+        "type": "bomb"
       },
       {
         "x": 7,
