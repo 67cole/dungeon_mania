@@ -965,7 +965,7 @@ public class DungeonManiaController {
             
             if (entity.getType().equals("boulder")) {
                 if (!map.containsKey(entity.getPosition())) {
-                    map.put(entity.getPosition(), 1);
+                    map.put(entity.getPosition(), 3);
                 }
                 else {
                     map.put(entity.getPosition(), 2);
@@ -975,7 +975,7 @@ public class DungeonManiaController {
 
         for (Integer amt : map.values()) {
             // even
-            if (amt != 2) {
+            if (amt != 1) {
                 return; // not finished with boulders goal 
             }
         }
@@ -1187,6 +1187,9 @@ public class DungeonManiaController {
         String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
         try {
             JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
+            currDungeon.setHeight(jsonObject.get("height").getAsInt());
+            currDungeon.setWidth(jsonObject.get("width").getAsInt());
+            
             JsonArray entitiesList = jsonObject.get("entities").getAsJsonArray();
             
             for (int i = 0; i < entitiesList.size(); i++) {
