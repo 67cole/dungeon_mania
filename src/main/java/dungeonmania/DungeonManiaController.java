@@ -602,15 +602,6 @@ public class DungeonManiaController {
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {    
         // Get entity list
         List<Entity> entities = currDungeon.getEntities();
-
-
-        if (!itemUsedInvalid(itemUsed, entities)) {
-            throw new IllegalArgumentException("The item used is invalid.");
-        }
-        
-        if (!itemUsedNotInInventory(itemUsed)) {
-            throw new InvalidActionException("The item is not in the inventory.");
-        }
         
         Dungeon main = null;
         List<Entity> entitiesToBeRemoved = new ArrayList<Entity>();
@@ -915,7 +906,85 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse build(String buildable) throws IllegalArgumentException, InvalidActionException {
-        return null;
+        List<CollectableEntity> itemsToBeRemoved = new ArrayList<CollectableEntity>();
+        if (buildable.equals("bow")) {
+            String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+            currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+            // Removing the items
+            int wood = 0;
+            int arrow = 0;
+            for (CollectableEntity item: currDungeon.inventory) {
+                if (wood >= 1 && arrow >= 3) {
+                    break;
+                }
+                if (item.getType().equals("wood") && wood < 2) {
+                    itemsToBeRemoved.add(item);
+                    wood++;
+                }
+                if (item.getType().equals("arrow") && arrow < 4) {
+                    itemsToBeRemoved.add(item);
+                    arrow++;
+                }
+            }
+            // Position needs to be stated as checkNext requires a position to run
+            Position tempPos = new Position(-1, -1);
+            Bow bow = new Bow(tempPos, "bow", entityId, true);
+            currDungeon.inventory.add(bow);
+            currDungeon.buildables.remove(buildable);
+        }
+        if (buildable.equals("shield")) {
+            String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+            currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+            // Removing the items
+            int key = 0;
+            int treasure = 0;
+            int wood = 0;
+            for (CollectableEntity item: currDungeon.inventory) {
+                if (wood >= 2 && treasure >= 1 && key >= 1) {
+                    break;
+                }
+                if (item.getType().equals("wood") && wood < 3) {
+                    itemsToBeRemoved.add(item);
+                    wood++;
+                }
+                if (item.getType().equals("key") && key < 2 && treasure < 2) {
+                    itemsToBeRemoved.add(item);
+                    currDungeon.setKeyStatus(true);
+                    key++;
+                }
+                 if (item.getType().equals("treasure") && treasure < 2 && key < 2) {
+                    itemsToBeRemoved.add(item);
+                    treasure++;
+                }
+            }
+            // Position needs to be stated as checkNext requires a position to run
+            Position tempPos = new Position(-1, -1);
+            Shield shield = new Shield(tempPos, "shield", entityId, true);
+            currDungeon.inventory.add(shield);
+            currDungeon.buildables.remove(buildable);
+        }
+
+        for (CollectableEntity item: itemsToBeRemoved) {
+            currDungeon.inventory.remove(item);
+        }
+
+        List<EntityResponse> erList= new ArrayList<EntityResponse>();
+        for(Entity entity: currDungeon.getEntities()) {
+            EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
+            erList.add(er);
+        }
+
+        List<ItemResponse> irList= new ArrayList<ItemResponse>();
+        for(CollectableEntity collectableEntity: currDungeon.inventory) {
+            ItemResponse ir = new ItemResponse(collectableEntity.getID(), collectableEntity.getType());
+            irList.add(ir);
+        }
+
+        DungeonResponse dr = new DungeonResponse(currDungeon.getDungeonId(), currDungeon.getDungeonName(),
+            erList, irList, currDungeon.buildables, currDungeon.getDungeonGoals());
+        
+        lastTick = dr;
+        return dr;
     }
 
 
@@ -1207,43 +1276,6 @@ public class DungeonManiaController {
                 return true;
             }
         }
-        return false;
-    }
-
-    /**
-     * This function checks whether or not the item given in tick is valid
-     * @param itemUsed - string of the id of the item used
-     * @param entities - the list of all the entities in the dungeon
-     */
-    public boolean itemUsedInvalid(String itemUsed, List<Entity> entities) {
-        if (itemUsed == null) return true;
-
-        String[] items = {"bomb", "health_potion", "invincibility_potion", "invisibility_potion"};
-        List<String> itemAvailable = Arrays.asList(items);
-
-        for (Entity entity : entities) {
-            if (itemAvailable.contains(entity.getType())) {
-                if (entity.getID().equals(itemUsed)) return true;
-            }
-        }
-        
-        return false;
-    }
-
-    /**
-     * This function checks whether or not the item given in tick is in the inventory
-     * @param itemUsed - string of the id of the item used
-     * @param entities - the list of all the entities in the dungeon
-     */
-    public boolean itemUsedNotInInventory(String itemUsed) {    
-        if (itemUsed == null) return true;
-
-        List<CollectableEntity> inventory = currDungeon.getInventory();
-
-        for (CollectableEntity collectable : inventory) {
-            if (collectable.getID().equals(itemUsed)) return true;
-        }
-            
         return false;
     }
     

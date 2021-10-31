@@ -103,11 +103,11 @@ public abstract class CollectableEntity implements Entity {
             }
         }
         // Creating a bow if bow does not already exist in buildables
-        if (wood == 1 && arrow == 3 && bow != 1) {
+        if (wood >= 1 && arrow >= 3 && bow != 1) {
             main.buildables.add("bow");
         } 
         // Creating a shield with treasure if shield does not already exist in buildables
-        if (wood == 2 && treasure == 1 && shield != 1) {
+        if (wood >= 2 && treasure >= 1 && shield != 1) {
             main.buildables.add("shield");
         } 
         // Creating a shield with key if shield does not already exist in buildables

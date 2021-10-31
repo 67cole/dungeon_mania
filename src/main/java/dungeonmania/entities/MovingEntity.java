@@ -5,6 +5,8 @@ import dungeonmania.util.Position;
 import java.util.ArrayList;
 import java.util.List;
 import dungeonmania.entities.CollectableEntities.Sword;
+import dungeonmania.entities.BuildableEntities.Bow;
+import dungeonmania.entities.BuildableEntities.Shield;
 import dungeonmania.entities.CollectableEntities.Armour;
 import dungeonmania.entities.CollectableEntities.Key;
 import dungeonmania.entities.CollectableEntities.Bomb;
@@ -549,52 +551,83 @@ public abstract class MovingEntity implements Entity {
             }
             // Simulate a round of battle
             int weaponAtk = 0;
-            boolean charArmour = false;
+            boolean charHasArmour = false;
+            boolean charHasShield = false;
+            boolean charHasBow = false;
             boolean enemyArmour = false;
+            Sword swordHolder = null;
+            Armour armourHolder = null;
+            Shield shieldHolder = null;
+            Bow bowHolder = null;
             if (this.getArmour()) {
                 enemyArmour = true;
             }
-            Sword swordHolder = null;
-            Armour armourHolder = null;
             for (CollectableEntity item: main.inventory) {
                 if (item.getType().equals("sword")) {
                     Sword sword = (Sword) item;
                     weaponAtk = sword.getAttack();
                     sword.reduceDurability();
                     swordHolder = sword.checkDurability();
-                    break;
                 }
                 if (item.getType().equals("armour")) {
                     Armour armour = (Armour) item;
-                    charArmour = true;
+                    charHasArmour = true;
                     armour.reduceDurability();
                     armourHolder = armour.checkDurability();
-                    break;
+                }
+                if (item.getType().equals("bow")) {
+                    Bow bow = (Bow) item;
+                    charHasBow = true;
+                    bow.reduceDurability();
+                    bowHolder = bow.checkDurability();
+                }
+                if (item.getType().equals("shield")) {
+                    Shield shield = (Shield) item;
+                    charHasShield = true;
+                    shield.reduceDurability();
+                    shieldHolder = shield.checkDurability();
                 }
             }
-            // Remove the sword if durability runs out
             if (swordHolder != null) {
                 main.inventory.remove(swordHolder);
             }
-            // Remove the armour if durability runs out
             if (armourHolder != null) {
                 main.inventory.remove(armourHolder);
+            }
+            if (bowHolder != null) {
+                main.inventory.remove(bowHolder);
+            }
+            if (shieldHolder != null) {
+                main.inventory.remove(shieldHolder);
             }
             int characterHealth = player.getHealth();
             int characterAD = player.getAttack();
             int enemyHealth = this.getHealth();
             int enemyAD = this.getAttack();
-            if (charArmour) {
-                characterHealth = characterHealth - ((enemyHealth * (enemyAD / 2)) / 10);
+            // Calculations for character
+            if (charHasArmour) {
+                if (charHasShield) {
+                    characterHealth = characterHealth - ((enemyHealth * (enemyAD / 4)) / 10);
+                }
+                else {
+                    characterHealth = characterHealth - ((enemyHealth * (enemyAD / 2)) / 10);
+                }
             }
             else {
-                characterHealth = characterHealth - ((enemyHealth * (enemyAD)) / 10);
+                characterHealth = characterHealth - ((enemyHealth * enemyAD) / 10);
             }
+            // Calculations for enemy
             if (enemyArmour) {
                 enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+                if (charHasBow) {
+                    enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+                }
             }
             else {
                 enemyHealth = enemyHealth - ((characterHealth * (characterAD + weaponAtk)) / 5);
+                if (charHasBow) {
+                    enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+                }
             }
             // Check if character dies
             if (!checkAlive(characterHealth)) {
