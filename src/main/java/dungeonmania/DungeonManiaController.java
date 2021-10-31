@@ -778,7 +778,7 @@ public class DungeonManiaController {
                         dir = posLoop.get(loopPos);
                     }
 
-                    spider.moveSpider(dir);
+                    spider.moveEntity(dir);
 
                     // update loopPos
                     if (spider.getClockwise() == true) {

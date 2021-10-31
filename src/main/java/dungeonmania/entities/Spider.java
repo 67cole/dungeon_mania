@@ -121,7 +121,7 @@ public class Spider extends MovingEntity {
      * Movement for the spider
      */
     @Override
-    public void moveSpider(Position direction) {
+    public void moveEntity(Position direction) {
         if (direction.equals(up)) {
             super.moveUpward();
         } else if (direction.equals(down)) {
