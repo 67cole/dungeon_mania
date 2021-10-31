@@ -1,10 +1,12 @@
 Character
+
     -   The character's starting health is 10
     -   The chracter's starting attack is 2
     -   The character starts off with no inventory
     -   The character starts off with no buildables
 
 Zombie
+
     -   The zombie's starting health is 3
     -   The zombie's starting attack is 1
     -   The zombie spawner won't spawn anything if there is no avaiable white   space around it
@@ -12,6 +14,7 @@ Zombie
     -   Zombies can't interact with anything (i.e. moving a boulder)
 
 Spider
+
     -   The spider's starting health is 1
     -   The spider's starting attack is 1
     -   Spiders can't spawn on edge of dungeon 
@@ -19,6 +22,7 @@ Spider
     -   A spider cannot spawn on or under a boulder
 
 Mercenary
+
     -   The mercenary's starting health is 3
     -   The mercenary's starting attack is 2
     -   The mercenary would spawn every 75 ticks
@@ -26,9 +30,11 @@ Mercenary
     -   Mercenaries will always have a valid spot to move to, it cannot be trapped
 
 Portal 
+
     -   There will always be a corresponding portal to a portal given
 
 Json
+
     -   The json files provided in testing would be correct
 
 Endings 
