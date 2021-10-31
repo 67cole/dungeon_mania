@@ -85,13 +85,20 @@ public class DungeonManiaController {
         }
     }
 
-    public DungeonResponse newGame(String dungeonName, String gameMode) throws IllegalArgumentException {
+    public DungeonResponse newGame(String dungeonName, String gameMode) throws IllegalArgumentException {    
+        // INCOMPLETE *********
+        if (!dungeonNotValid(dungeonName)) {
+            throw new IllegalArgumentException("This dungeon does not exist.");
+        }
+
+        if (!gameModeNotValid(gameMode)) {
+            throw new IllegalArgumentException("This gamemode is not valid.");
+        }
 
         List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
         List<String> emptyBuildables = new ArrayList<String>();
-        // Plan
-        // First: Have to create a new dungeon by using the json file in the dungeons folder, and inserting the entitys on to the map.
-        
+      
+
         // Create the unique identifier for the new dungeon
         String dungeonId = String.format("dungeon%d", dungeonCounter);
         dungeonCounter += 1;
@@ -102,13 +109,12 @@ public class DungeonManiaController {
         dungeons.add(main);
         currDungeon = main;
 
-        // Setting the gamemode
         switch (gameMode) {
-            case "peaceful":
+            case "Peaceful":
                 currDungeon.setPeaceful(true);
                 break;
 
-            case "hard":
+            case "Hard":
                 currDungeon.setHard(true);
                 break;
         }
@@ -406,7 +412,14 @@ public class DungeonManiaController {
                     Character characterEntity = new Character(position, type, entityId , false);
                     main.addEntities(characterEntity);  
                     characterEntity.setAttack(entity.get("attack").getAsInt());
-                    characterEntity.setHealth(entity.get("health").getAsInt());
+                    
+                    if (currDungeon.getHard()) {
+                        characterEntity.setHealth((entity.get("health").getAsInt()) - 4);
+                    }
+                    else {
+                        characterEntity.setHealth(entity.get("health").getAsInt());
+                    }
+                    
                     characterEntity.setSpawn(position);
                     break;
                 case "wall":                       
@@ -498,7 +511,6 @@ public class DungeonManiaController {
                     Mercenary mercenaryEntity = new Mercenary(position, type, entityId, true);
                     mercenaryEntity.setAttack(entity.get("attack").getAsInt());
                     mercenaryEntity.setHealth(entity.get("health").getAsInt());
-                
                     main.addEntities(mercenaryEntity);
                     break;
                 
@@ -566,8 +578,19 @@ public class DungeonManiaController {
     }
 
 
-    public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
+    public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {    
+        // Get entity list
+        List<Entity> entities = currDungeon.getEntities();
 
+
+        if (!itemUsedInvalid(itemUsed, entities)) {
+            throw new IllegalArgumentException("The item used is invalid.");
+        }
+        
+        if (!itemUsedNotInInventory(itemUsed)) {
+            throw new InvalidActionException("The item is not in the inventory.");
+        }
+        
         Dungeon main = null;
         List<Entity> entitiesToBeRemoved = new ArrayList<Entity>();
 
@@ -580,15 +603,33 @@ public class DungeonManiaController {
         int zombieAddedLater = 0;
         int mercenaryAddedLater = 0;
         int EnemyCheck = 0;
+        boolean invincibilityActive = false; 
 
         Position playerSpawnPosition = null;
         main = currDungeon;
 
-        // Get entity list
-        List<Entity> entities = currDungeon.getEntities();
+        // Get the character class
+        Character character = getCharacter(entities);
+        
+        // Check potion duration and set it off if it expires
+        potionTickAdder(character);
+        potionChecker(character);
 
-        // Mercenary Movement goes last
-        mercenaryMovement(entities, movementDirection);
+        // If the gamemode is peaceful, act as if the character has invisibility
+        if (currDungeon.getPeaceful()) character.setIsInvisible(true);
+
+        // If the gamemode is hard, always turn off invincibility
+        if (currDungeon.getHard()) character.setIsInvincible(false);
+
+
+        // Checks if the character is invincible, then move the enemies
+        if (character.isInvincible()) {
+            invincibilityPhase(character, entities, movementDirection);
+            invincibilityActive = true;
+        }
+
+        // Mercenary Movement goes first
+        if (!invincibilityActive) mercenaryMovement(entities, movementDirection);
 
         for (Entity entity : entities) {
             // Mercenary should only spawn if there is an enemy for the dungeon
@@ -600,7 +641,6 @@ public class DungeonManiaController {
                 MovingEntity temp = (MovingEntity) entity;
                 Character temp2  = (Character) entity;
                 playerSpawnPosition = temp2.getSpawn();
-                // Potion Checker
                 
                 // If the inital direction is NONE then an item has been used
                 if (movementDirection == Direction.NONE) {
@@ -635,7 +675,7 @@ public class DungeonManiaController {
                 // If it is here movement is allowed and
                 // it might need to interact with an entity.
                 temp.moveEntity(movementDirection);
-                for (Entity interactingEntity: interactingEntities) {
+                for (Entity interactingEntity : interactingEntities) {
                     // Check if it is empty square or an entity
                     if (interactingEntity != null) {
                         // EntityFunction that handles all interactions with player
@@ -702,23 +742,31 @@ public class DungeonManiaController {
             }
             
             // Zombie Spawner Ticks
-            if (entity.getType().equals("zombie_toast_spawner") && currDungeon.getTickCounter() % 20 == 0) {
-                Position zombieSpawn = checkWhiteSpace(entity.getPosition(), entities);
-                // If there is no white space around zombie spawner, don't spawn zombie
-                if (zombieSpawn == null) continue;
+            if (entity.getType().equals("zombie_toast_spawner")) {
+                if ((currDungeon.getHard() && currDungeon.getTickCounter() % 15 == 0) || (!currDungeon.getHard() && currDungeon.getTickCounter() % 20 == 0)) {
+                    Position zombieSpawn = checkWhiteSpace(entity.getPosition(), entities);
 
-                String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
-                ZombieToast zombieToastEntity = new ZombieToast(zombieSpawn, "zombie_toast", entityId, true);
-                zombieHolder = zombieToastEntity;
-                zombieAddedLater = 1;
+                    // If there is no white space around zombie spawner, don't spawn zombie
+                    if (zombieSpawn == null) continue;
+
+                    String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                    currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
+
+                    ZombieToast zombieToastEntity = new ZombieToast(zombieSpawn, "zombie_toast", entityId, true);
+                    zombieHolder = zombieToastEntity;
+                    zombieAddedLater = 1;
+                }
             }
+
             // Zombie Movement (moves the same for character but can't interact)
-            if (entity.getType().equals("zombie_toast")) {
+            if (entity.getType().equals("zombie_toast") && !invincibilityActive) {
                 ZombieToast temp = (ZombieToast) entity;
                 temp.moveEntity(entities);
             }         
+
+
             // Spider Movement
-            if (entity.getType().equals("spider")) {
+            if (entity.getType().equals("spider") && !invincibilityActive) {
                 MovingEntity temp = (MovingEntity) entity;
                 MovingEntity spider = (Spider) entity;
                 int loopPos = spider.getLoopPos();
@@ -795,7 +843,7 @@ public class DungeonManiaController {
         }
 
         // Spider spawner ticks
-        if ((checkMaxSpiders(entities) == false) && (currDungeon.getTickCounter() % 10 == 0)) {
+        if ((checkMaxSpiders(entities) == false) && (currDungeon.getTickCounter() % 25 == 0)) {
             Position spiderSpawn = getSpiderSpawn(entities);
             String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
             currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
@@ -994,14 +1042,34 @@ public class DungeonManiaController {
 
     /**
      * Moves the mercenary around
+     * @param entities - The list of all entities in the dungeon
+     * @param direction - The direction of the character
      */
     public void mercenaryMovement(List<Entity> entities, Direction direction) {
+        Position player = getPlayerPosition(entities);
+        player = player.translateBy(direction);
+
         for (Entity entity : entities) {
             if (entity.getType().equals("mercenary")) {
                 Mercenary temp = (Mercenary) entity;
-                Position player = getPlayerPosition(entities);
-                player = player.translateBy(direction);
                 temp.moveEntity(entities, player);
+            }
+        }
+    }
+
+    /**
+     * Moves the enemies around if the character is invincible
+     * @param character - The character class
+     * @param entities - The list of all entities
+     */
+    public void invincibilityPhase(Character character, List<Entity> entities, Direction direction) {
+        Position player = getPlayerPosition(entities);
+        player = player.translateBy(direction);
+
+        for (Entity entity : entities) {
+            if (entity.getType().equals("zombie_toast") || entity.getType().equals("spider") || entity.getType().equals("mercenary")) {
+                MovingEntity temp = (MovingEntity) entity;
+                temp.runEnemy(entities, player);
             }
         }
     }
@@ -1116,25 +1184,36 @@ public class DungeonManiaController {
 
     /**
      * This function checks whether or not the item given in tick is valid
-     * @param itemUsed
+     * @param itemUsed - string of the id of the item used
+     * @param entities - the list of all the entities in the dungeon
      */
-    public boolean itemUsedInvalid(String itemUsed) {
+    public boolean itemUsedInvalid(String itemUsed, List<Entity> entities) {
+        if (itemUsed == null) return true;
+
         String[] items = {"bomb", "health_potion", "invincibility_potion", "invisibility_potion"};
         List<String> itemAvailable = Arrays.asList(items);
-        itemAvailable.add(null);
+
+        for (Entity entity : entities) {
+            if (itemAvailable.contains(entity.getType())) {
+                if (entity.getID().equals(itemUsed)) return true;
+            }
+        }
         
-        return itemAvailable.contains(itemUsed);
+        return false;
     }
 
     /**
      * This function checks whether or not the item given in tick is in the inventory
-     * @param itemUsed
+     * @param itemUsed - string of the id of the item used
+     * @param entities - the list of all the entities in the dungeon
      */
     public boolean itemUsedNotInInventory(String itemUsed) {    
+        if (itemUsed == null) return true;
+
         List<CollectableEntity> inventory = currDungeon.getInventory();
 
         for (CollectableEntity collectable : inventory) {
-            if (collectable.getType().equals(itemUsed)) return true;
+            if (collectable.getID().equals(itemUsed)) return true;
         }
             
         return false;
@@ -1325,6 +1404,7 @@ public class DungeonManiaController {
         return false;
 
     }
+
     public boolean checkBomb(List<Entity> interactingEntities) {
         for (Entity interactingEntity: interactingEntities) {
             if (interactingEntity != null) {
@@ -1335,5 +1415,72 @@ public class DungeonManiaController {
         }
         return false;
     }
+
+    public Character getCharacter(List <Entity> entities) {
+        for (Entity entity : entities) {
+            if (entity.getType().equals("player")) {
+                return (Character) entity; 
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * This function adds on a tick if the character is invincible or invisible
+     * @param character
+     */
+    public void potionTickAdder(Character character) {
+        // If the character is invisible, add onto the tick counter
+        if (character.isInvisible()) {
+            currDungeon.setInvisibilityPotionCounter(currDungeon.getInvisibilityPotionCounter() + 1);
+        }
+
+        // If the character is invincible, add onto the tick counter
+        if (character.isInvincible()) {
+            currDungeon.setInvincibilityCounter(currDungeon.getInvincibilityPotionCounter() + 1);
+        }
+    }
+
+    /**
+     * This function checks whether the potion should still be active or not
+     * @param character
+     */
+    public void potionChecker(Character character) {
+        // Remove the invisibility potion after 15 ticks
+        if (currDungeon.getInvisibilityPotionCounter() % 15 == 0) {
+            character.setIsInvisible(false);
+        }
+
+        // Remove the invincibility potion after 10 ticks
+        if (currDungeon.getInvincibilityPotionCounter() % 10 == 0) {
+            character.setIsInvincible(false);
+        }
+    }
+
+    /**
+     * This function checks whether the dungeon exists
+     * @param dungeonName - this is the dungeon name
+     */
+    public boolean dungeonNotValid(String dungeonName) {
+       
+
+
+        
+        return true;
+    }
+
+    /**
+     * This function checks whether the gamemode is valid
+     * @param gameMode - this is the gameMode
+     */
+    public boolean gameModeNotValid(String gameMode) {
+        for (String gamemodeState : getGameModes()) {
+            if (gamemodeState.equals(gameMode)) return true;
+        }
+
+        return false;
+    }
 }
+
 
