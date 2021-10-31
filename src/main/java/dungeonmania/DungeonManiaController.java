@@ -32,6 +32,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import javax.xml.stream.events.EntityDeclaration;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -572,7 +574,7 @@ public class DungeonManiaController {
         
         Dungeon main = null;
         List<Entity> entitiesToBeRemoved = new ArrayList<Entity>();
-
+        List<Entity> allNearbyEntities = new ArrayList<Entity>();
         currDungeon.setTickCounter(currDungeon.getTickCounter() + 1);
         Spider spid = null;
         int spiderSpawned = 0;
@@ -653,7 +655,37 @@ public class DungeonManiaController {
                     if (interactingEntity != null) {
                         // EntityFunction that handles all interactions with player
                         interactingEntity.entityFunction(entities, (Character) temp, movementDirection, main);
-                        
+
+                        Position playerPos = new Position(0, 0);
+                        for (Entity ent : entities) {
+                            if (ent.getType().equals("player")) playerPos = ent.getPosition();
+                                
+                        }
+                        for (Entity enti : entities) {
+                            System.out.printf("player pos: %d, %d ", playerPos.getX(), playerPos.getY());
+                            System.out.printf("currEnt pos: %d, %d of type %s\n", enti.getPosition().getX(), enti.getPosition().getY(), enti.getType());
+
+                            if (enti.getType().equals("boulder")) {
+                                
+                                Position entPos = enti.getPosition();
+                                Position up = new Position(0, -1);
+                                Position down = new Position(0, 1);
+                                Position left = new Position(-1, 0);
+                                Position right = new Position(1, 0);
+                                if (playerPos.equals(entPos.translateBy(up)) || playerPos.equals(entPos.translateBy(down)) || playerPos.equals(entPos.translateBy(left)) || playerPos.equals(entPos.translateBy(right))) {
+                                    doExplode(entities, (Character) temp, main, enti, allNearbyEntities); 
+                                    System.out.println("HI");
+                                }
+
+                                // doExplode(entities, (Character) temp, main, enti, allNearbyEntities);
+                            }
+                        }
+                        // entitiesToBeRemoved.addAll(allNearbyEntities);
+                        for (Entity enta : allNearbyEntities) {
+                            entitiesToBeRemoved.add(enta);
+                        }
+
+
                         
                         // If the character is dead
                         if (!temp.isAlive()) {
@@ -828,7 +860,7 @@ public class DungeonManiaController {
         if (zombieAddedLater == 1) main.addEntities(zombieHolder);
         if (mercenaryAddedLater == 1) main.addEntities(mercenaryHolder);
         if (spiderSpawned == 1) main.addEntities(spid);
-
+        
         // Remove the collectible from the map
         entityRemover(entitiesToBeRemoved, main);
         
@@ -1422,5 +1454,113 @@ public class DungeonManiaController {
             character.setIsInvincible(false);
         }
     }
+
+
+ 
+    public void doExplode(List<Entity> entities, Character player,  Dungeon main, Entity bou, List<Entity> nearby) {
+        // pos = boulder position
+        Position boulderPos = bou.getPosition();
+        // find a switch
+
+        List<Entity> entitiesAtBoulder = main.getEntitiesAtPos(boulderPos);
+        Position N = boulderPos.translateBy(0, -1);
+        Position E = boulderPos.translateBy(1, 0);
+        Position S = boulderPos.translateBy(0, 1);
+        Position W = boulderPos.translateBy(-1, 0);
+        
+        List<Entity> entsAbove = main.getEntitiesAtPos(N);
+        List<Entity> entsRight = main.getEntitiesAtPos(E);
+        List<Entity> entsBelow = main.getEntitiesAtPos(S);
+        List<Entity> entsLeft = main.getEntitiesAtPos(W);
+
+        for (Entity currEnt : entitiesAtBoulder) {
+            if (currEnt.getType().equals("switch")) {
+                // see if there are bombs cardinally adjacent, if so, explode any adjacent bombs
+                if (isBombAtPos(entsAbove)) {
+                    System.out.println("Bomb above");
+                    explode(entsAbove, entities, N, main, player, nearby);
+                }
+                if (isBombAtPos(entsRight)) {
+                    explode(entsRight, entities, E, main, player, nearby);
+                    System.out.println("Bomb right");
+                } 
+                if (isBombAtPos(entsBelow)) {
+                    explode(entsBelow, entities, S, main, player, nearby);
+                    System.out.println("Bomb below");
+                } 
+                if (isBombAtPos(entsLeft)) {
+                    explode(entsLeft, entities, W, main, player, nearby);
+                    System.out.println("Bomb left");
+                }
+                
+            }
+        }
+    }
+    
+    public Boolean isBombAtPos(List<Entity> entities) {
+        for (Entity currEnt : entities) {
+            if (currEnt.getType().equals("bomb")) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void explode(List<Entity> entitiesAtPos, List<Entity> entities, Position pos, Dungeon main, Character player, List<Entity> NearbyEntities) {
+        
+        Position N = pos.translateBy(0, -1);
+        Position NE = pos.translateBy(1, -1);
+        Position E = pos.translateBy(1, 0);
+        Position SE = pos.translateBy(1, 1);
+        Position S = pos.translateBy(0, 1);
+        Position SW = pos.translateBy(-1, 1);
+        Position W = pos.translateBy(-1, 0);
+        Position NW = pos.translateBy(-1, -1);
+        
+        List<Entity> entsN = main.getEntitiesAtPos(N);
+        List<Entity> entsNE = main.getEntitiesAtPos(NE);
+        List<Entity> entsE = main.getEntitiesAtPos(E);
+        List<Entity> entsSE = main.getEntitiesAtPos(SE);
+        List<Entity> entsS = main.getEntitiesAtPos(S);
+        List<Entity> entsSW = main.getEntitiesAtPos(SW);
+        List<Entity> entsW = main.getEntitiesAtPos(W);
+        List<Entity> entsNW = main.getEntitiesAtPos(NW);
+        List<Entity> entsO = entitiesAtPos;
+
+        NearbyEntities.addAll(entsN);
+        NearbyEntities.addAll(entsNE);
+        NearbyEntities.addAll(entsE);
+        NearbyEntities.addAll(entsSE);
+        NearbyEntities.addAll(entsS);
+        NearbyEntities.addAll(entsSW);
+        NearbyEntities.addAll(entsW);
+        NearbyEntities.addAll(entsNW);
+        NearbyEntities.addAll(entsO);
+        // NearbyEntities.removeIf(s -> (!s.getType().equals("player")));
+        // Iterator<Entity> itr = allNearbyEntities.iterator();
+        // while (itr.hasNext()) {
+        //     Entity curr = itr.next();
+        //     if (!(curr.getType().equals("player"))) {
+        //         itr.remove();
+        //         System.out.println("removed");
+        //     }
+            
+        // }
+        
+        // allNearbyEntities.removeIf(s -> (!s.getType().equals("player")));
+
+        // // // entities.removeAll(allNearbyEntities);
+        // for (Entity curr : allNearbyEntities) {
+        //     if (!curr.getType().equals("player")) entities.remove(curr);
+        // }
+
+
+        // entities.removeAll(allNearbyEntities);
+        // entities.add(player);
+
+        
+        
+    }
+
 }
 
