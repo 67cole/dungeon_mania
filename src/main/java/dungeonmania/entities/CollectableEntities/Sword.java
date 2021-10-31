@@ -15,25 +15,51 @@ public class Sword extends CollectableEntity{
      * Attack of sword
      */
     private int attack;
-
+    /**
+     * Creates the sword
+     * @param position - the current position in the dungeon
+     * @param type - the type of entity
+     * @param ID - the ID of entity
+     * @param isInteractable - check if the entity is interactable
+     */
     public Sword(Position position, String type, String ID, boolean IsInteractable) {
         super(position,type, ID, IsInteractable);
         this.durability = 5;
         this.attack = ATTACK;
     }
-
+    /**
+     * Getter for durability
+     * @return int
+     */
     public int getDurability() {
         return this.durability;
     }
 
+    public void setDurability(int durability) {
+        this.durability = durability;
+    }
+
+    public void setAttack(int attack) {
+        this.attack = attack;
+    }
+
+    /**
+     * Reduces durability by 1
+     */
     public void reduceDurability() {
         this.durability -= 1;
     }
-
+    /**
+     * Getter for attack
+     * @return int
+     */
     public int getAttack() {
 		return this.attack;
 	}
-
+    /**
+     * Checks durability of sword
+     * @return Sword
+     */
     public Sword checkDurability() {
         if (this.durability == 0) {
             return this;
