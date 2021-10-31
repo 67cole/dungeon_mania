@@ -33,4 +33,11 @@ public class Sword extends CollectableEntity{
     public int getAttack() {
 		return this.attack;
 	}
+
+    public Sword checkDurability() {
+        if (this.durability == 0) {
+            return this;
+        }
+        return null;
+    }
 }

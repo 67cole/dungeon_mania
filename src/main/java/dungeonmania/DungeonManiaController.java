@@ -791,6 +791,11 @@ public class DungeonManiaController {
                         main.inventory.remove(entity2);
                         return;
                     }
+                    if (entity2.getType().equals("health_potion")) {
+                        player.restoreHealth();
+                        main.inventory.remove(entity2);
+                        return;
+                    }
                 }
             }
         }

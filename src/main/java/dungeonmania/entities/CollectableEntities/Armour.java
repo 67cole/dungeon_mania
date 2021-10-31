@@ -19,12 +19,15 @@ public class Armour extends CollectableEntity{
         return this.durability;
     }
 
-    public void setDurability(int durability) {
-        this.durability = durability;
-    }
-
     public void reduceDurability() {
         this.durability -= 1;
+    }
+
+    public Armour checkDurability() {
+        if (this.durability == 0) {
+            return this;
+        }
+        return null;
     }
 }
 

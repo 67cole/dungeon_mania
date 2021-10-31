@@ -101,8 +101,33 @@ public abstract class MovingEntity implements Entity {
     /**
      * Get position
      */
+     @Override
     public Position getPosition() {
         return position;
+    }
+
+    /**
+     * Get type
+     */
+     @Override
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * Get ID
+     */
+    @Override
+    public String getID() {
+        return ID;
+    }
+
+    /**
+     * Get isInteractable
+     */
+    @Override
+    public boolean getIsInteractable() {
+        return isInteractable;
     }
 
     /**
@@ -152,20 +177,6 @@ public abstract class MovingEntity implements Entity {
     }
 
     /**
-     * Get type
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * Get ID
-     */
-    public String getID() {
-        return ID;
-    }
-
-    /**
      * Getter for position in loop
      */
     public int getLoopPos() {
@@ -207,12 +218,6 @@ public abstract class MovingEntity implements Entity {
     public void setClockwise(boolean clockwise) {
     }
 
-    /**
-     * Get isInteractable
-     */
-    public boolean getIsInteractable() {
-        return isInteractable;
-    }
 
     /**
      * checkMovement checks for the next square if it's a wall/boulder.
@@ -478,7 +483,7 @@ public abstract class MovingEntity implements Entity {
         return false;
     }
 
-    public boolean checkBS(int characterHealth, int enemyHealth) {
+    public boolean checkBattleState(int characterHealth, int enemyHealth) {
         if (characterHealth <= 0) {
             return false;
         }
@@ -497,7 +502,7 @@ public abstract class MovingEntity implements Entity {
 
     @Override
     public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {
-        while (checkBS(player.getHealth(), this.getHealth())) {
+        while (checkBattleState(player.getHealth(), this.getHealth())) {
             // If character is invincible, set enemy dead, return.
             if (player.isInvincible()) {
                 this.setAlive(false);
@@ -510,17 +515,31 @@ public abstract class MovingEntity implements Entity {
             // Simulate a round of battle
             int weaponAtk = 0;
             boolean charArmour = false;
+            Sword swordHolder = null;
+            Armour armourHolder = null;
             for (CollectableEntity item: main.inventory) {
                 if (item.getType().equals("sword")) {
                     Sword sword = (Sword) item;
                     weaponAtk = sword.getAttack();
                     sword.reduceDurability();
+                    swordHolder = sword.checkDurability();
+                    break;
                 }
                 if (item.getType().equals("armour")) {
                     Armour armour = (Armour) item;
                     charArmour = true;
                     armour.reduceDurability();
+                    armourHolder = armour.checkDurability();
+                    break;
                 }
+            }
+            // Remove the sword if durability runs out
+            if (swordHolder != null) {
+                main.inventory.remove(swordHolder);
+            }
+            // Remove the armour if durability runs out
+            if (armourHolder != null) {
+                main.inventory.remove(armourHolder);
             }
             int characterHealth = player.getHealth();
             int characterAD = player.getAttack();
