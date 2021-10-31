@@ -2,6 +2,7 @@ package dungeonmania.entities;
 
 import dungeonmania.util.Position;
 
+import java.util.ArrayList;
 import java.util.List;
 import dungeonmania.entities.CollectableEntities.Sword;
 import dungeonmania.entities.CollectableEntities.Armour;
@@ -409,17 +410,18 @@ public abstract class MovingEntity implements Entity {
 
     }
 
-    public Entity checkNext(Direction direction, List<Entity> entities) {
+    public List<Entity> checkNext(Direction direction, List<Entity> entities) {
+        List<Entity> interactingEntities = new ArrayList<Entity>();
         switch (direction) {
             case UP:
                 Position attemptedMove = position.translateBy(0, -1);
                 Entity spider = checkSpider(direction, entities, attemptedMove);
                 if (spider != null) {
-                    return spider;
+                    interactingEntities.add(spider);
                 } 
                 for (Entity entity : entities) {
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove)) {
-                        return entity;
+                        interactingEntities.add(entity);
                     }
                 }
                 break;
@@ -428,11 +430,11 @@ public abstract class MovingEntity implements Entity {
                 Position attemptedMove1 = position.translateBy(0, 1);
                 Entity spider2 = checkSpider(direction, entities, attemptedMove1);
                 if (spider2 != null) {
-                    return spider2;
+                    interactingEntities.add(spider2);
                 } 
                 for (Entity entity : entities) {
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove1)) {
-                        return entity;
+                        interactingEntities.add(entity);
                     }
                 }
                 break;
@@ -441,11 +443,11 @@ public abstract class MovingEntity implements Entity {
                 Position attemptedMove2 = position.translateBy(-1, 0);
                 Entity spider3 = checkSpider(direction, entities, attemptedMove2);
                 if (spider3 != null) {
-                    return spider3;
+                    interactingEntities.add(spider3);
                 } 
                 for (Entity entity : entities) {
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove2)) {
-                        return entity;
+                        interactingEntities.add(entity);
                     }
                 }
                 break;
@@ -454,11 +456,11 @@ public abstract class MovingEntity implements Entity {
                 Position attemptedMove3 = position.translateBy(1, 0);
                 Entity spider4 = checkSpider(direction, entities, attemptedMove3);
                 if (spider4 != null) {
-                    return spider4;
+                    interactingEntities.add(spider4);
                 } 
                 for (Entity entity : entities) {
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove3)) {
-                        return entity;
+                        interactingEntities.add(entity);
                     }
                 }
                 break; 
@@ -467,19 +469,19 @@ public abstract class MovingEntity implements Entity {
                 Position noMove = position;
                 Entity spider5 = checkSpider(direction, entities, noMove);
                 if (spider5 != null) {
-                    return spider5;
+                    interactingEntities.add(spider5);
                 } 
                 for (Entity entity : entities) {
                     if (entity.getType().equals("player")) continue;
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(noMove)) {
-                        return entity;
+                        interactingEntities.add(entity);
                     }
                 }
                 break; 
         }
 
         // If it's a white square, you can move
-        return null; 
+        return interactingEntities; 
     }   
 
     public boolean boulderBlocked(Direction direction, Position attemptedMove, List<Entity> entities, Entity entity) {
