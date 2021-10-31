@@ -134,6 +134,10 @@ public class DungeonManiaController {
         jsonObj.addProperty("entityCounter", currDungeon.getEntityCounter());
         jsonObj.addProperty("tickCounter", currDungeon.getTickCounter());
         jsonObj.addProperty("keyStatus", currDungeon.getKeyStatus());
+        jsonObj.addProperty("width", currDungeon.getWidth());
+        jsonObj.addProperty("height", currDungeon.getHeight());
+        jsonObj.addProperty("invisibilityPotionCounter", currDungeon.getInvisibilityPotionCounter());
+        jsonObj.addProperty("invincibilityPotionCounter", currDungeon.getInvincibilityPotionCounter());
 
         JsonArray jsonEntities = jsonObj.get("entities").getAsJsonArray();
         JsonArray jsonInventory = jsonObj.get("inventory").getAsJsonArray();
@@ -340,6 +344,12 @@ public class DungeonManiaController {
                     main.setTickCounter(dungeon.get("tickCounter").getAsInt());
                     main.setEntityCounter(dungeon.get("entityCounter").getAsInt());
                     main.setKeyStatus(dungeon.get("keyStatus").getAsBoolean());
+                    main.setWidth(dungeon.get("width").getAsInt());
+                    main.setHeight(dungeon.get("height").getAsInt());
+                    main.setInvincibilityCounter(dungeon.get("invincibilityPotionCounter").getAsInt());
+                    main.setInvisibilityPotionCounter(dungeon.get("invisibilityPotionCounter").getAsInt());
+
+
                     currDungeon = main;
                     JsonArray entitiesList = dungeon.get("entities").getAsJsonArray();
                     JsonArray inventoryList = dungeon.get("inventory").getAsJsonArray();
