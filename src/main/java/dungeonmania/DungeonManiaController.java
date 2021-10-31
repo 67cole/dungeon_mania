@@ -102,15 +102,21 @@ public class DungeonManiaController {
         dungeons.add(main);
         currDungeon = main;
 
+        // Setting the gamemode
+        switch (gameMode) {
+            case "peaceful":
+                currDungeon.setPeaceful(true);
+                break;
+
+            case "hard":
+                currDungeon.setHard(true);
+                break;
+        }
+
         addEntitiesToList(dungeonName, main);
         
-
-        // To do: Inventory, Entities, Buildables, Goals
-        // Need a way to add the entity position location from the json into the dungeon object.
-        //Open up the json file and obtain information on x,y, and type. Depending on the type, we will create that corresponding
-        //Class and add it into the entities list for the dungeon.
         List<EntityResponse> erList = new ArrayList<EntityResponse>();
-        for(Entity entity: main.getEntities()) {
+        for (Entity entity: main.getEntities()) {
             EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
             erList.add(er);
         }
@@ -577,7 +583,10 @@ public class DungeonManiaController {
 
         Position playerSpawnPosition = null;
         main = currDungeon;
+
+        // Get entity list
         List<Entity> entities = currDungeon.getEntities();
+
         // Mercenary Movement goes last
         mercenaryMovement(entities, movementDirection);
 
