@@ -407,8 +407,20 @@ public abstract class MovingEntity implements Entity {
             }
         }
         return entityDoor;
-
     }
+
+    //Checks if the position to be moved in is a door, if it is, return that door
+    public Door checkDoor(Position position, List<Entity> entities) {
+        Door entityDoor = null;
+        for (Entity entity: entities) {
+            if (entity.getPosition().equals(position) && entity.getType().equals("door")) {
+                entityDoor = (Door) entity;
+                return entityDoor;
+            }
+        }
+        return entityDoor;
+    }
+
 
     public List<Entity> checkNext(Direction direction, List<Entity> entities) {
         List<Entity> interactingEntities = new ArrayList<Entity>();
