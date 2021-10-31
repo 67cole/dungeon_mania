@@ -1323,7 +1323,7 @@ public class DungeonManiaController {
      * @param dungeonName
      * @return returnGoal
      */
-    public String getGoalsFromJson(String dungeonName)  {
+    public String getGoalsFromJson(String dungeonName) {
         String returnGoal = "";
         String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
         try {

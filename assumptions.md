@@ -59,3 +59,7 @@ InvisibilityPotion
 
 Armour
     -   20 percent chance to receive after a successfull battle
+
+
+Goals
+    - If goals are not given for a dungeon, assume it cannot be completed
