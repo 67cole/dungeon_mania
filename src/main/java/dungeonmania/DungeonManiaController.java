@@ -585,6 +585,7 @@ public class DungeonManiaController {
         int mercenaryAddedLater = 0;
         int EnemyCheck = 0;
         boolean invincibilityActive = false; 
+        Character tempChar = null;
 
         Position playerSpawnPosition = null;
         main = currDungeon;
@@ -655,35 +656,36 @@ public class DungeonManiaController {
                     if (interactingEntity != null) {
                         // EntityFunction that handles all interactions with player
                         interactingEntity.entityFunction(entities, (Character) temp, movementDirection, main);
+                        
 
-                        Position playerPos = new Position(0, 0);
-                        for (Entity ent : entities) {
-                            if (ent.getType().equals("player")) playerPos = ent.getPosition();
+                        // Position playerPos = new Position(0, 0);
+                        // for (Entity ent : entities) {
+                        //     if (ent.getType().equals("player")) playerPos = ent.getPosition();
                                 
-                        }
-                        for (Entity enti : entities) {
-                            System.out.printf("player pos: %d, %d ", playerPos.getX(), playerPos.getY());
-                            System.out.printf("currEnt pos: %d, %d of type %s\n", enti.getPosition().getX(), enti.getPosition().getY(), enti.getType());
+                        // }
+                        // for (Entity enti : entities) {
+                        //     System.out.printf("player pos: %d, %d ", playerPos.getX(), playerPos.getY());
+                        //     System.out.printf("currEnt pos: %d, %d of type %s\n", enti.getPosition().getX(), enti.getPosition().getY(), enti.getType());
 
-                            if (enti.getType().equals("boulder")) {
+                        //     if (enti.getType().equals("boulder")) {
                                 
-                                Position entPos = enti.getPosition();
-                                Position up = new Position(0, -1);
-                                Position down = new Position(0, 1);
-                                Position left = new Position(-1, 0);
-                                Position right = new Position(1, 0);
-                                if (playerPos.equals(entPos.translateBy(up)) || playerPos.equals(entPos.translateBy(down)) || playerPos.equals(entPos.translateBy(left)) || playerPos.equals(entPos.translateBy(right))) {
-                                    doExplode(entities, (Character) temp, main, enti, allNearbyEntities); 
-                                    System.out.println("HI");
-                                }
+                        //         Position entPos = enti.getPosition();
+                        //         Position up = new Position(0, -1);
+                        //         Position down = new Position(0, 1);
+                        //         Position left = new Position(-1, 0);
+                        //         Position right = new Position(1, 0);
+                        //         if (playerPos.equals(entPos.translateBy(up)) || playerPos.equals(entPos.translateBy(down)) || playerPos.equals(entPos.translateBy(left)) || playerPos.equals(entPos.translateBy(right))) {
+                        //             doExplode(entities, (Character) temp, main, enti, allNearbyEntities); 
+                        //             System.out.println("HI");
+                        //         }
 
-                                // doExplode(entities, (Character) temp, main, enti, allNearbyEntities);
-                            }
-                        }
-                        // entitiesToBeRemoved.addAll(allNearbyEntities);
-                        for (Entity enta : allNearbyEntities) {
-                            entitiesToBeRemoved.add(enta);
-                        }
+                        //         // doExplode(entities, (Character) temp, main, enti, allNearbyEntities);
+                        //     }
+                        // }
+                        // // entitiesToBeRemoved.addAll(allNearbyEntities);
+                        // for (Entity enta : allNearbyEntities) {
+                        //     entitiesToBeRemoved.add(enta);
+                        // }
 
 
                         
@@ -861,6 +863,37 @@ public class DungeonManiaController {
         if (mercenaryAddedLater == 1) main.addEntities(mercenaryHolder);
         if (spiderSpawned == 1) main.addEntities(spid);
         
+        Position playerPos = new Position(0, 0);
+        for (Entity ent : entities) {
+            if (ent.getType().equals("player")) playerPos = ent.getPosition();
+                
+        }
+        for (Entity currPlayer : entities) {
+            if (currPlayer.getType().equals("player")) tempChar = (Character) currPlayer;
+        }
+        for (Entity enti : entities) {
+            System.out.printf("player pos: %d, %d ", playerPos.getX(), playerPos.getY());
+            System.out.printf("currEnt pos: %d, %d of type %s\n", enti.getPosition().getX(), enti.getPosition().getY(), enti.getType());
+
+            if (enti.getType().equals("boulder")) {
+                
+                Position entPos = enti.getPosition();
+                Position up = new Position(0, -1);
+                Position down = new Position(0, 1);
+                Position left = new Position(-1, 0);
+                Position right = new Position(1, 0);
+                if (playerPos.equals(entPos.translateBy(up)) || playerPos.equals(entPos.translateBy(down)) || playerPos.equals(entPos.translateBy(left)) || playerPos.equals(entPos.translateBy(right))) {
+                    doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities); 
+                    System.out.println("HI");
+                }
+
+                // doExplode(entities, (Character) temp, main, enti, allNearbyEntities);
+            }
+        }
+        // entitiesToBeRemoved.addAll(allNearbyEntities);
+        for (Entity enta : allNearbyEntities) {
+            entitiesToBeRemoved.add(enta);
+        }
         // Remove the collectible from the map
         entityRemover(entitiesToBeRemoved, main);
         
@@ -1526,16 +1559,64 @@ public class DungeonManiaController {
         List<Entity> entsW = main.getEntitiesAtPos(W);
         List<Entity> entsNW = main.getEntitiesAtPos(NW);
         List<Entity> entsO = entitiesAtPos;
-
-        NearbyEntities.addAll(entsN);
-        NearbyEntities.addAll(entsNE);
-        NearbyEntities.addAll(entsE);
-        NearbyEntities.addAll(entsSE);
-        NearbyEntities.addAll(entsS);
-        NearbyEntities.addAll(entsSW);
-        NearbyEntities.addAll(entsW);
-        NearbyEntities.addAll(entsNW);
-        NearbyEntities.addAll(entsO);
+        for (Entity ent : entsN) {
+            if (!ent.getType().equals("player")) {
+                NearbyEntities.add(ent);
+                System.out.printf("\n1\n");
+            }
+        }
+        for (Entity ent : entsNE) {
+            if (!ent.getType().equals("player")) {
+                NearbyEntities.add(ent);
+                System.out.printf("\n2\n");
+            }
+        }
+        for (Entity ent : entsE) {
+            if (!ent.getType().equals("player")) {
+                NearbyEntities.add(ent);
+                System.out.printf("\n3\n");
+            }
+        }
+        for (Entity ent : entsSE) {
+            if (!ent.getType().equals("player")) {
+                NearbyEntities.add(ent);
+            
+                System.out.printf("\n4\n");
+            }
+        }
+        for (Entity ent : entsS) {
+            if (!ent.getType().equals("player")) {
+                NearbyEntities.add(ent);
+                System.out.printf("\n5\n");
+            }
+        }
+        for (Entity ent : entsSW) {
+            if (!ent.getType().equals("player")) {
+                NearbyEntities.add(ent);
+                System.out.printf("\n6\n"); 
+            }
+        }
+        for (Entity ent : entsW) {
+            if (!ent.getType().equals("player")) {
+                NearbyEntities.add(ent);
+                System.out.printf("\n7\n");
+            }
+        }
+        for (Entity ent : entsNW) {
+            if (!ent.getType().equals("player")) {
+                NearbyEntities.add(ent);
+                System.out.printf("\n8\n");
+            }
+        }
+        // NearbyEntities.addAll(entsN);
+        // NearbyEntities.addAll(entsNE);
+        // NearbyEntities.addAll(entsE);
+        // NearbyEntities.addAll(entsSE);
+        // NearbyEntities.addAll(entsS);
+        // NearbyEntities.addAll(entsSW);
+        // NearbyEntities.addAll(entsW);
+        // NearbyEntities.addAll(entsNW);
+        // NearbyEntities.addAll(entsO);
         // NearbyEntities.removeIf(s -> (!s.getType().equals("player")));
         // Iterator<Entity> itr = allNearbyEntities.iterator();
         // while (itr.hasNext()) {
