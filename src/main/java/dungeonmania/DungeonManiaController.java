@@ -916,6 +916,7 @@ public class DungeonManiaController {
 
         boolean posFound = false;
         while (posFound == false) {
+
             int x = getRandomNumber(1, 16);
             int y = getRandomNumber(1, 14);
             int check = 0;
