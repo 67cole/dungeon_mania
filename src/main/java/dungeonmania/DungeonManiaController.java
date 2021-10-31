@@ -117,175 +117,6 @@ public class DungeonManiaController {
         
         return dr;
     }
-    
-    public void addEntitiesToList(String dungeonName, Dungeon main) {
-
-        String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
-        try {
-            JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
-            JsonArray entitiesList = jsonObject.get("entities").getAsJsonArray();
-            
-            for (int i = 0; i < entitiesList.size(); i++) {
-                JsonObject entity = entitiesList .get(i).getAsJsonObject();
-                String type = entity.get("type").getAsString();
-                int x = entity.get("x").getAsInt();
-                int y = entity.get("y").getAsInt();
-                Position position = new Position(x,y);;
-                String entityId =  String.format("entity%d", entityCounter);
-                entityCounter += 1;
-                switch(type) {
-                    case "player":
-                        Character characterEntity = new Character(position, type, entityId , false);
-                        main.addEntities(characterEntity);  
-                        characterEntity.setSpawn(position);
-                        break;
-                    case "wall":                       
-                        Wall wallEntity = new Wall(position, type, entityId , false);
-                        main.addEntities(wallEntity);  
-                        break;
-                    case "exit":
-                        Exit exitEntity = new Exit(position, type, entityId, true);
-                        main.addEntities(exitEntity);
-                        break;
-                    case "boulder":
-                        Boulder boulderEntity= new Boulder(position, type, entityId, true);
-                        main.addEntities(boulderEntity);
-                        break;
-                    case "switch":
-                        Switch switchEntity = new Switch(position, type, entityId, true);
-                        main.addEntities(switchEntity);
-                        break;
-                    case "door":
-                        int keyType = entity.get("key").getAsInt();
-                        Door doorEntity = new Door(position, type, entityId, true, keyType, true);
-                        main.addEntities(doorEntity);
-                        break;
-                    case "portal":
-                        String colour = entity.get("colour").getAsString();
-                        Portal portalEntity = new Portal(position, type, entityId, true, colour);
-                        main.addEntities(portalEntity);
-                        break;
-                    case "zombie_toast_spawner":
-                        ZombieToastSpawner zombieToastSpawner = new ZombieToastSpawner(position, type, entityId, true);
-                        main.addEntities(zombieToastSpawner);
-                        break;
-                    case "key":
-                        main.setKeyCounter(main.getKeyCounter() + 1);
-                        Key key = new Key(position, type, entityId, true, main.getKeyCounter());
-                        main.addEntities(key);
-                        break;
-                    case "arrow":
-                        Arrows arrows = new Arrows(position, type, entityId, true);
-                        main.addEntities(arrows);
-                        break;
-                    case "bomb":
-                        Bomb bomb = new Bomb(position, type, entityId, true);
-                        main.addEntities(bomb);
-                        break;
-                    case "health_potion":
-                        HealthPotion healthPotion = new HealthPotion(position, type, entityId, true);
-                        main.addEntities(healthPotion);
-                        break;
-                    case "invincibility_potion":
-                        InvincibilityPotion invincibilityPotion = new InvincibilityPotion(position, type, entityId, true);
-                        main.addEntities(invincibilityPotion);
-                        break;
-                    case "invisibility_potion":
-                        InvisibilityPotion invisibilityPotion = new InvisibilityPotion(position, type, entityId, true);
-                        main.addEntities(invisibilityPotion);
-                        break;
-                    case "sword":
-                        Sword sword = new Sword(position, type, entityId, true);
-                        main.addEntities(sword);
-                        break;
-                    case "treasure":
-                        Treasure treasure = new Treasure(position, type, entityId, true);
-                        main.addEntities(treasure);
-                        break;
-                    case "wood":
-                        Wood wood = new Wood(position, type, entityId, true);
-                        main.addEntities(wood);
-                        break;
-                    case "spider":
-                        Spider spiderEntity = new Spider(position, type, entityId, true);
-                        main.addEntities(spiderEntity);
-                        break;
-                    case "zombie_toast":
-                        ZombieToast zombieToast = new ZombieToast(position, type, entityId, true);
-                        main.addEntities(zombieToast);
-                        break;
-                    case "mercenary":
-                        Mercenary mercenaryEntity = new Mercenary(position, type, entityId, true);
-                        main.addEntities(mercenaryEntity);
-                        break;
-                }
-            }
-        } catch (Exception e) {
-
-        }   
-    }
-
-    public String getGoalsFromJson(String dungeonName)  {
-        String returnGoal = "";
-        String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
-        try {
-            JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
-            JsonObject goalCondition = jsonObject.get("goal-condition").getAsJsonObject();
-            String goal = goalCondition.get("goal").getAsString();
-            switch(goal) {
-                case "AND":
-                    JsonArray subgoals = goalCondition.get("subgoals").getAsJsonArray();
-                    for (int i = 0; i < subgoals.size(); i++) {
-                        JsonObject goals = subgoals.get(i).getAsJsonObject();
-                        if (goals.get("goal").getAsString().equals("enemies")) {
-                            if (findEnemies(filename, "mercenary") && findEnemies(filename, "spider")) {
-                                returnGoal += ":mercenary AND :spider";    
-                            } else if (findEnemies(filename, "spider")) {
-                                returnGoal += ":spider";
-                            } else if (findEnemies(filename, "mercenary")) {
-                                returnGoal += ":mercenary";
-                            }
-                        } 
-                        else {
-                            returnGoal += ":" + goals.get("goal").getAsString();
-                        }                   
-                        if (i + 1 != subgoals.size()) {
-                            returnGoal += " AND ";
-                        }
-                    }
-                    break;
-                case "exit":
-                    returnGoal = ":exit";
-                    break;
-                case "boulders":
-                    returnGoal = ":boulder";
-                    break;
-
-            }
-        } catch (Exception e) {
-
-        }
-        return returnGoal;
-        
-    }
-
-    public boolean findEnemies(String filename, String enemy) {
-        try {
-            JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
-            JsonArray entitiesList = jsonObject.get("entities").getAsJsonArray();
-            for (int i = 0; i < entitiesList.size(); i++) {
-                JsonObject entity = entitiesList.get(i).getAsJsonObject();
-                if (entity.get("type").getAsString().equals(enemy)) {
-                    return true;
-                }
-            }
-
-        } catch (Exception e) {
-
-        }     
-        return false;
-
-    }
 
     public DungeonResponse saveGame(String name) throws IllegalArgumentException {
         return null;
@@ -300,6 +131,14 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {
+
+        if (!itemUsedInvalid(itemUsed)) {
+            throw new IllegalArgumentException("The item used is invalid.");
+        }
+
+        if (!itemUsedNotInInventory(itemUsed)) {
+            throw new InvalidActionException("The item is not in the inventory.");
+        }
 
         Dungeon main = null;
         List<Entity> entitiesToBeRemoved = new ArrayList<Entity>();
@@ -706,6 +545,11 @@ public class DungeonManiaController {
         }
     }
 
+    /**
+     * Helper Function that returns the players position 
+     * @param entities
+     * @return position
+     */
     public Position getPlayerPosition(List<Entity> entities) {
         for (Entity player: entities) {
             if (player.getType().equals("player")) {
@@ -732,9 +576,8 @@ public class DungeonManiaController {
     
     
     /**
-     * Searches for a key
-     * @param inventory - inventory of the character
-     * @return boolean
+     * Searches for a key, returns true if the key could be found
+     * @param inventory
      */
     public boolean keyChecker(List<CollectableEntity> inventory) {
         for (CollectableEntity item: inventory) {
@@ -836,6 +679,218 @@ public class DungeonManiaController {
             }
         }
         return false;
+    }
+
+    /**
+     * This function checks whether or not the item given in tick is valid
+     * @param itemUsed
+     */
+    public boolean itemUsedInvalid(String itemUsed) {
+        String[] items = {"bomb", "health_potion", "invincibility_potion", "invisibility_potion"};
+        List<String> itemAvailable = Arrays.asList(items);
+        itemAvailable.add(null);
+        
+        return itemAvailable.contains(itemUsed);
+    }
+
+    /**
+     * This function checks whether or not the item given in tick is in the inventory
+     * @param itemUsed
+     */
+    public boolean itemUsedNotInInventory(String itemUsed) {    
+        List<CollectableEntity> inventory = currDungeon.getInventory();
+
+        for (CollectableEntity collectable : inventory) {
+            if (collectable.getType().equals(itemUsed)) return true;
+        }
+            
+        return false;
+    }
+    
+    /**
+     * Helper Function that takes in the json file and adds all entities into entities list
+     * @param dungeonName
+     * @param main
+     */
+    public void addEntitiesToList(String dungeonName, Dungeon main) {
+
+        String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
+        try {
+            JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
+            JsonArray entitiesList = jsonObject.get("entities").getAsJsonArray();
+            
+            for (int i = 0; i < entitiesList.size(); i++) {
+                JsonObject entity = entitiesList .get(i).getAsJsonObject();
+                String type = entity.get("type").getAsString();
+                int x = entity.get("x").getAsInt();
+                int y = entity.get("y").getAsInt();
+                Position position = new Position(x,y);;
+                String entityId =  String.format("entity%d", entityCounter);
+                entityCounter += 1;
+                switch(type) {
+                    case "player":
+                        Character characterEntity = new Character(position, type, entityId , false);
+                        main.addEntities(characterEntity);  
+                        characterEntity.setSpawn(position);
+                        break;
+                    case "wall":                       
+                        Wall wallEntity = new Wall(position, type, entityId , false);
+                        main.addEntities(wallEntity);  
+                        break;
+                    case "exit":
+                        Exit exitEntity = new Exit(position, type, entityId, true);
+                        main.addEntities(exitEntity);
+                        break;
+                    case "boulder":
+                        Boulder boulderEntity= new Boulder(position, type, entityId, true);
+                        main.addEntities(boulderEntity);
+                        break;
+                    case "switch":
+                        Switch switchEntity = new Switch(position, type, entityId, true);
+                        main.addEntities(switchEntity);
+                        break;
+                    case "door":
+                        int keyType = entity.get("key").getAsInt();
+                        Door doorEntity = new Door(position, type, entityId, true, keyType, true);
+                        main.addEntities(doorEntity);
+                        break;
+                    case "portal":
+                        String colour = entity.get("colour").getAsString();
+                        Portal portalEntity = new Portal(position, type, entityId, true, colour);
+                        main.addEntities(portalEntity);
+                        break;
+                    case "zombie_toast_spawner":
+                        ZombieToastSpawner zombieToastSpawner = new ZombieToastSpawner(position, type, entityId, true);
+                        main.addEntities(zombieToastSpawner);
+                        break;
+                    case "key":
+                        main.setKeyCounter(main.getKeyCounter() + 1);
+                        Key key = new Key(position, type, entityId, true, main.getKeyCounter());
+                        main.addEntities(key);
+                        break;
+                    case "arrow":
+                        Arrows arrows = new Arrows(position, type, entityId, true);
+                        main.addEntities(arrows);
+                        break;
+                    case "bomb":
+                        Bomb bomb = new Bomb(position, type, entityId, true);
+                        main.addEntities(bomb);
+                        break;
+                    case "health_potion":
+                        HealthPotion healthPotion = new HealthPotion(position, type, entityId, true);
+                        main.addEntities(healthPotion);
+                        break;
+                    case "invincibility_potion":
+                        InvincibilityPotion invincibilityPotion = new InvincibilityPotion(position, type, entityId, true);
+                        main.addEntities(invincibilityPotion);
+                        break;
+                    case "invisibility_potion":
+                        InvisibilityPotion invisibilityPotion = new InvisibilityPotion(position, type, entityId, true);
+                        main.addEntities(invisibilityPotion);
+                        break;
+                    case "sword":
+                        Sword sword = new Sword(position, type, entityId, true);
+                        main.addEntities(sword);
+                        break;
+                    case "treasure":
+                        Treasure treasure = new Treasure(position, type, entityId, true);
+                        main.addEntities(treasure);
+                        break;
+                    case "wood":
+                        Wood wood = new Wood(position, type, entityId, true);
+                        main.addEntities(wood);
+                        break;
+                    case "spider":
+                        Spider spiderEntity = new Spider(position, type, entityId, true);
+                        main.addEntities(spiderEntity);
+                        break;
+                    case "zombie_toast":
+                        ZombieToast zombieToast = new ZombieToast(position, type, entityId, true);
+                        main.addEntities(zombieToast);
+                        break;
+                    case "mercenary":
+                        Mercenary mercenaryEntity = new Mercenary(position, type, entityId, true);
+                        main.addEntities(mercenaryEntity);
+                        break;
+                }
+            }
+        } catch (Exception e) {
+
+        }   
+    }
+
+    /**
+     * Helper Function that returns the goals as a string
+     * @param dungeonName
+     * @return returnGoal
+     */
+    public String getGoalsFromJson(String dungeonName)  {
+        String returnGoal = "";
+        String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
+        try {
+            JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
+            JsonObject goalCondition = jsonObject.get("goal-condition").getAsJsonObject();
+            String goal = goalCondition.get("goal").getAsString();
+            switch(goal) {
+                case "AND":
+                    JsonArray subgoals = goalCondition.get("subgoals").getAsJsonArray();
+                    for (int i = 0; i < subgoals.size(); i++) {
+                        JsonObject goals = subgoals.get(i).getAsJsonObject();
+                        if (goals.get("goal").getAsString().equals("enemies")) {
+                            if (findEnemies(filename, "mercenary") && findEnemies(filename, "spider")) {
+                                returnGoal += ":mercenary AND :spider";    
+                            } else if (findEnemies(filename, "spider")) {
+                                returnGoal += ":spider";
+                            } else if (findEnemies(filename, "mercenary")) {
+                                returnGoal += ":mercenary";
+                            }
+                        } 
+                        else {
+                            returnGoal += ":" + goals.get("goal").getAsString();
+                        }                   
+                        if (i + 1 != subgoals.size()) {
+                            returnGoal += " AND ";
+                        }
+                    }
+                    break;
+                case "exit":
+                    returnGoal = ":exit";
+                    break;
+                case "boulders":
+                    returnGoal = ":boulder";
+                    break;
+
+            }
+        } catch (Exception e) {
+
+        }
+        return returnGoal;
+        
+    }
+
+    /**
+     * Helper Function that returns true if an enemy goal could be found in the 
+     * json file 
+     * @param filename
+     * @param enemy
+     * @return boolean
+     */
+    public boolean findEnemies(String filename, String enemy) {
+        try {
+            JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
+            JsonArray entitiesList = jsonObject.get("entities").getAsJsonArray();
+            for (int i = 0; i < entitiesList.size(); i++) {
+                JsonObject entity = entitiesList.get(i).getAsJsonObject();
+                if (entity.get("type").getAsString().equals(enemy)) {
+                    return true;
+                }
+            }
+
+        } catch (Exception e) {
+
+        }     
+        return false;
+
     }
 }
 
