@@ -22,6 +22,8 @@ public class Dungeon {
     private boolean keyStatus = true;
     private int tickCounter;
     private int entityCounter;
+    private int height;
+    private int width;
 
     public Dungeon(String dungeonName, String dungeonId, String dungeonGoals) {
         this.dungeonName = dungeonName;
@@ -29,6 +31,32 @@ public class Dungeon {
         this.dungeonGoals = dungeonGoals;
         this.keyCounter = 0;
     }
+
+    
+
+    public int getHeight() {
+        return height;
+    }
+
+
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+
+
+    public int getWidth() {
+        return width;
+    }
+
+
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+
 
     public int getEntityCounter() {
         return entityCounter;
