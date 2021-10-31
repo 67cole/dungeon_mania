@@ -21,12 +21,22 @@ public class Dungeon {
     private int keyCounter;
     private boolean keyStatus = true;
     private int tickCounter;
+    private int entityCounter;
 
     public Dungeon(String dungeonName, String dungeonId, String dungeonGoals) {
         this.dungeonName = dungeonName;
         this.dungeonId = dungeonId;
         this.dungeonGoals = dungeonGoals;
         this.keyCounter = 0;
+    }
+
+    public int getEntityCounter() {
+        return entityCounter;
+    }
+
+
+    public void setEntityCounter(int entityCounter) {
+        this.entityCounter = entityCounter;
     }
 
     public int getTickCounter() {
