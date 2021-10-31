@@ -10,6 +10,8 @@ public class ZombieToast extends MovingEntity {
     private final static int STARTING_HEALTH = 3;
     private final static int ATTACK = 1;
 
+    
+
     /**
      * Creates the main zombie
      * @param position - the current position in the dungeon
@@ -21,6 +23,11 @@ public class ZombieToast extends MovingEntity {
         super(position, type, ID, isInteractable);
         setHealth(STARTING_HEALTH);
         setAttack(ATTACK);
+        Random random = new Random();
+        int chance = random.nextInt(6);
+        if (chance == 3) {
+            setArmour(true);
+        }
     }
 
     public void moveEntity(List<Entity> entities) {

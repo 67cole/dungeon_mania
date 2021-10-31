@@ -47,7 +47,7 @@ public class DungeonManiaController {
     
     private List<Dungeon> dungeons = new ArrayList<Dungeon>();
 
-    // This will be changed based on negame or loadgame
+    // This will be changed based on newgame or loadgame
     private Dungeon currDungeon;
 
     private int dungeonCounter = 0;
@@ -245,6 +245,22 @@ public class DungeonManiaController {
                                 Position tempPos = new Position(-1, -1);
                                 TheOneRing oneRing = new TheOneRing(tempPos, "one_ring", entityId, true);
                                 main.inventory.add(oneRing);
+                            }
+                        }
+                        // Accounting for chance to receive armour
+                        if (interactingEntity.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
+                            MovingEntity mob = (MovingEntity) interactingEntity;
+                            if (mob.getArmour()) {
+                                Random random = new Random();
+                                int chance = random.nextInt(11);
+                                if (chance == 5) {
+                                    String entityId =  String.format("entity%d", entityCounter);
+                                    entityCounter += 1;
+                                    // Position needs to be stated as checkNext requires a position to run
+                                    Position tempPos = new Position(-1, -1);
+                                    Armour armour = new Armour(tempPos, "armour", entityId, true);
+                                    main.inventory.add(armour);
+                                }
                             }
                         }
                     }
@@ -574,8 +590,8 @@ public class DungeonManiaController {
 
     /**
      * Removes an entity from Entities List
-     * @param entityList
-     * @param main
+     * @param entityList - the list of entities to be removed in the dungeon
+     * @param main - the dungeon
      */
      public void entityRemover(List<Entity> entityList, Dungeon main) {
         for (Entity entityToBeRemoved : entityList) {
@@ -597,6 +613,12 @@ public class DungeonManiaController {
             }
         }
     }
+    /**
+     * Uses the item in the inventory
+     * @param player - the character
+     * @param main - the dungeon
+     * @param itemUsed - the item that is used
+     */
     public void useItem(Character player, Dungeon main, String itemUsed) {
         if (itemUsed != null) {
             for (CollectableEntity entity2: main.inventory) {
@@ -621,7 +643,13 @@ public class DungeonManiaController {
             }
         }
     }
-
+    /**
+     * Checks if the bomb is activated
+     * @param player - the character
+     * @param main - the dungeon
+     * @param itemUsed - the item that is used
+     * @return Bomb
+     */
     public Bomb useBomb(Character player, Dungeon main, String itemUsed) {
         if (itemUsed != null) {
             for (CollectableEntity entity2: main.inventory) {
@@ -638,7 +666,11 @@ public class DungeonManiaController {
         }
         return null;
     }
-
+    /**
+     * Checks if the bomb is activated
+     * @param entity - the item
+     * @return boolean 
+     */
     public boolean isBombActivated(Entity entity) {
         if (entity.getType().equals("bomb")) {
             Bomb bomb = (Bomb) entity;
