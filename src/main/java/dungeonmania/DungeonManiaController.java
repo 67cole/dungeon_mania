@@ -782,6 +782,7 @@ public class DungeonManiaController {
             // Zombie Movement (moves the same for character but can't interact)
             if (entity.getType().equals("zombie_toast") && !invincibilityActive) {
                 ZombieToast temp = (ZombieToast) entity;
+                
                 temp.moveEntity(entities);
             }         
 

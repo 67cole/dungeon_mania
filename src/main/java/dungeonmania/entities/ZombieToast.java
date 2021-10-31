@@ -38,24 +38,56 @@ public class ZombieToast extends MovingEntity {
         switch(randDirection) {
             case 0:
                 if (checkMovement(super.getPosition().translateBy(0, -1), entities)) {
+                    // If its netiher a wall nor a boulder, check if its a door
+                    Door doorEntity = checkDoor(super.getPosition().translateBy(0,-1), entities); 
+                    if (doorEntity != null) {
+                        //If it is a door, check if its locked or not, if it isnt locked, move into it
+                        if (doorEntity.getLocked() == true) {
+                            break;
+                        }
+                    }
                     super.moveUpward();
                     break;
                 }
             
             case 1:
                 if (checkMovement(super.getPosition().translateBy(0, 1), entities)) {
+                    // If its netiher a wall nor a boulder, check if its a door
+                    Door doorEntity = checkDoor(super.getPosition().translateBy(0,1), entities); 
+                    if (doorEntity != null) {
+                        //If it is a door, check if its locked or not, if it isnt locked, move into it
+                        if (doorEntity.getLocked() == true) {
+                            break;
+                        }
+                    }
                     super.moveDownward();
                     break;
                 }
             
             case 2:
                 if (checkMovement(super.getPosition().translateBy(-1, 0), entities)) {
+                    // If its netiher a wall nor a boulder, check if its a door
+                    Door doorEntity = checkDoor(super.getPosition().translateBy(-1, 0), entities); 
+                    if (doorEntity != null) {
+                        //If it is a door, check if its locked or not, if it isnt locked, move into it
+                        if (doorEntity.getLocked() == true) {
+                            break;
+                        }
+                    }
                     super.moveLeft();
                     break;
                 }
             
             case 3:
                 if (checkMovement(super.getPosition().translateBy(1, 0), entities)) {
+                    // If its netiher a wall nor a boulder, check if its a door
+                    Door doorEntity = checkDoor(super.getPosition().translateBy(1,0), entities); 
+                    if (doorEntity != null) {
+                        //If it is a door, check if its locked or not, if it isnt locked, move into it
+                        if (doorEntity.getLocked() == true) {
+                            break;
+                        }
+                    }
                     super.moveRight();
                     break;
                 }
