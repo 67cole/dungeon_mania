@@ -21,6 +21,8 @@ Spider
     -   Spiders can't spawn on edge of dungeon 
     -   The max amount of spiders is 8
     -   A spider cannot spawn on or under a boulder
+    -   When the player drinks an invincibility potion, the spiders will break out of the cycle and run as far as it can. Once invincibility potion ends, it will begin the cycle again at its new location
+    -   The spider can run outside the map whilst invincibility is still active
 
 Mercenary
 
@@ -49,6 +51,11 @@ TheOneRing
 
 InvincibilityPotion
     -   Assumes durability is not affected
+    -   The invincibility potion will last for 10 ticks
+
+InvisibilityPotion
+    -   The invisibility potion will last for 10 ticks
+    -   If the invincibility potion is taken during invisibility phase, the invisibility phase should take priority
 
 Armour
     -   20 percent chance to receive after a successfull battle

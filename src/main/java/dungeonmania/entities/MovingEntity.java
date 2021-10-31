@@ -526,13 +526,13 @@ public abstract class MovingEntity implements Entity {
     @Override
     public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {
         while (checkBattleState(player.getHealth(), this.getHealth())) {
+            // If character is invisible, return.
+            if (player.isInvisible()) {
+                return;
+            }
             // If character is invincible, set enemy dead, return.
             if (player.isInvincible()) {
                 this.setAlive(false);
-                return;
-            }
-            // If character is invisible, return.
-            if (player.isInvisible()) {
                 return;
             }
             // Simulate a round of battle
@@ -604,6 +604,47 @@ public abstract class MovingEntity implements Entity {
         }
     }
     
+    /**
+     * Moving the enemy if the invincibility potion is active
+     */
+    public void runEnemy (List<Entity> entities, Position playerPosition) {
+        Position current = getPosition();
 
+        // Get the adjacent positions around the enemy
+        List<Position> adjacent = current.getAdjacentPositions();
+
+        // Index 1, 3, 5 and 7 are adjacent position 
+        List<Position> validPositions = new ArrayList<>();
+        validPositions.add(adjacent.get(1));
+        validPositions.add(adjacent.get(3));
+        validPositions.add(adjacent.get(5));
+        validPositions.add(adjacent.get(7));
+
+
+        // Final placeholders for positions moved and longest distance
+        double longestDistance = -99999999;
+        Position destination = null; 
+
+        // This looks through adjacent positions, checks whether the next square is movable
+        // then checks for the longest distance between these squares
+        for (Position position : validPositions) {
+            if (checkMovement(position, entities) || getType().equals("spider")) {
+                Position vector = Position.calculatePositionBetween(position, playerPosition);
+                double distance = Math.sqrt(Math.pow(vector.getX(), 2) + Math.pow(vector.getY(), 2));
+
+                if (distance >= longestDistance) {
+                    destination = position; 
+                    longestDistance = distance;
+                }
+            }
+        }   
+
+        // Checks whether we need to move the enemy at all
+        Position originalVector = Position.calculatePositionBetween(current, playerPosition);
+        double originalDistance = Math.sqrt(Math.pow(originalVector.getX(), 2) + Math.pow(originalVector.getY(), 2));
+   
+        // Now moving the enemy. Also check the movement once more as spider can be on wall
+        if (longestDistance > originalDistance) setPosition(destination);
+    }
 
 }
