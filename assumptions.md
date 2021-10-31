@@ -33,6 +33,8 @@ Mercenary
     -   Mercenaries can't interact with anything (i.e. moving a boulder )
     -   Mercenaries will always have a valid spot to move to, it cannot be trapped
     -   10 percent chance of spawning with armour
+    -   Mercenaries have a 4 unit battle radius (this uses pythagorus from the square units)
+
 
 Portal 
 
@@ -64,4 +66,8 @@ InvisibilityPotion
 Armour
 
     -   20 percent chance to receive after a successful battle
+
+Battle
+
+    -   The character can only have one battle at a time in ONE tick, so if a mercenary moves on top of the character mid battle, it will battle in the next tick, or if a spider jumps on top mid battle, it will crawl away unless the character moves on top of their path next tick.
 
