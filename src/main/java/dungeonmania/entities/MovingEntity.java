@@ -2,6 +2,7 @@ package dungeonmania.entities;
 
 import dungeonmania.util.Position;
 
+import java.util.ArrayList;
 import java.util.List;
 import dungeonmania.entities.CollectableEntities.Sword;
 import dungeonmania.entities.CollectableEntities.Armour;
@@ -46,6 +47,11 @@ public abstract class MovingEntity implements Entity {
      * If it is interactable
      */
     private boolean isInteractable;
+
+    /**
+     * Armour of the entity
+     */
+    private boolean armour = false;
 
     /**
      * Creates a moving entity that can be moved up, down, left and right into cardinally adjacent square
@@ -101,8 +107,49 @@ public abstract class MovingEntity implements Entity {
     /**
      * Get position
      */
+     @Override
     public Position getPosition() {
         return position;
+    }
+
+    /**
+     * Get type
+     */
+     @Override
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * Get ID
+     */
+    @Override
+    public String getID() {
+        return ID;
+    }
+
+    /**
+     * Get isInteractable
+     */
+    @Override
+    public boolean getIsInteractable() {
+        return isInteractable;
+    }
+
+    /**
+     * Getting the armour status of entity
+     * @return boolean
+     */
+    public boolean getArmour() {
+        return this.armour;
+    }
+
+    /**
+     * Setting the armour status of entity
+     * @return boolean
+     */
+    public void setArmour(boolean armour) {
+        this.armour = armour;
     }
 
     /**
@@ -152,20 +199,6 @@ public abstract class MovingEntity implements Entity {
     }
 
     /**
-     * Get type
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * Get ID
-     */
-    public String getID() {
-        return ID;
-    }
-
-    /**
      * Getter for position in loop
      */
     public int getLoopPos() {
@@ -207,12 +240,6 @@ public abstract class MovingEntity implements Entity {
     public void setClockwise(boolean clockwise) {
     }
 
-    /**
-     * Get isInteractable
-     */
-    public boolean getIsInteractable() {
-        return isInteractable;
-    }
 
     /**
      * checkMovement checks for the next square if it's a wall/boulder.
@@ -383,17 +410,18 @@ public abstract class MovingEntity implements Entity {
 
     }
 
-    public Entity checkNext(Direction direction, List<Entity> entities) {
+    public List<Entity> checkNext(Direction direction, List<Entity> entities) {
+        List<Entity> interactingEntities = new ArrayList<Entity>();
         switch (direction) {
             case UP:
                 Position attemptedMove = position.translateBy(0, -1);
                 Entity spider = checkSpider(direction, entities, attemptedMove);
                 if (spider != null) {
-                    return spider;
+                    interactingEntities.add(spider);
                 } 
                 for (Entity entity : entities) {
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove)) {
-                        return entity;
+                        interactingEntities.add(entity);
                     }
                 }
                 break;
@@ -402,11 +430,11 @@ public abstract class MovingEntity implements Entity {
                 Position attemptedMove1 = position.translateBy(0, 1);
                 Entity spider2 = checkSpider(direction, entities, attemptedMove1);
                 if (spider2 != null) {
-                    return spider2;
+                    interactingEntities.add(spider2);
                 } 
                 for (Entity entity : entities) {
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove1)) {
-                        return entity;
+                        interactingEntities.add(entity);
                     }
                 }
                 break;
@@ -415,11 +443,11 @@ public abstract class MovingEntity implements Entity {
                 Position attemptedMove2 = position.translateBy(-1, 0);
                 Entity spider3 = checkSpider(direction, entities, attemptedMove2);
                 if (spider3 != null) {
-                    return spider3;
+                    interactingEntities.add(spider3);
                 } 
                 for (Entity entity : entities) {
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove2)) {
-                        return entity;
+                        interactingEntities.add(entity);
                     }
                 }
                 break;
@@ -428,11 +456,11 @@ public abstract class MovingEntity implements Entity {
                 Position attemptedMove3 = position.translateBy(1, 0);
                 Entity spider4 = checkSpider(direction, entities, attemptedMove3);
                 if (spider4 != null) {
-                    return spider4;
+                    interactingEntities.add(spider4);
                 } 
                 for (Entity entity : entities) {
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(attemptedMove3)) {
-                        return entity;
+                        interactingEntities.add(entity);
                     }
                 }
                 break; 
@@ -441,19 +469,19 @@ public abstract class MovingEntity implements Entity {
                 Position noMove = position;
                 Entity spider5 = checkSpider(direction, entities, noMove);
                 if (spider5 != null) {
-                    return spider5;
+                    interactingEntities.add(spider5);
                 } 
                 for (Entity entity : entities) {
                     if (entity.getType().equals("player")) continue;
                     if (!entity.getType().equals("switch") && entity.getPosition().equals(noMove)) {
-                        return entity;
+                        interactingEntities.add(entity);
                     }
                 }
                 break; 
         }
 
         // If it's a white square, you can move
-        return null; 
+        return interactingEntities; 
     }   
 
     public boolean boulderBlocked(Direction direction, Position attemptedMove, List<Entity> entities, Entity entity) {
@@ -478,7 +506,7 @@ public abstract class MovingEntity implements Entity {
         return false;
     }
 
-    public boolean checkBS(int characterHealth, int enemyHealth) {
+    public boolean checkBattleState(int characterHealth, int enemyHealth) {
         if (characterHealth <= 0) {
             return false;
         }
@@ -497,30 +525,48 @@ public abstract class MovingEntity implements Entity {
 
     @Override
     public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {
-        while (checkBS(player.getHealth(), this.getHealth())) {
+        while (checkBattleState(player.getHealth(), this.getHealth())) {
+            // If character is invisible, return.
+            if (player.isInvisible()) {
+                return;
+            }
             // If character is invincible, set enemy dead, return.
             if (player.isInvincible()) {
                 this.setAlive(false);
                 return;
             }
-            // If character is invisible, return.
-            if (player.isInvisible()) {
-                return;
-            }
             // Simulate a round of battle
             int weaponAtk = 0;
             boolean charArmour = false;
+            boolean enemyArmour = false;
+            if (this.getArmour()) {
+                enemyArmour = true;
+            }
+            Sword swordHolder = null;
+            Armour armourHolder = null;
             for (CollectableEntity item: main.inventory) {
                 if (item.getType().equals("sword")) {
                     Sword sword = (Sword) item;
                     weaponAtk = sword.getAttack();
                     sword.reduceDurability();
+                    swordHolder = sword.checkDurability();
+                    break;
                 }
                 if (item.getType().equals("armour")) {
                     Armour armour = (Armour) item;
                     charArmour = true;
                     armour.reduceDurability();
+                    armourHolder = armour.checkDurability();
+                    break;
                 }
+            }
+            // Remove the sword if durability runs out
+            if (swordHolder != null) {
+                main.inventory.remove(swordHolder);
+            }
+            // Remove the armour if durability runs out
+            if (armourHolder != null) {
+                main.inventory.remove(armourHolder);
             }
             int characterHealth = player.getHealth();
             int characterAD = player.getAttack();
@@ -532,7 +578,12 @@ public abstract class MovingEntity implements Entity {
             else {
                 characterHealth = characterHealth - ((enemyHealth * (enemyAD)) / 10);
             }
-            int newEnemyHealth = enemyHealth - ((characterHealth * (characterAD + weaponAtk)) / 5);
+            if (enemyArmour) {
+                enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+            }
+            else {
+                enemyHealth = enemyHealth - ((characterHealth * (characterAD + weaponAtk)) / 5);
+            }
             // Check if character dies
             if (!checkAlive(characterHealth)) {
                 player.setAlive(false);
@@ -547,12 +598,53 @@ public abstract class MovingEntity implements Entity {
                this.setHealth(0);
             }
             else {
-                this.setHealth(newEnemyHealth);
+                this.setHealth(enemyHealth);
             }
             // If none are dead, repeat the round
         }
     }
     
+    /**
+     * Moving the enemy if the invincibility potion is active
+     */
+    public void runEnemy (List<Entity> entities, Position playerPosition) {
+        Position current = getPosition();
 
+        // Get the adjacent positions around the enemy
+        List<Position> adjacent = current.getAdjacentPositions();
+
+        // Index 1, 3, 5 and 7 are adjacent position 
+        List<Position> validPositions = new ArrayList<>();
+        validPositions.add(adjacent.get(1));
+        validPositions.add(adjacent.get(3));
+        validPositions.add(adjacent.get(5));
+        validPositions.add(adjacent.get(7));
+
+
+        // Final placeholders for positions moved and longest distance
+        double longestDistance = -99999999;
+        Position destination = null; 
+
+        // This looks through adjacent positions, checks whether the next square is movable
+        // then checks for the longest distance between these squares
+        for (Position position : validPositions) {
+            if (checkMovement(position, entities) || getType().equals("spider")) {
+                Position vector = Position.calculatePositionBetween(position, playerPosition);
+                double distance = Math.sqrt(Math.pow(vector.getX(), 2) + Math.pow(vector.getY(), 2));
+
+                if (distance >= longestDistance) {
+                    destination = position; 
+                    longestDistance = distance;
+                }
+            }
+        }   
+
+        // Checks whether we need to move the enemy at all
+        Position originalVector = Position.calculatePositionBetween(current, playerPosition);
+        double originalDistance = Math.sqrt(Math.pow(originalVector.getX(), 2) + Math.pow(originalVector.getY(), 2));
+   
+        // Now moving the enemy. Also check the movement once more as spider can be on wall
+        if (longestDistance > originalDistance) setPosition(destination);
+    }
 
 }

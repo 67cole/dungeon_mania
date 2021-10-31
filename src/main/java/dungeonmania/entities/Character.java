@@ -7,8 +7,8 @@ import dungeonmania.util.*;
 public class Character extends MovingEntity {
     private final static int STARTING_HEALTH = 10;
     private final static int ATTACK = 2;
-    private Position spawnPosition = null;
 
+    private Position spawnPosition = null;
     private boolean invincible;
     private boolean invisible;
 
@@ -48,6 +48,10 @@ public class Character extends MovingEntity {
 
     public void setIsInvisible(boolean isInvisible) {
         this.invisible = isInvisible;
+    }
+
+    public void restoreHealth() {
+        setHealth(STARTING_HEALTH);
     }
 
     /**

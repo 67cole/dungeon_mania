@@ -19,7 +19,7 @@ public class Spider extends MovingEntity {
 
 
     /**
-     * Creates the main zombie
+     * Creates the spider
      * @param position - the current position in the dungeon
      * @param type - the type of entity
      * @param ID - the ID of entity
