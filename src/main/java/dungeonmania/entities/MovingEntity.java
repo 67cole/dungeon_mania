@@ -515,6 +515,7 @@ public abstract class MovingEntity implements Entity {
                     Sword sword = (Sword) item;
                     weaponAtk = sword.getAttack();
                     sword.reduceDurability();
+                    System.out.println(sword.getDurability());
                 }
                 if (item.getType().equals("armour")) {
                     Armour armour = (Armour) item;
