@@ -145,9 +145,7 @@ public class DungeonManiaController {
         jsonObj.addProperty("saveName", name);
         jsonObj.addProperty("entityCounter", currDungeon.getEntityCounter());
         jsonObj.addProperty("tickCounter", currDungeon.getTickCounter());
-        jsonObj.addProperty("keyStatus", currDungeon.getKeyStatus());
-        jsonObj.addProperty("width", currDungeon.getWidth());
-        jsonObj.addProperty("height", currDungeon.getHeight());
+        jsonObj.addProperty("keyStatus", currDungeon.getKeyStatus());;
         jsonObj.addProperty("invisibilityPotionCounter", currDungeon.getInvisibilityPotionCounter());
         jsonObj.addProperty("invincibilityPotionCounter", currDungeon.getInvincibilityPotionCounter());
 
@@ -367,8 +365,6 @@ public class DungeonManiaController {
                     main.setTickCounter(dungeon.get("tickCounter").getAsInt());
                     main.setEntityCounter(dungeon.get("entityCounter").getAsInt());
                     main.setKeyStatus(dungeon.get("keyStatus").getAsBoolean());
-                    main.setWidth(dungeon.get("width").getAsInt());
-                    main.setHeight(dungeon.get("height").getAsInt());
                     main.setInvincibilityCounter(dungeon.get("invincibilityPotionCounter").getAsInt());
                     main.setInvisibilityPotionCounter(dungeon.get("invisibilityPotionCounter").getAsInt());
 
@@ -1042,10 +1038,8 @@ public class DungeonManiaController {
 
         boolean posFound = false;
         while (posFound == false) {
-            int maxWidth = currDungeon.getWidth();
-            int maxHeight = currDungeon.getHeight();
-            int x = getRandomNumber(0, maxWidth - 1);
-            int y = getRandomNumber(0, maxHeight - 1);
+            int x = getRandomNumber(0, 15);
+            int y = getRandomNumber(0, 15);
             int check = 0;
             Position pos = new Position(x, y);
             Position posAbove = new Position(x, y + 1);
