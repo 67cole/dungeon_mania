@@ -38,7 +38,7 @@ public class Bow extends BuildableEntity{
     }
     /**
      * Checks durability of bow
-     * @return Sword
+     * @return Bow
      */
     public Bow checkDurability() {
         if (this.durability == 0) {
