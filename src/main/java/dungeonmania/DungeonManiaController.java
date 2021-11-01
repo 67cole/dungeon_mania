@@ -7,6 +7,7 @@ import dungeonmania.entities.MovingEntity;
 import dungeonmania.entities.BuildableEntities.*;
 import dungeonmania.entities.CollectableEntities.*;
 import dungeonmania.entities.RareCollectableEntities.*;
+import dungeonmania.exceptions.*;
 import dungeonmania.exceptions.InvalidActionException;
 import dungeonmania.response.models.AnimationQueue;
 import dungeonmania.response.models.DungeonResponse;
@@ -676,6 +677,14 @@ public class DungeonManiaController {
      * @throws InvalidActionException
      */
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {    
+        if (!itemUsedInvalid(itemUsed)) {
+            throw new IllegalArgumentException("The item used is invalid.");
+         }
+
+        if (!itemUsedNotInInventory(itemUsed)) {
+            throw new InvalidActionException("The item is not in the inventory.");
+        }
+
         // Get entity list
         List<Entity> entities = currDungeon.getEntities();
         
@@ -736,7 +745,6 @@ public class DungeonManiaController {
                     useItem(temp2, main, itemUsed);
                     // Sets the bomb 
                     bombHolder = useBomb(temp2, main, itemUsed);
-                    continue;
                 }
                 // Either the character moves or it doesnt.
                 // Check if its blocked by a wall, in which it doesnt move
@@ -1341,6 +1349,43 @@ public class DungeonManiaController {
         }
         return null;
     }
+
+    /**
+     * This function checks whether or not the item given in tick is valid
+     * @param itemUsed
+     */
+    public boolean itemUsedInvalid(String itemUsed) {
+        if (itemUsed == null) return true;
+
+        String[] items = {"bomb", "health_potion", "invincibility_potion", "invisibility_potion"};
+        List<String> itemAvailable = Arrays.asList(items);
+
+        for (CollectableEntity collectables : currDungeon.getInventory()) {
+            if (collectables.getID().equals(itemUsed)) {
+                if (itemAvailable.contains(collectables.getType())) return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * This function checks whether or not the item given in tick is in the inventory
+     * @param itemUsed
+     */
+    public boolean itemUsedNotInInventory(String itemUsed) {
+        if (itemUsed == null) return true;
+
+        List<CollectableEntity> inventory = currDungeon.getInventory();
+
+        for (CollectableEntity collectable : inventory) {
+            if (collectable.getID().equals(itemUsed)) return true;
+        }
+            
+        return false;
+    }
+
+
 
     /**
      * Moves the mercenary around
