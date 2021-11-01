@@ -62,14 +62,26 @@ public class DungeonManiaController {
     public DungeonManiaController() {
     }
 
+    /**
+     * returns skin
+     * @return String
+     */
     public String getSkin() {
         return "default";
     }
 
+    /**
+     * returns localisation
+     * @return String
+     */
     public String getLocalisation() {
         return "en_US";
     }
 
+    /**
+     * returns gamemodes
+     * @return List<String>
+     */
     public List<String> getGameModes() {
         return Arrays.asList("Standard", "Peaceful", "Hard");
     }
@@ -86,7 +98,14 @@ public class DungeonManiaController {
             return new ArrayList<>();
         }
     }
-
+    
+    /**
+     * creates a new game
+     * @param dungeonName
+     * @param gameMode
+     * @return DungeonResponse
+     * @throws IllegalArgumentException
+     */
     public DungeonResponse newGame(String dungeonName, String gameMode) throws IllegalArgumentException {    
         // INCOMPLETE *********
         if (!dungeonNotValid(dungeonName)) {
@@ -135,6 +154,12 @@ public class DungeonManiaController {
         return dr;
     }
 
+    /**
+     * saves the game
+     * @param name
+     * @return DungeonResponse
+     * @throws IllegalArgumentException
+     */
     public DungeonResponse saveGame(String name) throws IllegalArgumentException {
 
         // Edit database.json file
@@ -341,6 +366,12 @@ public class DungeonManiaController {
     }
 
 
+    /**
+     * loads the game
+     * @param name
+     * @return DungeonResponse
+     * @throws IllegalArgumentException
+     */
     public DungeonResponse loadGame(String name) throws IllegalArgumentException {
 
         boolean nameChecker = false;
@@ -419,7 +450,13 @@ public class DungeonManiaController {
 
         return games;
     }
-
+    
+    /**
+     * adds entities to inventory
+     * @param main
+     * @param entitiesList
+     * @param inventoryList
+     */
     public void addEntitiesInventory(Dungeon main, JsonArray entitiesList, JsonArray inventoryList) {
 
         for (int i = 0; i < entitiesList.size(); i++) {
@@ -600,7 +637,14 @@ public class DungeonManiaController {
 
     }
 
-
+    /***
+     * initiates a tick of the game
+     * @param itemUsed
+     * @param movementDirection
+     * @return DungeonResponse
+     * @throws IllegalArgumentException
+     * @throws InvalidActionException
+     */
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {    
         // Get entity list
         List<Entity> entities = currDungeon.getEntities();
@@ -695,38 +739,6 @@ public class DungeonManiaController {
                     if (interactingEntity != null) {
                         // EntityFunction that handles all interactions with player
                         interactingEntity.entityFunction(entities, (Character) temp, movementDirection, main);
-                        
-
-                        // Position playerPos = new Position(0, 0);
-                        // for (Entity ent : entities) {
-                        //     if (ent.getType().equals("player")) playerPos = ent.getPosition();
-                                
-                        // }
-                        // for (Entity enti : entities) {
-                        //     System.out.printf("player pos: %d, %d ", playerPos.getX(), playerPos.getY());
-                        //     System.out.printf("currEnt pos: %d, %d of type %s\n", enti.getPosition().getX(), enti.getPosition().getY(), enti.getType());
-
-                        //     if (enti.getType().equals("boulder")) {
-                                
-                        //         Position entPos = enti.getPosition();
-                        //         Position up = new Position(0, -1);
-                        //         Position down = new Position(0, 1);
-                        //         Position left = new Position(-1, 0);
-                        //         Position right = new Position(1, 0);
-                        //         if (playerPos.equals(entPos.translateBy(up)) || playerPos.equals(entPos.translateBy(down)) || playerPos.equals(entPos.translateBy(left)) || playerPos.equals(entPos.translateBy(right))) {
-                        //             doExplode(entities, (Character) temp, main, enti, allNearbyEntities); 
-                        //             System.out.println("HI");
-                        //         }
-
-                        //         // doExplode(entities, (Character) temp, main, enti, allNearbyEntities);
-                        //     }
-                        // }
-                        // // entitiesToBeRemoved.addAll(allNearbyEntities);
-                        // for (Entity enta : allNearbyEntities) {
-                        //     entitiesToBeRemoved.add(enta);
-                        // }
-
-
                         
                         // If the character is dead
                         if (!temp.isAlive()) {
@@ -916,35 +928,22 @@ public class DungeonManiaController {
         for (Entity currPlayer : entities) {
             if (currPlayer.getType().equals("player")) tempChar = (Character) currPlayer;
         }
+        // find boulders to check explosion eligibility
         for (Entity enti : entities) {
-            // System.out.printf("player pos: %d, %d ", playerPos.getX(), playerPos.getY());
-            // System.out.printf("currEnt pos: %d, %d of type %s\n", enti.getPosition().getX(), enti.getPosition().getY(), enti.getType());
-
+            // if boulder, check that the boulder has a switch and explode any nearby bombs
             if (enti.getType().equals("boulder")) {
-                
                 Position entPos = enti.getPosition();
                 Position up = new Position(0, -1);
                 Position down = new Position(0, 1);
                 Position left = new Position(-1, 0);
                 Position right = new Position(1, 0);
                 if (playerPos.equals(entPos.translateBy(up)) || playerPos.equals(entPos.translateBy(down)) || playerPos.equals(entPos.translateBy(left)) || playerPos.equals(entPos.translateBy(right))) {
-                    // System.out.println("attempting explode");
-                    doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities); 
-                    
+                    doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);    
                 }
-
-                // doExplode(entities, (Character) temp, main, enti, allNearbyEntities);
             }
         }
-        // entitiesToBeRemoved.addAll(allNearbyEntities);
-        for (Entity enta : allNearbyEntities) {
-            // System.out.printf("removing: %s\n", enta.getType());
-            entitiesToBeRemoved.add(enta);
-        }
-        // System.out.println("Entities to be removed");
-        // for (Entity enta : entitiesToBeRemoved) {
-        //     System.out.printf("%s\n", enta.getType());
-        // }
+        // add all nearby entities to the bomb to entiitesToBeRemoved
+        entitiesToBeRemoved.addAll(allNearbyEntities);
         // Remove the collectible from the map
         entityRemover(entitiesToBeRemoved, main);
         
@@ -1262,11 +1261,8 @@ public class DungeonManiaController {
      * @param main - the dungeon
      */
      public void entityRemover(List<Entity> entityList, Dungeon main) {
-        // System.out.println("now removing entities");
         for (Entity entityToBeRemoved : entityList) {
             if (entityToBeRemoved != null) {
-                // System.out.println("found a non-null object");
-                // System.out.println(entityToBeRemoved.getClass().getSuperclass().getName());
                 if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity")) {
                     if (entityToBeRemoved.getType().equals("key")) {
                         if (main.getKeyStatus()) {
@@ -1276,16 +1272,13 @@ public class DungeonManiaController {
                             return;
                         }
                     }
-                    // System.out.printf("removed %s\n", entityToBeRemoved);
                     main.removeEntity(entityToBeRemoved);
                     
                 }
                 else if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
-                    // System.out.printf("removed %s\n", entityToBeRemoved);
                     main.removeEntity(entityToBeRemoved);
                 }
                 else if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.StaticEntity")) {
-                    // System.out.printf("removed %s\n", entityToBeRemoved);
                     main.removeEntity(entityToBeRemoved);
                 }
             }
@@ -1548,6 +1541,11 @@ public class DungeonManiaController {
 
     }
 
+    /**
+     * checks if a bomb is activated
+     * @param interactingEntities
+     * @return boolean
+     */
     public boolean checkBomb(List<Entity> interactingEntities) {
         for (Entity interactingEntity: interactingEntities) {
             if (interactingEntity != null) {
@@ -1559,6 +1557,11 @@ public class DungeonManiaController {
         return false;
     }
 
+    /**
+     * returns the character
+     * @param entities
+     * @return Character
+     */
     public Character getCharacter(List <Entity> entities) {
         for (Entity entity : entities) {
             if (entity.getType().equals("player")) {
@@ -1602,7 +1605,14 @@ public class DungeonManiaController {
     }
 
 
- 
+    /**
+     * attempts to explode bombs given a boulder position
+     * @param entities
+     * @param player
+     * @param main
+     * @param bou
+     * @param nearby
+     */
     public void doExplode(List<Entity> entities, Character player,  Dungeon main, Entity bou, List<Entity> nearby) {
         // pos = boulder position
         Position boulderPos = bou.getPosition();
@@ -1621,32 +1631,31 @@ public class DungeonManiaController {
 
         for (Entity currEnt : entitiesAtBoulder) {
             if (currEnt.getType().equals("switch")) {
-                // System.out.println("checking for bombs");
                 // see if there are bombs cardinally adjacent, if so, explode any adjacent bombs
                 if (isBombAtPos(entsAbove)) {
-                    // System.out.println("Bomb above");
                     explode(entsAbove, entities, N, main, player, nearby);
                 }
                 if (isBombAtPos(entsRight)) {
-                    // System.out.println("Bomb right");
                     explode(entsRight, entities, E, main, player, nearby);
                     
                 } 
                 if (isBombAtPos(entsBelow)) {
-                    // System.out.println("Bomb below");
                     explode(entsBelow, entities, S, main, player, nearby);
                     
                 } 
                 if (isBombAtPos(entsLeft)) {
-                    // System.out.println("Bomb left");
                     explode(entsLeft, entities, W, main, player, nearby);
-                    
                 }
                 
             }
         }
     }
     
+    /**
+     * returns whether a bomb is in the list of entities at a given position
+     * @param entities
+     * @return Boolean
+     */
     public Boolean isBombAtPos(List<Entity> entities) {
         for (Entity currEnt : entities) {
             if (currEnt.getType().equals("bomb")) {
@@ -1656,6 +1665,15 @@ public class DungeonManiaController {
         return false;
     }
     
+    /**
+     * Explodes any bombs adjacent to a given bomb position
+     * @param entitiesAtPos
+     * @param entities
+     * @param pos
+     * @param main
+     * @param player
+     * @param NearbyEntities
+     */
     public void explode(List<Entity> entitiesAtPos, List<Entity> entities, Position pos, Dungeon main, Character player, List<Entity> NearbyEntities) {
         
         Position N = pos.translateBy(0, -1);
@@ -1676,94 +1694,52 @@ public class DungeonManiaController {
         List<Entity> entsW = main.getEntitiesAtPos(W);
         List<Entity> entsNW = main.getEntitiesAtPos(NW);
         List<Entity> entsO = entitiesAtPos;
+        // add all nearby non-player entities to the list of entities to be removed 
         for (Entity ent : entsN) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                // System.out.printf("1\n");
             }
         }
         for (Entity ent : entsNE) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                // System.out.printf("2\n");
             }
         }
         for (Entity ent : entsE) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                // System.out.printf("3\n");
             }
         }
         for (Entity ent : entsSE) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-            
-                // System.out.printf("4\n");
             }
         }
         for (Entity ent : entsS) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                // System.out.printf("5\n");
             }
         }
         for (Entity ent : entsSW) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                // System.out.printf("6\n"); 
             }
         }
         for (Entity ent : entsW) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                // System.out.printf("7\n");
             }
         }
         for (Entity ent : entsNW) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                // System.out.printf("8\n");
             }
         }
         for (Entity ent : entsO) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                // System.out.printf("9\n");
             }
         }
-        // NearbyEntities.addAll(entsN);
-        // NearbyEntities.addAll(entsNE);
-        // NearbyEntities.addAll(entsE);
-        // NearbyEntities.addAll(entsSE);
-        // NearbyEntities.addAll(entsS);
-        // NearbyEntities.addAll(entsSW);
-        // NearbyEntities.addAll(entsW);
-        // NearbyEntities.addAll(entsNW);
-        // NearbyEntities.addAll(entsO);
-        // NearbyEntities.removeIf(s -> (!s.getType().equals("player")));
-        // Iterator<Entity> itr = allNearbyEntities.iterator();
-        // while (itr.hasNext()) {
-        //     Entity curr = itr.next();
-        //     if (!(curr.getType().equals("player"))) {
-        //         itr.remove();
-        //         System.out.println("removed");
-        //     }
-            
-        // }
-        
-        // allNearbyEntities.removeIf(s -> (!s.getType().equals("player")));
-
-        // // // entities.removeAll(allNearbyEntities);
-        // for (Entity curr : allNearbyEntities) {
-        //     if (!curr.getType().equals("player")) entities.remove(curr);
-        // }
-
-
-        // entities.removeAll(allNearbyEntities);
-        // entities.add(player);
-
-        
-        
     }
 
     /**

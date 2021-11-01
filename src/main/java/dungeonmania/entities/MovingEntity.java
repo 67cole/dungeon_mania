@@ -246,6 +246,9 @@ public abstract class MovingEntity implements Entity {
     /**
      * checkMovement checks for the next square if it's a wall/boulder.
      * This uses direction args.
+     * @param direction
+     * @param entities
+     * @return boolean
      */
     public boolean checkMovement(Direction direction, List<Entity> entities) {
         switch (direction) {
@@ -322,6 +325,9 @@ public abstract class MovingEntity implements Entity {
     /**
      * checkMovement checks for the next square if it's a wall/boulder.
      * This gives a position already as an arg
+     * @param position
+     * @param entities
+     * @return boolean
      */
     public boolean checkMovement(Position position, List<Entity> entities) {
         
@@ -360,11 +366,15 @@ public abstract class MovingEntity implements Entity {
 
         return null;
     }
-    /* 
+    /**
      * checkDoorLock checks for the next square if it's a door. If the door is locked,
      * it should check for the specific key inside the characters inventory and open the door 
      * if the key matches the door. Returns true if the door is open and false if not
-     */
+     * @param entityDoor
+     * @param entities
+     * @param main
+     * @return boolean
+     **/
     public boolean checkDoorLock(Door entityDoor, List<Entity> entities, Dungeon main) {
 
         // If the door is locked, look for the key inside the inventory. Unlock the door if its found
@@ -397,7 +407,12 @@ public abstract class MovingEntity implements Entity {
         }
     }
 
-    //Checks if the position to be moved in is a door, if it is, return that door
+    /**
+     * Checks if the position to be moved in is a door, if it is, return that door
+     * @param movementDirection
+     * @param entities
+     * @return Door
+     */
     public Door checkDoor(Direction movementDirection, List<Entity> entities) {
         Position entityPosition = position.translateBy(movementDirection);
 
@@ -411,7 +426,12 @@ public abstract class MovingEntity implements Entity {
         return entityDoor;
     }
 
-    //Checks if the position to be moved in is a door, if it is, return that door
+    /**
+     * Checks if the position to be moved in is a door, if it is, return that door
+     * @param position
+     * @param entities
+     * @return Door
+     */
     public Door checkDoor(Position position, List<Entity> entities) {
         Door entityDoor = null;
         for (Entity entity: entities) {
@@ -423,7 +443,12 @@ public abstract class MovingEntity implements Entity {
         return entityDoor;
     }
 
-
+    /**
+     * returns a list of entities in the next square the player is moving to
+     * @param direction
+     * @param entities
+     * @return List<Entity>
+     */
     public List<Entity> checkNext(Direction direction, List<Entity> entities) {
         List<Entity> interactingEntities = new ArrayList<Entity>();
         switch (direction) {
@@ -498,6 +523,14 @@ public abstract class MovingEntity implements Entity {
         return interactingEntities; 
     }   
 
+    /**
+     * checks if the next position is blocked by a boulder
+     * @param direction
+     * @param attemptedMove
+     * @param entities
+     * @param entity
+     * @return boolean
+     */
     public boolean boulderBlocked(Direction direction, Position attemptedMove, List<Entity> entities, Entity entity) {
 
         if (entity.getType().equals("boulder") && entity.getPosition().equals(attemptedMove)) {
@@ -520,6 +553,12 @@ public abstract class MovingEntity implements Entity {
         return false;
     }
 
+    /**
+     * checks if a enemy and character are battling
+     * @param characterHealth
+     * @param enemyHealth
+     * @return boolean
+     */
     public boolean checkBattleState(int characterHealth, int enemyHealth) {
         if (characterHealth <= 0) {
             return false;
@@ -530,13 +569,18 @@ public abstract class MovingEntity implements Entity {
         return true;
     }
 
+    /**
+     * checks whether an entity is alive
+     * @param health
+     * @return boolean
+     */
     public boolean checkAlive(int health) {
         if (health <= 0) {
             return false;
         }
         return true;
     }
-
+    
     @Override
     public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {
         while (checkBattleState(player.getHealth(), this.getHealth())) {
@@ -651,6 +695,8 @@ public abstract class MovingEntity implements Entity {
     
     /**
      * Moving the enemy if the invincibility potion is active
+     * @param entities
+     * @param playerPosition
      */
     public void runEnemy (List<Entity> entities, Position playerPosition) {
         Position current = getPosition();

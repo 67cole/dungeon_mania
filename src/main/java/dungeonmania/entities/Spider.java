@@ -121,6 +121,7 @@ public class Spider extends MovingEntity {
 
     /**
      * Movement for the spider
+     * @param direction
      */
     @Override
     public void moveEntity(Position direction) {
