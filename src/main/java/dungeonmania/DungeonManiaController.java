@@ -96,7 +96,7 @@ public class DungeonManiaController {
             return new ArrayList<>();
         }
     }
-    
+
     /**
      * creates a new game
      * @param dungeonName
@@ -852,6 +852,12 @@ public class DungeonManiaController {
                         Position nextPos = spider.getPosition().translateBy(dir);
 
                         if (currEnt.getPosition().equals(nextPos) && currEnt.getType().equals("boulder")) {
+                            spider.setClockwise(!spider.getClockwise());
+                            
+                            spiderBlocked = 1;
+                            
+                        }
+                        else if (currEnt.getPosition().equals(nextPos) && currEnt.getType().equals("door")) {
                             spider.setClockwise(!spider.getClockwise());
                             
                             spiderBlocked = 1;
@@ -1770,6 +1776,14 @@ public class DungeonManiaController {
                 }
             }
         }
+    }
+
+    /**
+     * returns current dungeon
+     * @return Dungeon
+     */
+    public Dungeon getCurrDungeon() {
+        return this.currDungeon;
     }
 }
 
