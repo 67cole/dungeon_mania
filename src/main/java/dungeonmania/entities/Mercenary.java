@@ -54,6 +54,14 @@ public class Mercenary extends MovingEntity {
         // then checks for the shortest distance between these squares
         for (Position position : validPositions) {
             if (checkMovement(position, entities)) {
+                //Checks if the next square is a door, if its not locked, then 
+                Door doorEntity = checkDoor(position, entities);
+                if (doorEntity != null) {
+                    if (doorEntity.getLocked() == true) {
+                        continue;
+                    }
+                }
+                
                 Position vector = Position.calculatePositionBetween(position, playerPosition);
                 double distance = Math.sqrt(Math.pow(vector.getX(), 2) + Math.pow(vector.getY(), 2));
 

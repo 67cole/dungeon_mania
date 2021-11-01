@@ -22,7 +22,11 @@ Spider
     -   A spider cannot spawn on or under a boulder
     -   When the player drinks an invincibility potion, the spiders will break out of the cycle and run as far as it can. Once invincibility potion ends, it will begin the cycle again at its new location
     -   The spider can run outside the map whilst invincibility is still active
+<<<<<<< HEAD
     -   The spider can spawn on the edge of the dungeon and travel outside the dungeon
+=======
+    -   Spiders spawn every 25 ticks
+>>>>>>> master
 
 Mercenary
 
@@ -32,6 +36,8 @@ Mercenary
     -   Mercenaries can't interact with anything (i.e. moving a boulder )
     -   Mercenaries will always have a valid spot to move to, it cannot be trapped
     -   10 percent chance of spawning with armour
+    -   Mercenaries have a 4 unit battle radius (this uses pythagorus from the square units)
+
 
 Portal 
 
@@ -46,16 +52,25 @@ Endings
     -   Once the requirements for an ending is met the game will automatically end  
 
 TheOneRing
+
     -   Assumes the inventory is kept after respawn
     -   5 percent chance to receive after a successfull battle
 
 InvincibilityPotion
+
     -   Assumes durability is not affected
     -   The invincibility potion will last for 10 ticks
 
 InvisibilityPotion
-    -   The invisibility potion will last for 10 ticks
+
+    -   The invisibility potion will last for 15 ticks
     -   If the invincibility potion is taken during invisibility phase, the invisibility phase should take priority
 
 Armour
-    -   20 percent chance to receive after a successfull battle
+
+    -   20 percent chance to receive after a successful battle
+
+Battle
+
+    -   The character can only have one battle at a time in ONE tick, so if a mercenary moves on top of the character mid battle, it will battle in the next tick, or if a spider jumps on top mid battle, it will crawl away unless the character moves on top of their path next tick.
+
