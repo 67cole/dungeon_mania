@@ -17,7 +17,7 @@ public class CollectableEntityTest {
         DungeonManiaController controller = new DungeonManiaController();
         DungeonResponse newDungeon = controller.newGame("advanced-2", "Peaceful");
         DungeonResponse tickHolder = null;
-        for (int i = 0; i < 75; i++) {
+        for (int i = 0; i < 5; i++) {
             tickHolder =  controller.tick(null, Direction.RIGHT);
         }
         int sword = 0;
@@ -26,6 +26,11 @@ public class CollectableEntityTest {
                 sword = 1;
             }
         }
+        /*
+        for (int i = 0; i < 5; i++) {
+            tickHolder =  controller.tick(null, Direction.RIGHT);
+        }
+        */
         assertTrue(sword == 1);
     }
 }

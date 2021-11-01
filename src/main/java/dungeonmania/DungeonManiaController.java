@@ -1038,8 +1038,6 @@ public class DungeonManiaController {
 
         boolean posFound = false;
         while (posFound == false) {
-            int maxWidth = currDungeon.getWidth();
-            int maxHeight = currDungeon.getHeight();
             int x = getRandomNumber(0, 15);
             int y = getRandomNumber(0, 15);
             int check = 0;
@@ -1283,8 +1281,6 @@ public class DungeonManiaController {
         String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
         try {
             JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
-            currDungeon.setHeight(jsonObject.get("height").getAsInt());
-            currDungeon.setWidth(jsonObject.get("width").getAsInt());
             
             JsonArray entitiesList = jsonObject.get("entities").getAsJsonArray();
             
