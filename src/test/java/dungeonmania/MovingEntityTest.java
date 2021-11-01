@@ -69,7 +69,6 @@ public class MovingEntityTest {
 
     }
 
-<<<<<<< HEAD
     // Check if zombie spawns in every 20 tick on Standard Difficulty
     @Test
     public void testZombieSpawnStandard() {
@@ -257,7 +256,6 @@ public class MovingEntityTest {
 
 
 
-=======
     @Test
     public void testSpiderSpawn() {
         DungeonManiaController controller = new DungeonManiaController();
@@ -281,7 +279,41 @@ public class MovingEntityTest {
         
     }
 
->>>>>>> master
+    @Test
+    public void testSpiderSpawnMove() {
+        DungeonManiaController controller = new DungeonManiaController();
+        DungeonResponse newDungeon = controller.newGame("advanced-2", "Standard");
+        DungeonResponse tickHolder = null;
+        for (int i = 0; i < 27; i++) {
+            tickHolder =  controller.tick(null, Direction.LEFT);
+        }
+        Dungeon dung = controller.getCurrDungeon();
+        List<Entity> entities = dung.getEntities();
+        Position spiderPos = new Position(0, 0);
+        for (Entity currEnt : entities) {
+            if (currEnt.getType().equals("spider")) {
+                spiderPos = currEnt.getPosition();
+            }
+        }
+        assertTrue(spiderPos.getX() != 0);
+        assertTrue(spiderPos.getY() != 0);
+        System.out.printf("%d, %d", spiderPos.getX(), spiderPos.getY());
+        assertTrue(entityInPlace(spiderPos, tickHolder, "spider"));
+        
+        tickHolder = controller.tick(null, Direction.LEFT);
+        Position newSpiderPos = new Position(0, 0);
+        List<Entity> updatedEntities = dung.getEntities();
+        for (Entity currEnt : entities) {
+            if (currEnt.getType().equals("spider")) {
+                newSpiderPos = currEnt.getPosition();
+            }
+        }
+        assertTrue(newSpiderPos.getY() == spiderPos.getY() + 1);
+        assertTrue(newSpiderPos.getX() == spiderPos.getX());
+        assertTrue(entityInPlace(newSpiderPos, tickHolder, "spider"));
+        
+    }
+
     /**
      * Helper function that returns true if the entity type is on the same position
      * as whats given in the param 
