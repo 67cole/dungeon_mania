@@ -36,7 +36,7 @@ public class StaticEntityTest {
      public void testWallFunction() {
         DungeonManiaController controller = new DungeonManiaController();
         
-        DungeonResponse newDungeon = controller.newGame("advanced", "peaceful");
+        DungeonResponse newDungeon = controller.newGame("advanced", "Peaceful");
         Position toBePos = new Position(1,1);
         assertTrue(entityInPlace(toBePos, newDungeon, "player"));
 
@@ -59,7 +59,7 @@ public class StaticEntityTest {
     @Test
     public void testBouldersInDungeon() {
         DungeonManiaController controller = new DungeonManiaController();
-        DungeonResponse newDungeon = controller.newGame("boulders", "peaceful");
+        DungeonResponse newDungeon = controller.newGame("boulders", "Peaceful");
         assertTrue(entityInPlace(new Position(2,2), newDungeon, "player"));
 
         DungeonResponse tickHolder =  controller.tick(null, Direction.RIGHT);
@@ -78,7 +78,7 @@ public class StaticEntityTest {
     @Test
     public void testDoorFunction() {
         DungeonManiaController controller = new DungeonManiaController();
-        DungeonResponse newDungeon = controller.newGame("advanced-2", "peaceful");
+        DungeonResponse newDungeon = controller.newGame("advanced-2", "Peaceful");
         assertTrue(entityInPlace(new Position(1,1), newDungeon, "player"));
         DungeonResponse tickHolder = null;
         for(int i = 1; i < 9; i++) {
@@ -112,7 +112,7 @@ public class StaticEntityTest {
     @Test
     public void testPortalsInDungeon() {
         DungeonManiaController controller = new DungeonManiaController();
-        DungeonResponse newDungeon = controller.newGame("portals", null);
+        DungeonResponse newDungeon = controller.newGame("portals", "Peaceful");
         assertTrue(entityInPlace(new Position(0,0), newDungeon, "player"));
 
         DungeonResponse tickHolder = controller.tick(null, Direction.RIGHT);

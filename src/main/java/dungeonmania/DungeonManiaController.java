@@ -32,8 +32,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import javax.xml.stream.events.EntityDeclaration;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -172,9 +170,7 @@ public class DungeonManiaController {
         jsonObj.addProperty("saveName", name);
         jsonObj.addProperty("entityCounter", currDungeon.getEntityCounter());
         jsonObj.addProperty("tickCounter", currDungeon.getTickCounter());
-        jsonObj.addProperty("keyStatus", currDungeon.getKeyStatus());
-        jsonObj.addProperty("width", currDungeon.getWidth());
-        jsonObj.addProperty("height", currDungeon.getHeight());
+        jsonObj.addProperty("keyStatus", currDungeon.getKeyStatus());;
         jsonObj.addProperty("invisibilityPotionCounter", currDungeon.getInvisibilityPotionCounter());
         jsonObj.addProperty("invincibilityPotionCounter", currDungeon.getInvincibilityPotionCounter());
 
@@ -400,8 +396,6 @@ public class DungeonManiaController {
                     main.setTickCounter(dungeon.get("tickCounter").getAsInt());
                     main.setEntityCounter(dungeon.get("entityCounter").getAsInt());
                     main.setKeyStatus(dungeon.get("keyStatus").getAsBoolean());
-                    main.setWidth(dungeon.get("width").getAsInt());
-                    main.setHeight(dungeon.get("height").getAsInt());
                     main.setInvincibilityCounter(dungeon.get("invincibilityPotionCounter").getAsInt());
                     main.setInvisibilityPotionCounter(dungeon.get("invisibilityPotionCounter").getAsInt());
 
@@ -663,7 +657,6 @@ public class DungeonManiaController {
         int EnemyCheck = 0;
         boolean invincibilityActive = false; 
         Character tempChar = null;
-
         Position playerSpawnPosition = null;
         main = currDungeon;
 
@@ -1113,8 +1106,8 @@ public class DungeonManiaController {
 
         boolean posFound = false;
         while (posFound == false) {
-            int x = getRandomNumber(0, 16);
-            int y = getRandomNumber(0, 16);
+            int x = getRandomNumber(0, 15);
+            int y = getRandomNumber(0, 15);
             int check = 0;
             Position pos = new Position(x, y);
             Position posAbove = new Position(x, y + 1);
@@ -1181,9 +1174,7 @@ public class DungeonManiaController {
     }
 
     public void checkExitGoal(List<Entity> entities, Dungeon dungeon, MovingEntity player) {
-
         for (Entity entity : entities) {
-
             if (entity.getType().equals("exit")) {
                 if (entity.getPosition().equals(player.getPosition())) {
                     dungeon.setDungeonGoals("");
@@ -1273,7 +1264,6 @@ public class DungeonManiaController {
                         }
                     }
                     main.removeEntity(entityToBeRemoved);
-                    
                 }
                 else if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
                     main.removeEntity(entityToBeRemoved);
@@ -1362,8 +1352,6 @@ public class DungeonManiaController {
         String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
         try {
             JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
-            currDungeon.setHeight(jsonObject.get("height").getAsInt());
-            currDungeon.setWidth(jsonObject.get("width").getAsInt());
             
             JsonArray entitiesList = jsonObject.get("entities").getAsJsonArray();
             

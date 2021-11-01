@@ -15,7 +15,7 @@ public class MovingEntityTest {
 
     public void testMercenarySpawn() {
         DungeonManiaController controller = new DungeonManiaController();
-        DungeonResponse newDungeon = controller.newGame("advanced", "Peaceful");
+        DungeonResponse newDungeon = controller.newGame("advanced-2", "Peaceful");
         Position toBePos = new Position(1,1);
         assertTrue(entityInPlace(toBePos, newDungeon, "player"));
         DungeonResponse tickHolder = null;
