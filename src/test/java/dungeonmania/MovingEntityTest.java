@@ -38,6 +38,7 @@ public class MovingEntityTest {
 
     }
 
+    // check if spider spawns correctly
     @Test
     public void testSpiderSpawn() {
         DungeonManiaController controller = new DungeonManiaController();
@@ -56,8 +57,41 @@ public class MovingEntityTest {
         }
         assertTrue(spiderPos.getX() != 0);
         assertTrue(spiderPos.getY() != 0);
-        System.out.printf("%d, %d", spiderPos.getX(), spiderPos.getY());
         assertTrue(entityInPlace(spiderPos, tickHolder, "spider"));
+        
+    }
+
+    // check if spider spawns correctly and moves upwards on tick 1
+    @Test
+    public void testSpiderMoveUp() {
+        DungeonManiaController controller = new DungeonManiaController();
+        DungeonResponse newDungeon = controller.newGame("advanced-2", "Standard");
+        DungeonResponse tickHolder = null;
+        for (int i = 0; i < 27; i++) {
+            tickHolder =  controller.tick(null, Direction.LEFT);
+        }
+        Dungeon dung = controller.getCurrDungeon();
+        List<Entity> entities = dung.getEntities();
+        Position spiderPos = new Position(0, 0);
+        for (Entity currEnt : entities) {
+            if (currEnt.getType().equals("spider")) {
+                spiderPos = currEnt.getPosition();
+            }
+        }
+        assertTrue(spiderPos.getX() != 0);
+        assertTrue(spiderPos.getY() != 0);
+        assertTrue(entityInPlace(spiderPos, tickHolder, "spider"));
+
+        tickHolder = controller.tick(null, Direction.LEFT);
+        Position newSpiderPos = new Position(0, 0);
+        for (Entity currEnt : entities) {
+            if (currEnt.getType().equals("spider")) {
+                newSpiderPos = currEnt.getPosition();
+            }
+        }
+        assertTrue(newSpiderPos.getX() == spiderPos.getX());
+        assertTrue(newSpiderPos.getY() == spiderPos.getY() + 1);
+        assertTrue(entityInPlace(newSpiderPos, tickHolder, "spider"));
         
     }
 
