@@ -69,7 +69,6 @@ public class MovingEntityTest {
 
     }
 
-<<<<<<< HEAD
     // Check if zombie spawns in every 20 tick on Standard Difficulty
     @Test
     public void testZombieSpawnStandard() {
@@ -257,7 +256,6 @@ public class MovingEntityTest {
 
 
 
-=======
     @Test
     public void testSpiderSpawn() {
         DungeonManiaController controller = new DungeonManiaController();
@@ -281,7 +279,6 @@ public class MovingEntityTest {
         
     }
 
->>>>>>> master
     /**
      * Helper function that returns true if the entity type is on the same position
      * as whats given in the param 
