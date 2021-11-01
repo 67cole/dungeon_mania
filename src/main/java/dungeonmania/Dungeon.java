@@ -1,5 +1,6 @@
 package dungeonmania;
 
+import dungeonmania.util.Position;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -153,5 +154,17 @@ public class Dungeon {
     }
     public void setKeyStatus(boolean keyStatus) {
         this.keyStatus = keyStatus;
+    }
+
+    public List<Entity> getEntitiesAtPos(Position pos) {
+
+        List<Entity> entitiesAtPos = new ArrayList<Entity>();
+        for (Entity entity : entities) {
+            if (entity.getPosition().equals(pos)) {
+                entitiesAtPos.add(entity);
+            }
+        }
+
+        return entitiesAtPos;
     }
 }
