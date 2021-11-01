@@ -18,12 +18,15 @@ Spider
 
     -   The spider's starting health is 1
     -   The spider's starting attack is 1
-    -   Spiders can't spawn on edge of dungeon 
     -   The max amount of spiders is 8
     -   A spider cannot spawn on or under a boulder
     -   When the player drinks an invincibility potion, the spiders will break out of the cycle and run as far as it can. Once invincibility potion ends, it will begin the cycle again at its new location
     -   The spider can run outside the map whilst invincibility is still active
+<<<<<<< HEAD
+    -   The spider can spawn on the edge of the dungeon and travel outside the dungeon
+=======
     -   Spiders spawn every 25 ticks
+>>>>>>> master
 
 Mercenary
 
