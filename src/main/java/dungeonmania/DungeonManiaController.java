@@ -612,7 +612,8 @@ public class DungeonManiaController {
         int zombieAddedLater = 0;
         int mercenaryAddedLater = 0;
         int EnemyCheck = 0;
-        boolean invincibilityActive = false; 
+        boolean invincibilityActive = false;
+        Character player; 
 
         Position playerSpawnPosition = null;
         main = currDungeon;
@@ -649,6 +650,7 @@ public class DungeonManiaController {
             if (entity.getType().equals("player")) {
                 MovingEntity temp = (MovingEntity) entity;
                 Character temp2  = (Character) entity;
+                player = temp2;
                 playerSpawnPosition = temp2.getSpawn();
                 
                 // If the inital direction is NONE then an item has been used
@@ -878,6 +880,30 @@ public class DungeonManiaController {
             main.addEntities(bombHolder);
         }
 
+        // The Goal Checker Central
+
+
+        // Check boulders
+        if (main.getDungeonGoals().contains("boulder")) {
+            checkBoulderGoal(entities, main);
+        }
+        // Check exit
+        // already done
+
+        // Check treasure
+        if (main.getDungeonGoals().contains("treasure")) {
+            checkTreasureGoal(entities, main);
+        }
+
+
+        // Check enemies
+        if (main.getDungeonGoals().contains("mercenary")) {
+            checkEnemiesGoal(entities, main);
+        } 
+
+
+
+
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
         for(Entity entity: main.getEntities()) {
             EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
@@ -1098,13 +1124,59 @@ public class DungeonManiaController {
 
         for (Integer amt : map.values()) {
             // even
-            if (amt != 1) {
+            if (amt == 1) {
                 return; // not finished with boulders goal 
             }
         }
-        dungeon.setDungeonGoals("");
+
+        // Otherwise Goal has been completed!
+        // Need to remove it from the goals string
+
+        dungeon.setDungeonGoals(removeGoal(":boulder", dungeon));
 
     }
+
+    public String removeGoal(String goal, Dungeon dungeon) {
+
+        // ((X AND Y) OR (Z OR (G OR F)))
+        // ( AND (Z OR F))
+        String returnGoal = dungeon.getDungeonGoals();
+
+        returnGoal = returnGoal.replace("(" + goal + ")", "");
+        returnGoal = returnGoal.replace(goal + " AND ", "");
+        returnGoal = returnGoal.replace(" AND" + goal, "");
+
+        returnGoal = returnGoal.replace(" AND (" + goal + " OR " + ":mercenary)", "");
+        returnGoal = returnGoal.replace(" AND (" + goal + " OR " + ":treasure)", "");
+        returnGoal = returnGoal.replace(" AND (" + goal + " OR " + ":exit)", "");
+        returnGoal = returnGoal.replace(" AND (" + goal + " OR " + ":boulder)", "");
+
+        returnGoal = returnGoal.replace("(:mercenary " + " OR " + goal +") AND ", "");
+        returnGoal = returnGoal.replace("(:treasure " + " OR " + goal +") AND ", "");
+        returnGoal = returnGoal.replace("(:exit " + " OR " + goal +") AND ", "");
+        returnGoal = returnGoal.replace("(:boulder " + " OR " + goal +") AND", "");
+
+        returnGoal = returnGoal.replace("(" + goal + " OR " + ":mercenary)", "");
+        returnGoal = returnGoal.replace("(" + goal + " OR " + ":treasure)", "");
+        returnGoal = returnGoal.replace("(" + goal + " OR " + ":exit)", "");
+        returnGoal = returnGoal.replace("(" + goal + " OR " + ":boulder)", "");
+
+        returnGoal = returnGoal.replace("(:mercenary " + " OR " + goal +")", "");
+        returnGoal = returnGoal.replace("(:treasure " + " OR " + goal +")", "");
+        returnGoal = returnGoal.replace("(:exit " + " OR " + goal +")", "");
+        returnGoal = returnGoal.replace("(:boulder " + " OR " + goal +")", "");
+
+        // case where no brackets
+        returnGoal = returnGoal.replace(goal, "");
+
+        System.out.println(returnGoal);
+        System.out.println(goal);
+
+        return returnGoal;
+    }
+
+
+
 
     public void checkExitGoal(List<Entity> entities, Dungeon dungeon, MovingEntity player) {
 
@@ -1112,9 +1184,42 @@ public class DungeonManiaController {
 
             if (entity.getType().equals("exit")) {
                 if (entity.getPosition().equals(player.getPosition())) {
-                    dungeon.setDungeonGoals("");
+                    dungeon.setDungeonGoals(removeGoal(":exit", dungeon));
                 }
             }
+        }
+    }
+
+    public void checkTreasureGoal(List<Entity> entities, Dungeon dungeon) {
+
+        boolean isThereTreasure = false;
+        for (Entity entity : entities) {
+
+            if (entity.getType().equals("treasure")) {
+                isThereTreasure = true;
+            }
+        }
+
+        if (isThereTreasure == false) {
+            dungeon.setDungeonGoals(removeGoal(":treasure", dungeon));
+        }
+    }
+
+    public void checkEnemiesGoal(List<Entity> entities, Dungeon dungeon) {
+
+        boolean isThereEnemy = false;
+        for (Entity entity : entities) {
+
+            if (entity.getType().equals("mercenary") ||
+                entity.getType().equals("spider") || entity.getType().equals("zombie_toast")) {
+                
+                isThereEnemy = true;
+
+            }
+        }
+
+        if (isThereEnemy == false) {
+            dungeon.setDungeonGoals(removeGoal(":mercenary", dungeon));
         }
     }
 
@@ -1542,9 +1647,6 @@ public class DungeonManiaController {
      */
     public boolean dungeonNotValid(String dungeonName) {
        
-
-
-        
         return true;
     }
 
