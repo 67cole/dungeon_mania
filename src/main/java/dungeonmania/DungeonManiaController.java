@@ -711,7 +711,7 @@ public class DungeonManiaController {
                         // If the character isnt dead, then the enemy has to have died in the case of battle
                         // Takes into the account of collectable item
                         else {
-                            entitiesToBeRemoved.add(interactingEntity);
+                            if (!interactingEntity.getType().equals("boulder")) entitiesToBeRemoved.add(interactingEntity);
                             // Accounting for chance to receive TheOneRing
                             if (interactingEntity.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
                                 Random random = new Random();
@@ -872,8 +872,8 @@ public class DungeonManiaController {
             if (currPlayer.getType().equals("player")) tempChar = (Character) currPlayer;
         }
         for (Entity enti : entities) {
-            System.out.printf("player pos: %d, %d ", playerPos.getX(), playerPos.getY());
-            System.out.printf("currEnt pos: %d, %d of type %s\n", enti.getPosition().getX(), enti.getPosition().getY(), enti.getType());
+            // System.out.printf("player pos: %d, %d ", playerPos.getX(), playerPos.getY());
+            // System.out.printf("currEnt pos: %d, %d of type %s\n", enti.getPosition().getX(), enti.getPosition().getY(), enti.getType());
 
             if (enti.getType().equals("boulder")) {
                 
@@ -883,8 +883,9 @@ public class DungeonManiaController {
                 Position left = new Position(-1, 0);
                 Position right = new Position(1, 0);
                 if (playerPos.equals(entPos.translateBy(up)) || playerPos.equals(entPos.translateBy(down)) || playerPos.equals(entPos.translateBy(left)) || playerPos.equals(entPos.translateBy(right))) {
+                    // System.out.println("attempting explode");
                     doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities); 
-                    System.out.println("HI");
+                    
                 }
 
                 // doExplode(entities, (Character) temp, main, enti, allNearbyEntities);
@@ -892,8 +893,13 @@ public class DungeonManiaController {
         }
         // entitiesToBeRemoved.addAll(allNearbyEntities);
         for (Entity enta : allNearbyEntities) {
+            // System.out.printf("removing: %s\n", enta.getType());
             entitiesToBeRemoved.add(enta);
         }
+        // System.out.println("Entities to be removed");
+        // for (Entity enta : entitiesToBeRemoved) {
+        //     System.out.printf("%s\n", enta.getType());
+        // }
         // Remove the collectible from the map
         entityRemover(entitiesToBeRemoved, main);
         
@@ -1133,8 +1139,11 @@ public class DungeonManiaController {
      * @param main - the dungeon
      */
      public void entityRemover(List<Entity> entityList, Dungeon main) {
+        // System.out.println("now removing entities");
         for (Entity entityToBeRemoved : entityList) {
             if (entityToBeRemoved != null) {
+                // System.out.println("found a non-null object");
+                // System.out.println(entityToBeRemoved.getClass().getSuperclass().getName());
                 if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity")) {
                     if (entityToBeRemoved.getType().equals("key")) {
                         if (main.getKeyStatus()) {
@@ -1144,9 +1153,16 @@ public class DungeonManiaController {
                             return;
                         }
                     }
+                    // System.out.printf("removed %s\n", entityToBeRemoved);
                     main.removeEntity(entityToBeRemoved);
+                    
                 }
                 else if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
+                    // System.out.printf("removed %s\n", entityToBeRemoved);
+                    main.removeEntity(entityToBeRemoved);
+                }
+                else if (entityToBeRemoved.getClass().getSuperclass().getName().equals("dungeonmania.entities.StaticEntity")) {
+                    // System.out.printf("removed %s\n", entityToBeRemoved);
                     main.removeEntity(entityToBeRemoved);
                 }
             }
@@ -1508,22 +1524,26 @@ public class DungeonManiaController {
 
         for (Entity currEnt : entitiesAtBoulder) {
             if (currEnt.getType().equals("switch")) {
+                // System.out.println("checking for bombs");
                 // see if there are bombs cardinally adjacent, if so, explode any adjacent bombs
                 if (isBombAtPos(entsAbove)) {
-                    System.out.println("Bomb above");
+                    // System.out.println("Bomb above");
                     explode(entsAbove, entities, N, main, player, nearby);
                 }
                 if (isBombAtPos(entsRight)) {
+                    // System.out.println("Bomb right");
                     explode(entsRight, entities, E, main, player, nearby);
-                    System.out.println("Bomb right");
+                    
                 } 
                 if (isBombAtPos(entsBelow)) {
+                    // System.out.println("Bomb below");
                     explode(entsBelow, entities, S, main, player, nearby);
-                    System.out.println("Bomb below");
+                    
                 } 
                 if (isBombAtPos(entsLeft)) {
+                    // System.out.println("Bomb left");
                     explode(entsLeft, entities, W, main, player, nearby);
-                    System.out.println("Bomb left");
+                    
                 }
                 
             }
@@ -1562,50 +1582,56 @@ public class DungeonManiaController {
         for (Entity ent : entsN) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                System.out.printf("\n1\n");
+                // System.out.printf("1\n");
             }
         }
         for (Entity ent : entsNE) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                System.out.printf("\n2\n");
+                // System.out.printf("2\n");
             }
         }
         for (Entity ent : entsE) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                System.out.printf("\n3\n");
+                // System.out.printf("3\n");
             }
         }
         for (Entity ent : entsSE) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
             
-                System.out.printf("\n4\n");
+                // System.out.printf("4\n");
             }
         }
         for (Entity ent : entsS) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                System.out.printf("\n5\n");
+                // System.out.printf("5\n");
             }
         }
         for (Entity ent : entsSW) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                System.out.printf("\n6\n"); 
+                // System.out.printf("6\n"); 
             }
         }
         for (Entity ent : entsW) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                System.out.printf("\n7\n");
+                // System.out.printf("7\n");
             }
         }
         for (Entity ent : entsNW) {
             if (!ent.getType().equals("player")) {
                 NearbyEntities.add(ent);
-                System.out.printf("\n8\n");
+                // System.out.printf("8\n");
+            }
+        }
+        for (Entity ent : entsO) {
+            if (!ent.getType().equals("player")) {
+                NearbyEntities.add(ent);
+                // System.out.printf("9\n");
             }
         }
         // NearbyEntities.addAll(entsN);
