@@ -137,7 +137,6 @@ public class DungeonManiaController {
                 currDungeon.setHard(true);
                 break;
         }
-
         addEntitiesToList(dungeonName, main);
         
         List<EntityResponse> erList = new ArrayList<EntityResponse>();
@@ -146,6 +145,8 @@ public class DungeonManiaController {
             erList.add(er);
         }
         
+        // TODO: Sample goals
+
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
         lastTick = dr;
         
@@ -170,7 +171,7 @@ public class DungeonManiaController {
         jsonObj.addProperty("saveName", name);
         jsonObj.addProperty("entityCounter", currDungeon.getEntityCounter());
         jsonObj.addProperty("tickCounter", currDungeon.getTickCounter());
-        jsonObj.addProperty("keyStatus", currDungeon.getKeyStatus());;
+        jsonObj.addProperty("keyStatus", currDungeon.getKeyStatus());
         jsonObj.addProperty("invisibilityPotionCounter", currDungeon.getInvisibilityPotionCounter());
         jsonObj.addProperty("invincibilityPotionCounter", currDungeon.getInvincibilityPotionCounter());
 
@@ -190,7 +191,8 @@ public class DungeonManiaController {
         List<CollectableEntity> collectableList = new ArrayList<CollectableEntity>();
         for (Entity entity : currDungeon.getEntities()) {
             if (entity.getType().equals("sword") || entity.getType().equals("key") ||
-            entity.getType().equals("armour") || entity.getType().equals("bomb")) {
+            entity.getType().equals("armour") || entity.getType().equals("bomb") || 
+            entity.getType().equals("bow") || entity.getType().equals("shield")) {
                 CollectableEntity mv = (CollectableEntity) entity;
                 collectableList.add(mv);
             }
@@ -329,6 +331,24 @@ public class DungeonManiaController {
                     }
                 }
             }
+            else if (jEntity.get("type").getAsString().equals("bow")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("bow")) {
+                        Bow temp = (Bow) coEntity;
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("shield")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("shield")) {
+                        Shield temp = (Shield) coEntity;
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
         }
         
         File newFile = new File(filename);
@@ -403,7 +423,8 @@ public class DungeonManiaController {
                     currDungeon = main;
                     JsonArray entitiesList = dungeon.get("entities").getAsJsonArray();
                     JsonArray inventoryList = dungeon.get("inventory").getAsJsonArray();
-                    addEntitiesInventory(main, entitiesList, inventoryList);
+                    JsonArray buildableList = dungeon.get("buildables").getAsJsonArray();
+                    addEntitiesInventory(main, entitiesList, inventoryList, buildableList);
                     for(Entity entity: main.getEntities()) {
                         EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
                         erList.add(er);
@@ -451,7 +472,7 @@ public class DungeonManiaController {
      * @param entitiesList
      * @param inventoryList
      */
-    public void addEntitiesInventory(Dungeon main, JsonArray entitiesList, JsonArray inventoryList) {
+    public void addEntitiesInventory(Dungeon main, JsonArray entitiesList, JsonArray inventoryList, JsonArray buildableList) {
 
         for (int i = 0; i < entitiesList.size(); i++) {
             JsonObject entity = entitiesList.get(i).getAsJsonObject();
@@ -626,7 +647,22 @@ public class DungeonManiaController {
                     TheOneRing one = new TheOneRing(position, type, entityId, true);
                     main.inventory.add(one);
                     break;
+                case "bow":
+                    Bow bow = new Bow(position, type, entityId, true);
+                    bow.setDurability(entity.get("durability").getAsInt());
+                    main.inventory.add(bow);
+                    break;
+                case "shield":
+                    Shield shield = new Shield(position, type, entityId, true);
+                    shield.setDurability(entity.get("durability").getAsInt());
+                    main.inventory.add(shield);
+                    break;
             }
+        }
+
+        for (int i = 0; i < buildableList.size(); i++) {
+            String entity = buildableList.get(i).getAsString();
+            main.buildables.add(entity);
         }
 
     }
@@ -951,6 +987,30 @@ public class DungeonManiaController {
             main.addEntities(bombHolder);
         }
 
+        // The Goal Checker Central
+
+
+        // Check boulders
+        if (main.getDungeonGoals().contains("boulder")) {
+            checkBoulderGoal(entities, main);
+        }
+        // Check exit
+        // already done
+
+        // Check treasure
+        if (main.getDungeonGoals().contains("treasure")) {
+            checkTreasureGoal(entities, main);
+        }
+
+
+        // Check enemies
+        if (main.getDungeonGoals().contains("mercenary")) {
+            checkEnemiesGoal(entities, main);
+        } 
+
+
+
+
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
         for(Entity entity: main.getEntities()) {
             EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
@@ -1171,21 +1231,100 @@ public class DungeonManiaController {
 
         for (Integer amt : map.values()) {
             // even
-            if (amt != 1) {
+            if (amt == 1) {
                 return; // not finished with boulders goal 
             }
         }
-        dungeon.setDungeonGoals("");
+
+        // Otherwise Goal has been completed!
+        // Need to remove it from the goals string
+
+        dungeon.setDungeonGoals(removeGoal(":boulder", dungeon));
 
     }
+
+    public String removeGoal(String goal, Dungeon dungeon) {
+
+        // ((X AND Y) OR (Z OR (G OR F)))
+        // ( AND (Z OR F))
+        String returnGoal = dungeon.getDungeonGoals();
+
+        returnGoal = returnGoal.replace("(" + goal + ")", "");
+        returnGoal = returnGoal.replace(goal + " AND ", "");
+        returnGoal = returnGoal.replace(" AND" + goal, "");
+
+        returnGoal = returnGoal.replace(" AND (" + goal + " OR " + ":mercenary)", "");
+        returnGoal = returnGoal.replace(" AND (" + goal + " OR " + ":treasure)", "");
+        returnGoal = returnGoal.replace(" AND (" + goal + " OR " + ":exit)", "");
+        returnGoal = returnGoal.replace(" AND (" + goal + " OR " + ":boulder)", "");
+
+        returnGoal = returnGoal.replace("(:mercenary " + " OR " + goal +") AND ", "");
+        returnGoal = returnGoal.replace("(:treasure " + " OR " + goal +") AND ", "");
+        returnGoal = returnGoal.replace("(:exit " + " OR " + goal +") AND ", "");
+        returnGoal = returnGoal.replace("(:boulder " + " OR " + goal +") AND", "");
+
+        returnGoal = returnGoal.replace("(" + goal + " OR " + ":mercenary)", "");
+        returnGoal = returnGoal.replace("(" + goal + " OR " + ":treasure)", "");
+        returnGoal = returnGoal.replace("(" + goal + " OR " + ":exit)", "");
+        returnGoal = returnGoal.replace("(" + goal + " OR " + ":boulder)", "");
+
+        returnGoal = returnGoal.replace("(:mercenary " + " OR " + goal +")", "");
+        returnGoal = returnGoal.replace("(:treasure " + " OR " + goal +")", "");
+        returnGoal = returnGoal.replace("(:exit " + " OR " + goal +")", "");
+        returnGoal = returnGoal.replace("(:boulder " + " OR " + goal +")", "");
+
+        // case where no brackets
+        returnGoal = returnGoal.replace(goal, "");
+
+        System.out.println(returnGoal);
+        System.out.println(goal);
+
+        return returnGoal;
+    }
+
+
+
 
     public void checkExitGoal(List<Entity> entities, Dungeon dungeon, MovingEntity player) {
         for (Entity entity : entities) {
             if (entity.getType().equals("exit")) {
                 if (entity.getPosition().equals(player.getPosition())) {
-                    dungeon.setDungeonGoals("");
+                    dungeon.setDungeonGoals(removeGoal(":exit", dungeon));
                 }
             }
+        }
+    }
+
+    public void checkTreasureGoal(List<Entity> entities, Dungeon dungeon) {
+
+        boolean isThereTreasure = false;
+        for (Entity entity : entities) {
+
+            if (entity.getType().equals("treasure")) {
+                isThereTreasure = true;
+            }
+        }
+
+        if (isThereTreasure == false) {
+            dungeon.setDungeonGoals(removeGoal(":treasure", dungeon));
+        }
+    }
+
+    public void checkEnemiesGoal(List<Entity> entities, Dungeon dungeon) {
+
+        boolean isThereEnemy = false;
+        for (Entity entity : entities) {
+
+            if (entity.getType().equals("mercenary") ||
+                entity.getType().equals("spider") || entity.getType().equals("zombie_toast")) {
+                
+                isThereEnemy = true;
+
+            }
+        }
+
+        if (isThereEnemy == false) {
+            dungeon.setDungeonGoals(removeGoal(":mercenary", dungeon));
         }
     }
 
@@ -1473,42 +1612,64 @@ public class DungeonManiaController {
             JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
             JsonObject goalCondition = jsonObject.get("goal-condition").getAsJsonObject();
             String goal = goalCondition.get("goal").getAsString();
-            switch(goal) {
-                case "AND":
-                    JsonArray subgoals = goalCondition.get("subgoals").getAsJsonArray();
-                    for (int i = 0; i < subgoals.size(); i++) {
-                        JsonObject goals = subgoals.get(i).getAsJsonObject();
-                        if (goals.get("goal").getAsString().equals("enemies")) {
-                            if (findEnemies(filename, "mercenary") && findEnemies(filename, "spider")) {
-                                returnGoal += ":mercenary AND :spider";    
-                            } else if (findEnemies(filename, "spider")) {
-                                returnGoal += ":spider";
-                            } else if (findEnemies(filename, "mercenary")) {
-                                returnGoal += ":mercenary";
-                            }
-                        } 
-                        else {
-                            returnGoal += ":" + goals.get("goal").getAsString();
-                        }                   
-                        if (i + 1 != subgoals.size()) {
-                            returnGoal += " AND ";
-                        }
-                    }
-                    break;
-                case "exit":
-                    returnGoal = ":exit";
-                    break;
-                case "boulders":
-                    returnGoal = ":boulder";
-                    break;
-
+            // For the case of a double goal
+            if (goal.equals("AND") || goal.equals("OR")) {
+                JsonArray subGoals = goalCondition.get("subgoals").getAsJsonArray();
+                String firstString = returnSubGoal(subGoals.get(0).getAsJsonObject()); 
+                String secondString = returnSubGoal(subGoals.get(1).getAsJsonObject()); 
+                returnGoal = String.format("(%s %s %s)", firstString, goal, secondString);
             }
+
+            // we have a single goal, e.g., just exit
+            else {
+                returnGoal = jsonifyGoal(goal);
+            }
+
         } catch (Exception e) {
 
         }
         return returnGoal;
         
     }
+
+    public String jsonifyGoal(String goal) {
+
+        String returnGoal = "";
+        if (goal.equals("enemies")) {
+            // leave mercenary to be representative of all enemies for now..
+            returnGoal = ":mercenary";
+        }
+        else if (goal.equals("boulders")) {
+            returnGoal = ":boulder";
+        }
+        else {
+            // this covers case for treasure and exit
+            returnGoal = ":" + goal;
+        }
+        return returnGoal;
+    }
+
+    // Applied recursively
+    public String returnSubGoal(JsonObject goalObject) {
+
+        String returnGoal = "";
+        String goal = goalObject.get("goal").getAsString();
+
+        if (goal.equals("AND") || goal.equals("OR")) {
+            JsonArray subGoals = goalObject.get("subgoals").getAsJsonArray();
+            String firstString = returnSubGoal(subGoals.get(0).getAsJsonObject()); 
+            String secondString = returnSubGoal(subGoals.get(1).getAsJsonObject()); 
+            returnGoal = String.format("(%s %s %s)", firstString, goal, secondString);
+        }
+
+        // we have a single goal, e.g., just exit
+        else {
+            returnGoal = jsonifyGoal(goal);
+        }
+
+        return returnGoal;
+    }
+
 
     /**
      * Helper Function that returns true if an enemy goal could be found in the 
@@ -1742,9 +1903,6 @@ public class DungeonManiaController {
      */
     public boolean dungeonNotValid(String dungeonName) {
        
-
-
-        
         return true;
     }
 
