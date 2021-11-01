@@ -145,9 +145,7 @@ public class DungeonManiaController {
         jsonObj.addProperty("saveName", name);
         jsonObj.addProperty("entityCounter", currDungeon.getEntityCounter());
         jsonObj.addProperty("tickCounter", currDungeon.getTickCounter());
-        jsonObj.addProperty("keyStatus", currDungeon.getKeyStatus());
-        jsonObj.addProperty("width", currDungeon.getWidth());
-        jsonObj.addProperty("height", currDungeon.getHeight());
+        jsonObj.addProperty("keyStatus", currDungeon.getKeyStatus());;
         jsonObj.addProperty("invisibilityPotionCounter", currDungeon.getInvisibilityPotionCounter());
         jsonObj.addProperty("invincibilityPotionCounter", currDungeon.getInvincibilityPotionCounter());
 
@@ -367,8 +365,6 @@ public class DungeonManiaController {
                     main.setTickCounter(dungeon.get("tickCounter").getAsInt());
                     main.setEntityCounter(dungeon.get("entityCounter").getAsInt());
                     main.setKeyStatus(dungeon.get("keyStatus").getAsBoolean());
-                    main.setWidth(dungeon.get("width").getAsInt());
-                    main.setHeight(dungeon.get("height").getAsInt());
                     main.setInvincibilityCounter(dungeon.get("invincibilityPotionCounter").getAsInt());
                     main.setInvisibilityPotionCounter(dungeon.get("invisibilityPotionCounter").getAsInt());
 
@@ -602,15 +598,6 @@ public class DungeonManiaController {
     public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {    
         // Get entity list
         List<Entity> entities = currDungeon.getEntities();
-
-
-        if (!itemUsedInvalid(itemUsed, entities)) {
-            throw new IllegalArgumentException("The item used is invalid.");
-        }
-        
-        if (!itemUsedNotInInventory(itemUsed)) {
-            throw new InvalidActionException("The item is not in the inventory.");
-        }
         
         Dungeon main = null;
         List<Entity> entitiesToBeRemoved = new ArrayList<Entity>();
@@ -915,7 +902,85 @@ public class DungeonManiaController {
     }
 
     public DungeonResponse build(String buildable) throws IllegalArgumentException, InvalidActionException {
-        return null;
+        List<CollectableEntity> itemsToBeRemoved = new ArrayList<CollectableEntity>();
+        if (buildable.equals("bow")) {
+            String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+            currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+            // Removing the items
+            int wood = 0;
+            int arrow = 0;
+            for (CollectableEntity item: currDungeon.inventory) {
+                if (wood >= 1 && arrow >= 3) {
+                    break;
+                }
+                if (item.getType().equals("wood") && wood < 2) {
+                    itemsToBeRemoved.add(item);
+                    wood++;
+                }
+                if (item.getType().equals("arrow") && arrow < 4) {
+                    itemsToBeRemoved.add(item);
+                    arrow++;
+                }
+            }
+            // Position needs to be stated as checkNext requires a position to run
+            Position tempPos = new Position(-1, -1);
+            Bow bow = new Bow(tempPos, "bow", entityId, true);
+            currDungeon.inventory.add(bow);
+            currDungeon.buildables.remove(buildable);
+        }
+        if (buildable.equals("shield")) {
+            String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+            currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+            // Removing the items
+            int key = 0;
+            int treasure = 0;
+            int wood = 0;
+            for (CollectableEntity item: currDungeon.inventory) {
+                if (wood >= 2 && treasure >= 1 && key >= 1) {
+                    break;
+                }
+                if (item.getType().equals("wood") && wood < 3) {
+                    itemsToBeRemoved.add(item);
+                    wood++;
+                }
+                if (item.getType().equals("key") && key < 2 && treasure < 2) {
+                    itemsToBeRemoved.add(item);
+                    currDungeon.setKeyStatus(true);
+                    key++;
+                }
+                 if (item.getType().equals("treasure") && treasure < 2 && key < 2) {
+                    itemsToBeRemoved.add(item);
+                    treasure++;
+                }
+            }
+            // Position needs to be stated as checkNext requires a position to run
+            Position tempPos = new Position(-1, -1);
+            Shield shield = new Shield(tempPos, "shield", entityId, true);
+            currDungeon.inventory.add(shield);
+            currDungeon.buildables.remove(buildable);
+        }
+
+        for (CollectableEntity item: itemsToBeRemoved) {
+            currDungeon.inventory.remove(item);
+        }
+
+        List<EntityResponse> erList= new ArrayList<EntityResponse>();
+        for(Entity entity: currDungeon.getEntities()) {
+            EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
+            erList.add(er);
+        }
+
+        List<ItemResponse> irList= new ArrayList<ItemResponse>();
+        for(CollectableEntity collectableEntity: currDungeon.inventory) {
+            ItemResponse ir = new ItemResponse(collectableEntity.getID(), collectableEntity.getType());
+            irList.add(ir);
+        }
+
+        DungeonResponse dr = new DungeonResponse(currDungeon.getDungeonId(), currDungeon.getDungeonName(),
+            erList, irList, currDungeon.buildables, currDungeon.getDungeonGoals());
+        
+        lastTick = dr;
+        return dr;
     }
 
 
@@ -973,10 +1038,8 @@ public class DungeonManiaController {
 
         boolean posFound = false;
         while (posFound == false) {
-            int maxWidth = currDungeon.getWidth();
-            int maxHeight = currDungeon.getHeight();
-            int x = getRandomNumber(0, maxWidth - 1);
-            int y = getRandomNumber(0, maxHeight - 1);
+            int x = getRandomNumber(0, 15);
+            int y = getRandomNumber(0, 15);
             int check = 0;
             Position pos = new Position(x, y);
             Position posAbove = new Position(x, y + 1);
@@ -1043,9 +1106,7 @@ public class DungeonManiaController {
     }
 
     public void checkExitGoal(List<Entity> entities, Dungeon dungeon, MovingEntity player) {
-
         for (Entity entity : entities) {
-
             if (entity.getType().equals("exit")) {
                 if (entity.getPosition().equals(player.getPosition())) {
                     dungeon.setDungeonGoals("");
@@ -1209,43 +1270,6 @@ public class DungeonManiaController {
         }
         return false;
     }
-
-    /**
-     * This function checks whether or not the item given in tick is valid
-     * @param itemUsed - string of the id of the item used
-     * @param entities - the list of all the entities in the dungeon
-     */
-    public boolean itemUsedInvalid(String itemUsed, List<Entity> entities) {
-        if (itemUsed == null) return true;
-
-        String[] items = {"bomb", "health_potion", "invincibility_potion", "invisibility_potion"};
-        List<String> itemAvailable = Arrays.asList(items);
-
-        for (Entity entity : entities) {
-            if (itemAvailable.contains(entity.getType())) {
-                if (entity.getID().equals(itemUsed)) return true;
-            }
-        }
-        
-        return false;
-    }
-
-    /**
-     * This function checks whether or not the item given in tick is in the inventory
-     * @param itemUsed - string of the id of the item used
-     * @param entities - the list of all the entities in the dungeon
-     */
-    public boolean itemUsedNotInInventory(String itemUsed) {    
-        if (itemUsed == null) return true;
-
-        List<CollectableEntity> inventory = currDungeon.getInventory();
-
-        for (CollectableEntity collectable : inventory) {
-            if (collectable.getID().equals(itemUsed)) return true;
-        }
-            
-        return false;
-    }
     
     /**
      * Helper Function that takes in the json file and adds all entities into entities list
@@ -1257,8 +1281,6 @@ public class DungeonManiaController {
         String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
         try {
             JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
-            currDungeon.setHeight(jsonObject.get("height").getAsInt());
-            currDungeon.setWidth(jsonObject.get("width").getAsInt());
             
             JsonArray entitiesList = jsonObject.get("entities").getAsJsonArray();
             

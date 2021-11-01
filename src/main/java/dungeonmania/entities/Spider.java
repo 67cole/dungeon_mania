@@ -8,10 +8,10 @@ import dungeonmania.util.*;
 public class Spider extends MovingEntity {
     private final static int STARTING_HEALTH = 1;
     private final static int ATTACK = 1;
+    private int loopPos = 0;
+    private boolean clockwise = true;
     List<Position> clockwiseLoop = new ArrayList<Position>();
     List<Position> anticlockwiseLoop = new ArrayList<Position>();
-    int loopPos = 0;
-    boolean clockwise = true;
     Position up = new Position(0, -1);
     Position down = new Position(0, 1);
     Position left = new Position(-1, 0);

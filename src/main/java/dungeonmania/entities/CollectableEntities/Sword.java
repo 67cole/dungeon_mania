@@ -34,13 +34,13 @@ public class Sword extends CollectableEntity{
     public int getDurability() {
         return this.durability;
     }
-
+    /**
+     * Setter for durability
+     * @param durability
+     * @return void
+     */
     public void setDurability(int durability) {
         this.durability = durability;
-    }
-
-    public void setAttack(int attack) {
-        this.attack = attack;
     }
 
     /**
@@ -56,6 +56,14 @@ public class Sword extends CollectableEntity{
     public int getAttack() {
 		return this.attack;
 	}
+    /**
+     * Setter for attack
+     * @param attack
+     * @return void
+     */
+    public void setAttack(int attack) {
+        this.attack = attack;
+    }
     /**
      * Checks durability of sword
      * @return Sword
