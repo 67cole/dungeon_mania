@@ -799,7 +799,14 @@ public class DungeonManiaController {
                         // If the character isnt dead, then the enemy has to have died in the case of battle
                         // Takes into the account of collectable item
                         else {
-                            if (!interactingEntity.getType().equals("boulder")) entitiesToBeRemoved.add(interactingEntity);
+                            List<String> nonRemovable = Arrays.asList("boulder", "portal", "switch", "door", "exit", "swamp_tile");
+                            int dontRemove = 0;
+                            for (String curr : nonRemovable) {
+                                if (interactingEntity.getType().equals(curr)) dontRemove = 1;
+                            }
+                            if (dontRemove == 0) entitiesToBeRemoved.add(interactingEntity);
+
+                            // if (!interactingEntity.getType().equals("boulder")) entitiesToBeRemoved.add(interactingEntity);
                             // Accounting for chance to receive TheOneRing
                             if (interactingEntity.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
                                 Random random = new Random();
