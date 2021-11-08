@@ -1707,7 +1707,7 @@ public class DungeonManiaController {
                         main.addEntities(hydraEntity);
                         break;
                     case "assassin":
-                        Assassin assassinEntity = new Assassin(position, type entityId, true);
+                        Assassin assassinEntity = new Assassin(position, type, entityId, true);
                         main.addEntities(assassinEntity);
                         break;
                 }
