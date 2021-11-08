@@ -4,6 +4,7 @@ import dungeonmania.util.Position;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import dungeonmania.entities.CollectableEntities.Sword;
 import dungeonmania.entities.BuildableEntities.Bow;
 import dungeonmania.entities.BuildableEntities.Shield;
@@ -660,19 +661,32 @@ public abstract class MovingEntity implements Entity {
             else {
                 characterHealth = characterHealth - ((enemyHealth * enemyAD) / 10);
             }
-            // Calculations for enemy
-            if (enemyArmour) {
-                enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
-                if (charHasBow) {
-                    enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
-                }
+
+            // Calculate if hydra will heal or not
+            Random random = new Random();
+            int HydraHealing = random.nextInt(2);
+            
+            // Calculations for if the enemy is a hydra and it heals 
+            if (this.getType().equals("hydra") && HydraHealing == 1) {
+                enemyHealth = hydraBattleHealing(enemyHealth, characterHealth, characterAD, weaponAtk, enemyArmour, charHasBow);
             }
+
+            // Otherwise, calculate normally for an enemy, or hydra when it doesn't heal
             else {
-                enemyHealth = enemyHealth - ((characterHealth * (characterAD + weaponAtk)) / 5);
-                if (charHasBow) {
+                if (enemyArmour) {
                     enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+                    if (charHasBow) {
+                        enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+                    }
+                }
+                else {
+                    enemyHealth = enemyHealth - ((characterHealth * (characterAD + weaponAtk)) / 5);
+                    if (charHasBow) {
+                        enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+                    }
                 }
             }
+
             // Check if character dies
             if (!checkAlive(characterHealth)) {
                 player.setAlive(false);
@@ -736,6 +750,23 @@ public abstract class MovingEntity implements Entity {
    
         // Now moving the enemy. Also check the movement once more as spider can be on wall
         if (longestDistance > originalDistance) setPosition(destination);
+    }
+
+    public int hydraBattleHealing (int enemyHealth, int characterHealth, int characterAD, int weaponAtk, boolean enemyArmour, boolean charHasBow) {
+        if (enemyArmour) {
+            enemyHealth = enemyHealth + ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+            if (charHasBow) {
+                enemyHealth = enemyHealth + ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+            }
+        }
+        else {
+            enemyHealth = enemyHealth + ((characterHealth * (characterAD + weaponAtk)) / 5);
+            if (charHasBow) {
+                enemyHealth = enemyHealth + ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+            }
+        }
+
+        return enemyHealth;
     }
 
 }

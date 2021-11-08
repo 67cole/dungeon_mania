@@ -6,12 +6,11 @@ import java.util.List;
 import java.util.Random;
 
 
-public class ZombieToast extends MovingEntity {
-    private final static int STARTING_HEALTH = 3;
-    private final static int ATTACK = 1;
+public class Hydra extends MovingEntity {
+    private final static int STARTING_HEALTH = 8;
+    private final static int ATTACK = 4;
 
     
-
     /**
      * Creates the main zombie
      * @param position - the current position in the dungeon
@@ -19,23 +18,18 @@ public class ZombieToast extends MovingEntity {
      * @param ID - the ID of entity
      * @param isInteractable - check if the entity is interactable
      */
-    public ZombieToast(Position position, String type, String ID, boolean isInteractable) {
+    public Hydra(Position position, String type, String ID, boolean isInteractable) {
         super(position, type, ID, isInteractable);
         setHealth(STARTING_HEALTH);
         setAttack(ATTACK);
-        Random random = new Random();
-        int chance = random.nextInt(6);
-        if (chance == 3) {
-            setArmour(true);
-        }
     }
 
-    public void moveEntity(List<Entity> entities, Position playerPosition) {
-        // For now, zombies travel randomely
+    public void moveEntity(List<Entity> entities, Position position) {
+        // For now, hydras travel randomely
         Random random = new Random();
         int randDirection = random.nextInt(4);
 
-        if (playerPosition.equals(super.getPosition())) return;
+        if (position.equals(super.getPosition())) return;
 
         switch(randDirection) {
             case 0:
@@ -46,8 +40,9 @@ public class ZombieToast extends MovingEntity {
                         //If it is a door, check if its locked or not, if it isnt locked, move into it
                         if (doorEntity.getLocked() == true) {
                             break;
-                        }
+                        }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
                     }
+
                     super.moveUpward();
                     break;
                 }
@@ -66,7 +61,7 @@ public class ZombieToast extends MovingEntity {
                     break;
                 }
             
-            case 2:      
+            case 2:
                 if (checkMovement(super.getPosition().translateBy(-1, 0), entities)) {
                     // If its netiher a wall nor a boulder, check if its a door
                     Door doorEntity = checkDoor(super.getPosition().translateBy(-1, 0), entities); 
@@ -95,6 +90,7 @@ public class ZombieToast extends MovingEntity {
                 }
         }   
     }
+
 
 }
 
