@@ -30,7 +30,7 @@ Mercenary
 
     -   The mercenary's starting health is 3
     -   The mercenary's starting attack is 2
-    -   The mercenary would spawn every 75 ticks
+    -   The mercenary would spawn every 40 ticks
     -   Mercenaries can't interact with anything (i.e. moving a boulder )
     -   Mercenaries will always have a valid spot to move to, it cannot be trapped
     -   10 percent chance of spawning with armour
@@ -71,7 +71,22 @@ Armour
 Battle
 
     -   The character can only have one battle at a time in ONE tick, so if a mercenary moves on top of the character mid battle, it will battle in the next tick, or if a spider jumps on top mid battle, it will crawl away unless the character moves on top of their path next tick.
+    -   Only the hydra can battle other enemies
 
 Bomb explosions
     -   if a boulder activates a switch with multiple cardinally adjacent bombs, explode each one
     -   if pushing a boulder onto a switch involves picking up a cardinally adjacent bomb, pick it up and explode it
+
+Hydra
+
+    -   Hydras spawn in an available position adjacent to the player's current position
+    -   Hydras move randomely like zombies
+    -   The hydra's starting health is 8
+    -   The hydra's starting attack is 4
+
+Assassin
+
+    -   Assassins have a 20% chance of spawning in place of a mercenary 
+    -   Assassins have double the health and triple the attack damage of a mercenary 
+    -   So, their attack is 6 and their health is also 6
+    -   Because of the nature of assassins, they do not wear armour

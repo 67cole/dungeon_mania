@@ -696,9 +696,13 @@ public class DungeonManiaController {
         int spiderSpawned = 0;
         ZombieToast zombieHolder = null;
         Mercenary mercenaryHolder = null;
+        Hydra hydraHolder = null;
+        Assassin assassinHolder = null;
         Bomb bombHolder = null;
         int zombieAddedLater = 0;
         int mercenaryAddedLater = 0;
+        int hydraAddedLater = 0;
+        int assassinAddedLater = 0;
         int EnemyCheck = 0;
         boolean invincibilityActive = false; 
         Character tempChar = null;
@@ -725,8 +729,12 @@ public class DungeonManiaController {
             invincibilityActive = true;
         }
 
-        // Mercenary Movement goes first
+        // Enemy movement goes first
+        if (!invincibilityActive) hydraMovement(entities, movementDirection);
         if (!invincibilityActive) mercenaryMovement(entities, movementDirection);
+        if (!invincibilityActive) zombieMovement(entities, movementDirection);
+
+
 
         for (Entity entity : entities) {
             // Mercenary should only spawn if there is an enemy for the dungeon
@@ -855,14 +863,6 @@ public class DungeonManiaController {
                 }
             }
 
-            // Zombie Movement (moves the same for character but can't interact)
-            if (entity.getType().equals("zombie_toast") && !invincibilityActive) {
-                ZombieToast temp = (ZombieToast) entity;
-                
-                temp.moveEntity(entities);
-            }         
-
-
             // Spider Movement
             if (entity.getType().equals("spider") && !invincibilityActive) {
                 MovingEntity temp = (MovingEntity) entity;
@@ -939,14 +939,41 @@ public class DungeonManiaController {
             checkBoulderGoal(entities, main);
         }
         // Mercenary Spawn Ticks
-        // Every 75 ticks of the game causes a new mercenary to spawn
-        if (currDungeon.getTickCounter() % 75 == 0 && EnemyCheck == 1) {
+        // Every 40 ticks of the game causes a new mercenary to spawn
+        if (currDungeon.getTickCounter() % 40 == 0 && EnemyCheck == 1) {
+            
+            // Assassins have a chance of spawning in place of a mercenary (20%)
+            Random random = new Random();
+            int AssassinSpawn = random.nextInt(5);
+
+            if (AssassinSpawn == 3) {
+                String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
+
+                Assassin assassinEntity = new Assassin(playerSpawnPosition, "assassin", entityId, true);
+                assassinHolder = assassinEntity;
+                assassinAddedLater = 1;
+            }
+
+            else {
+                String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
+
+                Mercenary mercenaryEntity = new Mercenary(playerSpawnPosition, "mercenary", entityId, true);
+                mercenaryHolder = mercenaryEntity;
+                mercenaryAddedLater = 1;
+            }
+        }
+
+        // Hydra Spawn Ticks
+        if (currDungeon.getTickCounter() % 50 == 0 && currDungeon.getHard()) {
             String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
             currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
 
-            Mercenary mercenaryEntity = new Mercenary(playerSpawnPosition, "mercenary", entityId, true);
-            mercenaryHolder = mercenaryEntity;
-            mercenaryAddedLater = 1;
+            Position hydraSpawn = checkWhiteSpace(character.getPosition(), entities);
+            Hydra hydraEntity = new Hydra(hydraSpawn, "hydra", entityId, true);
+            hydraHolder = hydraEntity;
+            hydraAddedLater = 1;
         }
 
         // Spider spawner ticks
@@ -961,7 +988,10 @@ public class DungeonManiaController {
                  
         if (zombieAddedLater == 1) main.addEntities(zombieHolder);
         if (mercenaryAddedLater == 1) main.addEntities(mercenaryHolder);
+        if (hydraAddedLater == 1) main.addEntities(hydraHolder);
+        if (assassinAddedLater == 1) main.addEntities(assassinHolder);
         if (spiderSpawned == 1) main.addEntities(spid);
+
         
         Position playerPos = new Position(0, 0);
         for (Entity ent : entities) {
@@ -1385,7 +1415,41 @@ public class DungeonManiaController {
         return false;
     }
 
+    /**
+     * Moves the hydra around
+     * @param entities - The list of all entities in the dungeon
+     * @param direction - The direction of the character
+     */
+    public void hydraMovement (List<Entity> entities, Direction direction) {
+        Position player = getPlayerPosition(entities);
+        player = player.translateBy(direction);
 
+        for (Entity entity : entities) {
+            if (entity.getType().equals("hydra")) {
+                Hydra temp = (Hydra) entity;
+                temp.moveEntity(entities, player);
+
+            }
+        }
+    }
+
+    /**
+     * Moves the zombie around
+     * @param entities - The list of all entities in the dungeon
+     * @param direction - The direction of the character
+     */
+    public void zombieMovement (List <Entity> entities, Direction direction) {
+        Position player = getPlayerPosition(entities);
+        player = player.translateBy(direction);
+
+        for (Entity entity : entities) {
+            if (entity.getType().equals("zombie_toast")) {
+                ZombieToast temp = (ZombieToast) entity;
+                temp.moveEntity(entities, player);
+
+            }
+        }
+    }
 
     /**
      * Moves the mercenary around
@@ -1637,6 +1701,14 @@ public class DungeonManiaController {
                     case "mercenary":
                         Mercenary mercenaryEntity = new Mercenary(position, type, entityId, true);
                         main.addEntities(mercenaryEntity);
+                        break;
+                    case "hydra":
+                        Hydra hydraEntity = new Hydra(position, type, entityId, true);
+                        main.addEntities(hydraEntity);
+                        break;
+                    case "assassin":
+                        Assassin assassinEntity = new Assassin(position, type entityId, true);
+                        main.addEntities(assassinEntity);
                         break;
                 }
             }
