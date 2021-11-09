@@ -874,70 +874,85 @@ public class DungeonManiaController {
             if (entity.getType().equals("spider") && !invincibilityActive) {
                 MovingEntity temp = (MovingEntity) entity;
                 MovingEntity spider = (Spider) entity;
-                int loopPos = spider.getLoopPos();
-                // if just spawned, move upward. do not need to check for
-                // boulder above since cannot spawn below a boulder
-                if (loopPos == 0) {
-                    temp.moveUpward();
-                    // if finished a loop, reset
-                    if (loopPos == 9) {
-                        loopPos = 0;
-                    }
-                    spider.setLoopPos(loopPos + 1);
+                boolean swampMove = true;
+                for (Entity  staticEntity: entities) {
+                    if (staticEntity.getType().equals("swamp_tile") && staticEntity.getPosition().equals(spider.getPosition()));
+                        SwampTile swampEntity = (SwampTile) staticEntity;
+                        if (spider.getTotalMovement() < swampEntity.getMovementFactor()) {
+                            spider.swampMove();
+                            swampMove = false;
+                            continue;                            
+                        } else {
+                            spider.resetTotalMovement();
+                        }
+                }
+                if (swampMove == false) {
+                    continue;
                 } else {
-                    // 1. get currLoop based on movement direction
-                    // 2. check if next pos is a boulder
-                    //      if boulder, setClockwise to opposite
-                    // 3. move
-                    List<Position> posLoop = spider.getClockwiseLoop();
-                    List<Position> negLoop = spider.getAnticlockwiseLoop();
-
-                    // get direction of movement based on whether moving clockwise
-                    Position dir = posLoop.get(loopPos);                           
-                    if (spider.getClockwise() == false) {
-                        dir = negLoop.get(loopPos);
-                    }
-                    int spiderBlocked = 0;
-                    // if blocked, set dir to opposite
-                    for (Entity currEnt: entities) {
-                        Position nextPos = spider.getPosition().translateBy(dir);
-
-                        if (currEnt.getPosition().equals(nextPos) && currEnt.getType().equals("boulder")) {
-                            spider.setClockwise(!spider.getClockwise());
-                            
-                            spiderBlocked = 1;
-                            
-                        }
-                        else if (currEnt.getPosition().equals(nextPos) && currEnt.getType().equals("door")) {
-                            spider.setClockwise(!spider.getClockwise());
-                            
-                            spiderBlocked = 1;
-                            
-                        }
-                    }
-
-                    // double check if movement direction changed
-                    if (spider.getClockwise() == false) {
-                        dir = negLoop.get(loopPos);
-                    } else {
-                        dir = posLoop.get(loopPos);
-                    }
-                    if (spiderBlocked == 0) spider.moveEntity(dir);
-                    
-                    // update loopPos
-                    if (spider.getClockwise() == true) {
-                        if (loopPos == 8) {
+                    int loopPos = spider.getLoopPos();
+                    // if just spawned, move upward. do not need to check for
+                    // boulder above since cannot spawn below a boulder
+                    if (loopPos == 0) {
+                        temp.moveUpward();
+                        // if finished a loop, reset
+                        if (loopPos == 9) {
                             loopPos = 0;
                         }
                         spider.setLoopPos(loopPos + 1);
                     } else {
-                        if (loopPos == 1) {
-                            loopPos = 9;
-                        }
-                        spider.setLoopPos(loopPos - 1);
-                    }
+                        // 1. get currLoop based on movement direction
+                        // 2. check if next pos is a boulder
+                        //      if boulder, setClockwise to opposite
+                        // 3. move
+                        List<Position> posLoop = spider.getClockwiseLoop();
+                        List<Position> negLoop = spider.getAnticlockwiseLoop();
 
-                }
+                        // get direction of movement based on whether moving clockwise
+                        Position dir = posLoop.get(loopPos);                           
+                        if (spider.getClockwise() == false) {
+                            dir = negLoop.get(loopPos);
+                        }
+                        int spiderBlocked = 0;
+                        // if blocked, set dir to opposite
+                        for (Entity currEnt: entities) {
+                            Position nextPos = spider.getPosition().translateBy(dir);
+
+                            if (currEnt.getPosition().equals(nextPos) && currEnt.getType().equals("boulder")) {
+                                spider.setClockwise(!spider.getClockwise());
+                                
+                                spiderBlocked = 1;
+                                
+                            }
+                            else if (currEnt.getPosition().equals(nextPos) && currEnt.getType().equals("door")) {
+                                spider.setClockwise(!spider.getClockwise());
+                                
+                                spiderBlocked = 1;
+                                
+                            }
+                        }
+
+                        // double check if movement direction changed
+                        if (spider.getClockwise() == false) {
+                            dir = negLoop.get(loopPos);
+                        } else {
+                            dir = posLoop.get(loopPos);
+                        }
+                        if (spiderBlocked == 0) spider.moveEntity(dir);
+                        
+                        // update loopPos
+                        if (spider.getClockwise() == true) {
+                            if (loopPos == 8) {
+                                loopPos = 0;
+                            }
+                            spider.setLoopPos(loopPos + 1);
+                        } else {
+                            if (loopPos == 1) {
+                                loopPos = 9;
+                            }
+                            spider.setLoopPos(loopPos - 1);
+                        }
+                    }
+                }              
             }
         }
 
@@ -1430,12 +1445,27 @@ public class DungeonManiaController {
     public void hydraMovement (List<Entity> entities, Direction direction) {
         Position player = getPlayerPosition(entities);
         player = player.translateBy(direction);
-
+        boolean swampMove = true;
         for (Entity entity : entities) {
             if (entity.getType().equals("hydra")) {
                 Hydra temp = (Hydra) entity;
+                for (Entity staticEntity: entities) {
+                    //If the hydra is on the swamp tile, slow it down
+                    if (staticEntity.getType().equals("swamp_tile") && staticEntity.getPosition().equals(temp.getPosition())) {
+                        SwampTile swampEntity = (SwampTile) staticEntity;
+                        if (temp.getTotalMovement() < swampEntity.getMovementFactor()) {
+                            temp.swampMove();
+                            swampMove = false;
+                            continue;
+                        } else {
+                            temp.resetTotalMovement();
+                        }
+                    }
+                }
+                if (swampMove == false) {
+                    continue;
+                }
                 temp.moveEntity(entities, player);
-
             }
         }
     }
@@ -1448,12 +1478,27 @@ public class DungeonManiaController {
     public void zombieMovement (List <Entity> entities, Direction direction) {
         Position player = getPlayerPosition(entities);
         player = player.translateBy(direction);
-
+        boolean swampMove = true;
         for (Entity entity : entities) {
             if (entity.getType().equals("zombie_toast")) {
                 ZombieToast temp = (ZombieToast) entity;
+                for (Entity staticEntity: entities) {
+                    //If the zombie is on the swamp tile, slow it down
+                    if (staticEntity.getType().equals("swamp_tile") && staticEntity.getPosition().equals(temp.getPosition())) {
+                        SwampTile swampEntity = (SwampTile) staticEntity;
+                        if (temp.getTotalMovement() < swampEntity.getMovementFactor()) {
+                            temp.swampMove();
+                            swampMove = false;
+                            continue;
+                        } else {
+                            temp.resetTotalMovement();
+                        }
+                    }
+                }
+                if (swampMove == false) {
+                    continue;
+                }
                 temp.moveEntity(entities, player);
-
             }
         }
     }
@@ -1466,11 +1511,28 @@ public class DungeonManiaController {
     public void mercenaryMovement(List<Entity> entities, Direction direction) {
         Position player = getPlayerPosition(entities);
         player = player.translateBy(direction);
-
+        boolean swampMove = true;
         for (Entity entity : entities) {
             if (entity.getType().equals("mercenary")) {
-                Mercenary temp = (Mercenary) entity;
-                temp.moveEntity(entities, player);
+                Mercenary mercenaryEntity = (Mercenary) entity;
+                //check if the mercenary is on a swamp tile, if it is, check if it can move yet
+                for (Entity staticEntity : entities) {
+                    if (staticEntity.getType().equals("swamp_tile") && staticEntity.getPosition().equals(mercenaryEntity.getPosition())) {
+                        SwampTile swampEntity = (SwampTile) staticEntity;
+                        if (mercenaryEntity.getTotalMovement() < swampEntity.getMovementFactor()) {
+                            mercenaryEntity.swampMove();
+                            swampMove = false;
+                            continue;
+                        } else {
+                            mercenaryEntity.resetTotalMovement();
+                        }
+                    }
+                }
+                if (swampMove == false) {
+                    continue;
+                }
+                
+                mercenaryEntity.moveEntity(entities, player);
             }
         }
     }
@@ -1716,6 +1778,11 @@ public class DungeonManiaController {
                     case "assassin":
                         Assassin assassinEntity = new Assassin(position, type, entityId, true);
                         main.addEntities(assassinEntity);
+                        break;
+                    case "swamp_tile":
+                        SwampTile swamp = new SwampTile(position, type, entityId, false);
+                        swamp.setMovementFactor(entity.get("movement_factor").getAsInt());
+                        main.addEntities(swamp);
                         break;
                 }
             }
