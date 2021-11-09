@@ -732,6 +732,7 @@ public class DungeonManiaController {
         // Enemy movement goes first
         if (!invincibilityActive) hydraMovement(entities, movementDirection);
         if (!invincibilityActive) mercenaryMovement(entities, movementDirection);
+        if (!invincibilityActive) assassinMovement(entities, movementDirection);
         if (!invincibilityActive) zombieMovement(entities, movementDirection);
 
 
@@ -1092,7 +1093,78 @@ public class DungeonManiaController {
 
 
     public DungeonResponse interact(String entityId) throws IllegalArgumentException, InvalidActionException {
-        return null;
+        System.out.println("passing thru interact");
+        // Get entity list
+        List<Entity> entities = currDungeon.getEntities();
+
+        // Get inventory
+        List<CollectableEntity> inventory = currDungeon.getInventory();
+
+        // Get the character class
+        Character character = getCharacter(entities);
+
+        // Check if the entity exists within the dungeon
+        if (!entityIdCheck(entityId, entities)) {
+            throw new IllegalArgumentException("The entity does not exist.");
+        }
+
+        // Check what we are interacting with 
+        Entity interaction = IdToEntity(entityId, entities);
+
+        // Interaction with the mercenary
+        if (interaction.getType().equals("mercenary")) {
+            
+            // Check whether the player is close enough to the mercenary
+            if (!playerProximityMercenary(character, interaction)) {
+                throw new InvalidActionException("The player is not close enough to the mercenary.");
+            }
+
+            // Check whether the player has enough gold to bribe the mercenary
+            if (!playerHasEnoughGold(inventory)) {
+                throw new InvalidActionException("The player does not have enough gold to bribe the mercenary.");
+            }
+
+
+
+        }
+
+        // Interaction with the spawner
+        if (interaction.getType().equals("zombie_toast_spawner")) {
+
+            // Check whether the player is close enough to the spawner
+            if (!playerProximitySpawner(character, interaction)) {
+                throw new InvalidActionException("The player is not close enough to the spawner.");
+            }
+
+            // Check whether the player has a weapon to destroy the spawner
+            if (!playerHasSword(inventory)) {
+                throw new InvalidActionException("The player does not have a weapon to destory the spawner.");
+            }
+
+            System.out.println("lolfewlfw");
+            ZombieToastSpawner.interactWithSpawner(inventory, interaction, currDungeon);
+        }
+
+        List<EntityResponse> erList= new ArrayList<EntityResponse>();
+        for (Entity entity: currDungeon.getEntities()) {
+            EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
+            erList.add(er);
+        }
+
+        List<ItemResponse> irList= new ArrayList<ItemResponse>();
+        for (CollectableEntity collectableEntity: currDungeon.inventory) {
+            ItemResponse ir = new ItemResponse(collectableEntity.getID(), collectableEntity.getType());
+            irList.add(ir);
+        }
+
+        DungeonResponse dr = new DungeonResponse(currDungeon.getDungeonId(), currDungeon.getDungeonName(),
+            erList, irList, currDungeon.buildables, currDungeon.getDungeonGoals());
+
+        
+        lastTick = dr;
+
+        return dr;
+
     }
 
     public DungeonResponse build(String buildable) throws IllegalArgumentException, InvalidActionException {
@@ -1536,6 +1608,25 @@ public class DungeonManiaController {
             }
         }
     }
+
+    /**
+     * Moves the assassin around
+     * @param entities - The list of all entities in the dungeon
+     * @param direction - The direction of the character
+     */
+    public void assassinMovement(List<Entity> entities, Direction direction) {
+        Position player = getPlayerPosition(entities);
+        player = player.translateBy(direction);
+
+        for (Entity entity : entities) {
+            if (entity.getType().equals("assassin")) {
+                Assassin temp = (Assassin) entity;
+                temp.moveEntity();
+            }
+        }
+    }
+
+
 
     /**
      * Moves the enemies around if the character is invincible
@@ -2126,6 +2217,135 @@ public class DungeonManiaController {
             }
         }
     }
+
+    /**
+     * Checks whether the entityID is valid or not
+     * @param entityId - the id given in the argument 
+     * @param entities - the list of all entities in the dungeon
+     */
+    public boolean entityIdCheck(String entityId, List<Entity> entities) {
+        for (Entity entity : entities) {
+            if (entity.getID().equals(entityId)) return true;
+        }
+
+        return false; 
+    }
+
+    /**
+     * Return the entity we are interacting with
+     * @param entityId
+     * @param entities
+     * @return entity
+     */
+    public Entity IdToEntity(String entityId, List<Entity> entities) {
+        for (Entity entity : entities) {
+            if (entity.getID().equals(entityId)) return entity; 
+        }
+
+        // Returning null will never occur
+        return null;
+    }
+
+
+    /**
+     * Checks whether the place is close enough to the mercenary to bribe
+     * @param character - the character class
+     * @param interaction - the entity the character is interacting with, mercenary in this case
+     */
+    public boolean playerProximityMercenary(Character character, Entity interaction) {
+        // First, wrap the entity and get its position
+        Mercenary mercenary = (Mercenary) interaction;
+        Position mercenaryPosition = mercenary.getPosition();
+
+        // Checking the positions around the mercenary
+        List<Position> adjacent = mercenaryPosition.getAdjacentPositions();
+
+        // Index 1, 3, 5, 7 are cardinally adjacent positions, so place into temporary list holder
+        List<Position> validPositions = new ArrayList<>();
+
+        // However, also add one tiles to the left, right, up and down as it is 2 cardinal tiles
+        validPositions.add(adjacent.get(1));
+        validPositions.add(adjacent.get(1).translateBy(0, -1));
+        validPositions.add(adjacent.get(3));
+        validPositions.add(adjacent.get(3).translateBy(1, 0));
+        validPositions.add(adjacent.get(5));
+        validPositions.add(adjacent.get(5).translateBy(0, 1));
+        validPositions.add(adjacent.get(7));
+        validPositions.add(adjacent.get(7).translateBy(-1, 0));
+
+        // Now, get player position and check if they're in any of these squares
+        Position characterPosition = character.getPosition();
+
+        for (Position position : validPositions) {
+            if (position.equals(characterPosition)) return true;
+        }
+
+        return false; 
+    }
+
+    /**
+     * Checks whether the player is close enough to the spawner
+     * @param character - the character class
+     * @param interaction - the entity the character is interacting with, spawner in this case
+     */
+    public boolean playerProximitySpawner(Character character, Entity interaction) {
+        // First, wrap the entity and get its position
+        ZombieToastSpawner spawner = (ZombieToastSpawner) interaction;
+        Position spawnerPosition = spawner.getPosition();
+
+        // Checking the positions around the spawner
+        List<Position> adjacent = spawnerPosition.getAdjacentPositions();
+
+        // Index 1, 3, 5, 7 are cardinally adjacent positions, so place into temporary list holder
+        List<Position> validPositions = new ArrayList<>();
+        validPositions.add(adjacent.get(1));
+        validPositions.add(adjacent.get(3));
+        validPositions.add(adjacent.get(5));
+        validPositions.add(adjacent.get(7));
+
+        // Now, get player position and check if they're in any of these squares
+        Position characterPosition = character.getPosition();
+
+        for (Position position : validPositions) {
+            if (position.equals(characterPosition)) return true;
+        }
+
+        return false; 
+    }
+
+    /**
+     * Checks whether the player has enough gold to bribe the mercenary
+     * @param inventory - the player's inventory
+     */
+    public boolean playerHasEnoughGold(List<CollectableEntity> inventory) {
+        // Gold counter
+        int totalGold = 0;
+
+        // Checks for gold in the inventory
+        for (CollectableEntity item : inventory) {
+            if (item.getType().equals("treasure")) {
+                totalGold++;
+            }
+        }
+
+        if (totalGold >= 2) return true;
+
+        return false;
+    }
+
+    /**
+     * Checks whether the player has a sword to destory the spawner
+     * @param inventory - the player's inventory
+     */
+    public boolean playerHasSword(List<CollectableEntity> inventory) {
+        // Checks for a sword in the inventory
+        for (CollectableEntity item : inventory) {
+            if (item.getType().equals("sword")) return true;
+        }
+
+        return false;
+    }
+
 
     /**
      * returns current dungeon
