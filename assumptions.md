@@ -90,3 +90,9 @@ Assassin
     -   Assassins have double the health and triple the attack damage of a mercenary 
     -   So, their attack is 6 and their health is also 6
     -   Because of the nature of assassins, they do not wear armour
+
+Interacting
+
+    -   The player needs two gold to bribe the mercenary 
+    -   Only swords can destory the spawner (it doesn't make sense for bows to)
+    -   When destroying the spawner, it removes one durability off the sword
