@@ -16,6 +16,42 @@
             "y": 0,
             "type": "portal",
             "colour": "BLUE"
+        },
+        {
+            "x": 1,
+            "y": 1,
+            "type": "portal",
+            "colour": "RED"
+        },
+        {
+            "x": 4,
+            "y": 1,
+            "type": "portal",
+            "colour": "RED"
+        },
+        {
+            "x": 1,
+            "y": 2,
+            "type": "portal",
+            "colour": "YELLOW"
+        },
+        {
+            "x": 4,
+            "y": 2,
+            "type": "portal",
+            "colour": "YELLOW"
+        },
+        {
+            "x": 1,
+            "y": 3,
+            "type": "portal",
+            "colour": "GREY"
+        },
+        {
+            "x": 4,
+            "y": 3,
+            "type": "portal",
+            "colour": "GREY"
         }
     ],
     "width": 5,

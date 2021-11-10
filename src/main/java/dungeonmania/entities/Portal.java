@@ -35,25 +35,24 @@ public class Portal extends StaticEntity {
      */
     @Override
     public void entityFunction(List<Entity> entities, Character player, Direction direction, Dungeon main) {  
-        String colour = null;
+        String type = null;
+        
         for (Entity entity: entities) {
             //If the looped entity is a portal and that portal is in the same position as the player, obtain the colour of the portal
-            if (entity.getType().equals("portal") && entity.getPosition().equals(player.getPosition())) {
+            if (entity.getPosition().equals(player.getPosition()) && !entity.getType().equals(player.getType())) {
                 Portal portal = (Portal) entity;
-                colour = portal.getColour();
-                break;               
+                type = portal.getType();
+                break;
             }
         } 
         //Loop through entity list again for a portal with the same corresponding colour
         for (Entity entity: entities) {
             //If entity is a portal and its position isnt the same position as the player, then change the position of the character
             //Into position of the corresponding portal
-            if (entity.getType().equals("portal") && !entity.getPosition().equals(player.getPosition())) {
+            if (entity.getType().equals(type) && !entity.getPosition().equals(player.getPosition())) {             
                 Portal portal = (Portal) entity;
-                if (portal.getColour().equals(colour)) {
-                    player.setPosition(portal.getPosition());
-                    break;
-                }      
+                player.setPosition(portal.getPosition());
+                break;   
             }
         }
     }
