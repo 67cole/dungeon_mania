@@ -82,7 +82,7 @@ public class DungeonManiaController {
      * @return List<String>
      */
     public List<String> getGameModes() {
-        return Arrays.asList("Standard", "Peaceful", "Hard");
+        return Arrays.asList("standard", "peaceful", "hard");
     }
 
     /**
@@ -130,14 +130,15 @@ public class DungeonManiaController {
         currDungeon = main;
 
         switch (gameMode) {
-            case "Peaceful":
+            case "peaceful":
                 currDungeon.setPeaceful(true);
                 break;
 
-            case "Hard":
+            case "hard":
                 currDungeon.setHard(true);
                 break;
         }
+
         addEntitiesToList(dungeonName, main);
         
         List<EntityResponse> erList = new ArrayList<EntityResponse>();
@@ -708,21 +709,23 @@ public class DungeonManiaController {
         // Get the character class
         Character character = getCharacter(entities);
         
-        // Check potion duration and set it off if it expires
-        potionTickAdder(character);
-        potionChecker(character);
+        if (character != null) {
+            // Check potion duration and set it off if it expires
+            potionTickAdder(character);
+            potionChecker(character);
 
-        // If the gamemode is peaceful, act as if the character has invisibility
-        if (currDungeon.getPeaceful()) character.setIsInvisible(true);
+            // If the gamemode is peaceful, act as if the character has invisibility
+            if (currDungeon.getPeaceful()) character.setIsInvisible(true);
 
-        // If the gamemode is hard, always turn off invincibility
-        if (currDungeon.getHard()) character.setIsInvincible(false);
+            // If the gamemode is hard, always turn off invincibility
+            if (currDungeon.getHard()) character.setIsInvincible(false);
 
 
-        // Checks if the character is invincible, then move the enemies
-        if (character.isInvincible()) {
-            invincibilityPhase(character, entities, movementDirection);
-            invincibilityActive = true;
+            // Checks if the character is invincible, then move the enemies
+            if (character.isInvincible()) {
+                invincibilityPhase(character, entities, movementDirection);
+                invincibilityActive = true;
+            }
         }
 
         // Mercenary Movement goes first
@@ -1956,9 +1959,7 @@ public class DungeonManiaController {
      * @param gameMode - this is the gameMode
      */
     public boolean gameModeNotValid(String gameMode) {
-        for (String gamemodeState : getGameModes()) {
-            if (gamemodeState.equals(gameMode)) return true;
-        }
+        if (gameMode.equals("peaceful") || gameMode.equals("standard") || gameMode.equals("hard")) return true;
 
         return false;
     }
