@@ -872,72 +872,7 @@ public class DungeonManiaController {
 
             // Spider Movement
             if (entity.getType().equals("spider") && !invincibilityActive) {
-                MovingEntity temp = (MovingEntity) entity;
-                MovingEntity spider = (Spider) entity;
-                int loopPos = spider.getLoopPos();
-                // if just spawned, move upward. do not need to check for
-                // boulder above since cannot spawn below a boulder
-                if (loopPos == 0) {
-                    temp.moveUpward();
-                    // if finished a loop, reset
-                    if (loopPos == 9) {
-                        loopPos = 0;
-                    }
-                    spider.setLoopPos(loopPos + 1);
-                } else {
-                    // 1. get currLoop based on movement direction
-                    // 2. check if next pos is a boulder
-                    //      if boulder, setClockwise to opposite
-                    // 3. move
-                    List<Position> posLoop = spider.getClockwiseLoop();
-                    List<Position> negLoop = spider.getAnticlockwiseLoop();
-
-                    // get direction of movement based on whether moving clockwise
-                    Position dir = posLoop.get(loopPos);                           
-                    if (spider.getClockwise() == false) {
-                        dir = negLoop.get(loopPos);
-                    }
-                    int spiderBlocked = 0;
-                    // if blocked, set dir to opposite
-                    for (Entity currEnt: entities) {
-                        Position nextPos = spider.getPosition().translateBy(dir);
-
-                        if (currEnt.getPosition().equals(nextPos) && currEnt.getType().equals("boulder")) {
-                            spider.setClockwise(!spider.getClockwise());
-                            
-                            spiderBlocked = 1;
-                            
-                        }
-                        else if (currEnt.getPosition().equals(nextPos) && currEnt.getType().equals("door")) {
-                            spider.setClockwise(!spider.getClockwise());
-                            
-                            spiderBlocked = 1;
-                            
-                        }
-                    }
-
-                    // double check if movement direction changed
-                    if (spider.getClockwise() == false) {
-                        dir = negLoop.get(loopPos);
-                    } else {
-                        dir = posLoop.get(loopPos);
-                    }
-                    if (spiderBlocked == 0) spider.moveEntity(dir);
-                    
-                    // update loopPos
-                    if (spider.getClockwise() == true) {
-                        if (loopPos == 8) {
-                            loopPos = 0;
-                        }
-                        spider.setLoopPos(loopPos + 1);
-                    } else {
-                        if (loopPos == 1) {
-                            loopPos = 9;
-                        }
-                        spider.setLoopPos(loopPos - 1);
-                    }
-
-                }
+                ((MovingEntity) entity).moveSpider(entities, entity);
             }
         }
 
@@ -985,10 +920,10 @@ public class DungeonManiaController {
 
         // Spider spawner ticks
         if ((checkMaxSpiders(entities) == false) && (currDungeon.getTickCounter() % 25 == 0)) {
-            Position spiderSpawn = getSpiderSpawn(entities);
             String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
             currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
-            Spider newSpider = new Spider(spiderSpawn, "spider", entityId, true);                   
+            Spider newSpider = new Spider(null, "spider", entityId, true);  
+            newSpider.setPosition(newSpider.getSpiderSpawn(entities));                 
             spid = newSpider;
             spiderSpawned = 1;
         }
@@ -1211,41 +1146,6 @@ public class DungeonManiaController {
         } else {
             return true;
         }
-    }
-
-    public Position getSpiderSpawn(List<Entity> entities) {
-
-        boolean posFound = false;
-        while (posFound == false) {
-            int x = getRandomNumber(0, 15);
-            int y = getRandomNumber(0, 15);
-            int check = 0;
-            Position pos = new Position(x, y);
-            Position posAbove = new Position(x, y + 1);
-            for (Entity entity : entities) {
-                // if the square is a boulder
-                if ((entity.getPosition().equals(pos)) && (entity.getType().equals("boulder"))) {
-                    check = 1;
-                    break;
-                } else if ((entity.getPosition().equals(posAbove)) && (entity.getType().equals("boulder"))) {
-                    check = 1;
-                    break;
-                }
-            }
-            if (check == 0) {
-                return pos;
-            }
-            // check if the square is a bouldeer
-            // check if the square above is a boulder
-        }
-        
-
-
-        return null;
-    }
-
-    public int getRandomNumber(int min, int max) {
-        return (int) ((Math.random() * (max - min)) + min);
     }
 
     public void checkBoulderGoal(List<Entity> entities, Dungeon dungeon) {
