@@ -13,6 +13,9 @@ public class Dungeon {
 
     // Keep track of all entities in the dungeon
     private List<Entity> entities = new ArrayList<Entity>();
+    private int[][] dungeonMap = new int[16][18];
+    private int[][] adjMap = new int[288][288];
+
     public  List<CollectableEntity> inventory = new ArrayList<CollectableEntity>();
     public  List<String> buildables = new ArrayList<String>();
 
@@ -167,4 +170,119 @@ public class Dungeon {
 
         return entitiesAtPos;
     }
+
+    
+	public int[][] getDungeonMap() {
+		return this.dungeonMap;
+	}
+
+	public void setDungeonMap(List<Entity> entities) {
+		this.dungeonMap = dungeonArray(entities);
+	}
+
+	public int[][] getAdjMap() {
+		return this.adjMap;
+	}
+
+	public void setAdjMap(int[][] grid) {
+		this.adjMap = createAdjacencyMatrix(grid);
+	}
+
+
+    public int[][] dungeonArray(List<Entity> entities) {
+        int[][] array = new int[16][18];
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 18; j++) {
+                array[i][j] = 0;
+            }
+        }
+        for (Entity entity : entities) {
+            if (entity.getType().equals("wall") || entity.getType().equals("door")) {
+                
+                Position pos = entity.getPosition();
+
+                array[pos.getY()][pos.getX()] = 1;
+                
+                
+            }
+        }
+        return array;
+    }
+
+    public void printDungeon(int[][] dungeonArray) {
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 18; j++) {
+                if (dungeonArray[i][j] == 1) {
+                    System.out.printf("☐ ");
+                } else {
+                    System.out.printf("  ");
+                }
+                
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+    
+
+    public int[][] createAdjacencyMatrix(int[][] grid) {
+        int [][] adjMatrix = new int[288][288];
+        for (int row = 0; row < 288; row++) {
+            for (int col = 0; col < 288; col++) {
+                adjMatrix[row][col] = 9;
+                if (col == row) adjMatrix[row][col] = 0;
+            }
+        }
+        int node = 0;
+        for (int row = 0; row < 16; row++) {
+            for (int col = 0; col < 18; col++) {
+                if (grid[row][col] == 0) {
+                    // check up
+                    if (row > 0 && grid[row - 1][col] == 0) {
+                        adjMatrix[node][node - 6] = 1;
+                        adjMatrix[node - 6][node] = 1;
+                    }
+
+                    // check down
+                    if (row < 4 && grid[row + 1][col] == 0) {
+                        adjMatrix[node][node + 6] = 1;
+                        adjMatrix[node + 6][node] = 1;
+                    }
+
+                    // check right
+                    if (col < 5 && grid[row][col + 1] == 0) {
+                        adjMatrix[node][node + 1] = 1;
+                        adjMatrix[node + 1][node] = 1;
+                    }
+                    
+                    // check left
+                    if (col > 0 && grid[row][col - 1] == 0) {
+                        adjMatrix[node][node - 1] = 1;
+                        adjMatrix[node - 1][node] = 1;
+                    }
+                    
+                }
+                node++;
+            }
+        }
+        
+
+
+        return adjMatrix;
+    }
+
+    public Position djikstra(List<Entity> entities, Position startPos, Position endPos) {
+        int[][] dungeon = this.getDungeonMap();
+        int[][] adj = this.getAdjMap();
+
+
+        // 1st col - vertex
+        // 2nd col - shortest distance from startPos
+        // 3rd col - previous vertex
+        int[][] info = new int[288][3];
+
+
+        return null;
+    }
+
 }

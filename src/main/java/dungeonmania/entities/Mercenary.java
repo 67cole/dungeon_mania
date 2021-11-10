@@ -88,8 +88,6 @@ public class Mercenary extends MovingEntity {
         if (shortestDistance < originalDistance) super.setPosition(destination);
     }
 
-    public Position djikstra(List<Entity> entities, Position playerPosition) {
-
-        return null;
-    }
+   
+    
 }
