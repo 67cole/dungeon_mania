@@ -96,3 +96,7 @@ Interacting
     -   The player needs two gold to bribe the mercenary 
     -   Only swords can destory the spawner (it doesn't make sense for bows to)
     -   When destroying the spawner, it removes one durability off the sword
+
+SwampTiles
+    -   The movement factor determines the number of ticks it takes for a non-character entity to traverse to
+    a new position, for example , once an entity lands on a swamp tile with a movement factor of 2, the entity would leave that tile on the second tick
