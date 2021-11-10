@@ -947,11 +947,8 @@ public class DungeonManiaController {
             // if boulder, check that the boulder has a switch and explode any nearby bombs
             if (enti.getType().equals("boulder")) {
                 Position entPos = enti.getPosition();
-                Position up = new Position(0, -1);
-                Position down = new Position(0, 1);
-                Position left = new Position(-1, 0);
-                Position right = new Position(1, 0);
-                if (playerPos.equals(entPos.translateBy(up)) || playerPos.equals(entPos.translateBy(down)) || playerPos.equals(entPos.translateBy(left)) || playerPos.equals(entPos.translateBy(right))) {
+                ArrayList<Position> adjacentPos = entPos.getCardinallyAdjacentPositions();
+                if (playerPos.equals(adjacentPos.get(0)) || playerPos.equals(adjacentPos.get(1)) || playerPos.equals(adjacentPos.get(2)) || playerPos.equals(adjacentPos.get(3))) {
                     ((Boulder) enti).doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);    
                 }
             }
