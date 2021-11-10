@@ -55,6 +55,7 @@ public abstract class MovingEntity implements Entity {
      * Armour of the entity
      */
     private boolean armour = false;
+    private int totalMovement = 1;
 
     /**
      * Creates a moving entity that can be moved up, down, left and right into cardinally adjacent square
@@ -244,6 +245,27 @@ public abstract class MovingEntity implements Entity {
     public void setClockwise(boolean clockwise) {
     }
 
+    /**
+     * Adds onto totalmovement 
+     */
+    public void swampMove() {
+        totalMovement++;
+    }
+
+    /**
+     * Getter for total movement
+     */
+    public int getTotalMovement() {
+        return this.totalMovement;
+    }
+    /**
+     * Resets total movement back to original 
+
+     */
+    public void resetTotalMovement() {
+        this.totalMovement = 1;
+    }
+
 
     /**
      * checkMovement checks for the next square if it's a wall/boulder.
@@ -334,9 +356,9 @@ public abstract class MovingEntity implements Entity {
     public boolean checkMovement(Position position, List<Entity> entities) {
         
         for (Entity entity : entities) {
-            if (entity.getPosition().equals(position) && !entity.getType().equals("door") && !entity.getType().equals("switch") && !entity.getType().equals("player") && !entity.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity")) {
+            if (entity.getPosition().equals(position) && !entity.getType().equals("door") && !entity.getType().equals("switch") && !entity.getType().equals("player") 
+            && !entity.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity") && !entity.getType().equals("swamp_tile")) {
                 return false;
-            // If the square contains a door, check if its locked or not
             } 
         }
         return true;
@@ -768,6 +790,42 @@ public abstract class MovingEntity implements Entity {
         }
 
         return enemyHealth;
+    }
+
+    /**
+     * Checks if the position to be moved in is a swamp tile, if it is, return that tile
+     * @param position
+     * @param entities
+     * @return swamp tile
+     */
+    public SwampTile checkSwamp(Position position, List<Entity> entities) {
+        SwampTile swampEntity =  null;
+        for (Entity entity: entities) {
+            if (entity.getPosition().equals(position) && entity.getType().equals("swamp_tile")) {
+                swampEntity = (SwampTile) entity;
+                return swampEntity;
+            }
+        }
+        return swampEntity;
+    }
+
+    /**
+     * Checks if the position to be moved in is a swamp tile, if it is, return that tile
+     * @param movementDirection
+     * @param entities
+     * @return swamp tile
+     */
+    public SwampTile checkSwamp(Direction movementDirection, List<Entity> entities) {
+        Position entityPosition = position.translateBy(movementDirection);
+
+        SwampTile swampEntity = null;
+        for (Entity entity: entities) {
+            if (entity.getPosition().equals(entityPosition) && entity.getType().equals("swamp_tile")) {
+                swampEntity = (SwampTile)entity;
+                return swampEntity;
+            }
+        }
+        return swampEntity;
     }
 
 }
