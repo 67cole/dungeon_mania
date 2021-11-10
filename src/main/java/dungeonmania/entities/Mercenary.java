@@ -1,9 +1,13 @@
 package dungeonmania.entities;
 
 import dungeonmania.util.Position;
+import dungeonmania.util.Direction;
 
 import java.util.List;
 import java.util.Random;
+
+import javax.xml.stream.events.EntityDeclaration;
+
 import java.lang.Math;
 import java.util.ArrayList;
 
@@ -33,6 +37,10 @@ public class Mercenary extends MovingEntity {
      * Moving the mercenary
      */
     public void moveEntity (List<Entity> entities, Position playerPosition) {
+        // TODO: NEW FUNCTION
+        // Position movementDir = djikstra(entities, playerPosition);
+        // super.setPosition(super.getPosition().translateBy(movementDir));
+
         Position current = super.getPosition();
 
         // Get the adjacent positions around mercenary
@@ -78,5 +86,10 @@ public class Mercenary extends MovingEntity {
 
         // Now moving the mercenary
         if (shortestDistance < originalDistance) super.setPosition(destination);
+    }
+
+    public Position djikstra(List<Entity> entities, Position playerPosition) {
+
+        return null;
     }
 }
