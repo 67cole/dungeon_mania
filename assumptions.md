@@ -13,6 +13,7 @@ Zombie
     -   The zombie spawns will check for any white spaces CLOCKWISE, thus zombies will spawn in a clockwise manner 
     -   Zombies can't interact with anything (i.e. moving a boulder)
     -   10 percent chance of spawning with armour
+    -   Zombies can walk over items
 
 Spider
 
@@ -25,6 +26,7 @@ Spider
     -   The spider can spawn on the edge of the dungeon and travel outside the dungeon
     -   Spiders spawn every 25 ticks
     -   spiders cant go through doors
+    -   spiders can walk over items
 
 Mercenary
 
@@ -35,6 +37,7 @@ Mercenary
     -   Mercenaries will always have a valid spot to move to, it cannot be trapped
     -   10 percent chance of spawning with armour
     -   Mercenaries have a 4 unit battle radius (this uses pythagorus from the square units)
+    -   Mercenaries can walk over items
 
 
 Portal 

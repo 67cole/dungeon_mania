@@ -2,8 +2,6 @@ package dungeonmania;
 
 import dungeonmania.entities.*;
 import dungeonmania.entities.Character;
-import dungeonmania.entities.Spider;
-import dungeonmania.entities.MovingEntity;
 import dungeonmania.entities.BuildableEntities.*;
 import dungeonmania.entities.CollectableEntities.*;
 import dungeonmania.entities.RareCollectableEntities.*;
@@ -671,90 +669,14 @@ public class DungeonManiaController {
             }
 
             // Spider Movement
-                            
-            //boolean swampMove = true;
             if (entity.getType().equals("spider") && !invincibilityActive) {
-                // Spider spiderEntity = (Spider) entity;
-                // for (Entity  staticEntity: entities) {
-                //     if (staticEntity.getType().equals("swamp_tile") && staticEntity.getPosition().equals(spiderEntity.getPosition()));
-                //         SwampTile swampEntity = (SwampTile) staticEntity;
-                //         if (spiderEntity.getTotalMovement() < swampEntity.getMovementFactor()) {
-                //             spiderEntity.swampMove();
-                //             swampMove = false;
-                //             continue;                            
-                //         } else {
-                //             spiderEntity.resetTotalMovement();
-                //         }
-                // }
-                // if (swampMove == false) {
-                //     continue;
-                // } else {
-                    MovingEntity temp = (MovingEntity) entity;
-                    MovingEntity spider = (Spider) entity;
-                    int loopPos = spider.getLoopPos();
-                    // if just spawned, move upward. do not need to check for
-                    // boulder above since cannot spawn below a boulder
-                    if (loopPos == 0) {
-                        temp.moveUpward();
-                        // if finished a loop, reset
-                        if (loopPos == 9) {
-                            loopPos = 0;
-                        }
-                        spider.setLoopPos(loopPos + 1);
-                    } else {
-                        // 1. get currLoop based on movement direction
-                        // 2. check if next pos is a boulder
-                        //      if boulder, setClockwise to opposite
-                        // 3. move
-                        List<Position> posLoop = spider.getClockwiseLoop();
-                        List<Position> negLoop = spider.getAnticlockwiseLoop();
-
-                        // get direction of movement based on whether moving clockwise
-                        Position dir = posLoop.get(loopPos);                           
-                        if (spider.getClockwise() == false) {
-                            dir = negLoop.get(loopPos);
-                        }
-                        int spiderBlocked = 0;
-                        // if blocked, set dir to opposite
-                        for (Entity currEnt: entities) {
-                            Position nextPos = spider.getPosition().translateBy(dir);
-
-                            if (currEnt.getPosition().equals(nextPos) && currEnt.getType().equals("boulder")) {
-                                spider.setClockwise(!spider.getClockwise());
-                                
-                                spiderBlocked = 1;
-                                
-                            }
-                            else if (currEnt.getPosition().equals(nextPos) && currEnt.getType().equals("door")) {
-                                spider.setClockwise(!spider.getClockwise());
-                                
-                                spiderBlocked = 1;
-                                
-                            }
-                        }
-
-                        // double check if movement direction changed
-                        if (spider.getClockwise() == false) {
-                            dir = negLoop.get(loopPos);
-                        } else {
-                            dir = posLoop.get(loopPos);
-                        }
-                        if (spiderBlocked == 0) spider.moveEntity(dir);
-                        
-                        // update loopPos
-                        if (spider.getClockwise() == true) {
-                            if (loopPos == 8) {
-                                loopPos = 0;
-                            }
-                            spider.setLoopPos(loopPos + 1);
-                        } else {
-                            if (loopPos == 1) {
-                                loopPos = 9;
-                            }
-                            spider.setLoopPos(loopPos - 1);
-                        }
-                    }
-                //}              
+                boolean swampMove = true;
+                Spider temp = (Spider) entity;
+                swampMove = swampCanMove(temp, entities);
+                if (swampMove == false) {
+                    continue;
+                }
+                ((MovingEntity) entity).moveSpider(entities, entity);
             }
         }
 
@@ -802,10 +724,10 @@ public class DungeonManiaController {
 
         // Spider spawner ticks
         if ((checkMaxSpiders(entities) == false) && (currDungeon.getTickCounter() % 25 == 0)) {
-            Position spiderSpawn = getSpiderSpawn(entities);
             String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
             currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
-            Spider newSpider = new Spider(spiderSpawn, "spider", entityId, true);                   
+            Spider newSpider = new Spider(null, "spider", entityId, true);  
+            newSpider.setPosition(newSpider.getSpiderSpawn(entities));                 
             spid = newSpider;
             spiderSpawned = 1;
         }
@@ -830,12 +752,9 @@ public class DungeonManiaController {
             // if boulder, check that the boulder has a switch and explode any nearby bombs
             if (enti.getType().equals("boulder")) {
                 Position entPos = enti.getPosition();
-                Position up = new Position(0, -1);
-                Position down = new Position(0, 1);
-                Position left = new Position(-1, 0);
-                Position right = new Position(1, 0);
-                if (playerPos.equals(entPos.translateBy(up)) || playerPos.equals(entPos.translateBy(down)) || playerPos.equals(entPos.translateBy(left)) || playerPos.equals(entPos.translateBy(right))) {
-                    doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);    
+                ArrayList<Position> adjacentPos = entPos.getCardinallyAdjacentPositions();
+                if (playerPos.equals(adjacentPos.get(0)) || playerPos.equals(adjacentPos.get(1)) || playerPos.equals(adjacentPos.get(2)) || playerPos.equals(adjacentPos.get(3))) {
+                    ((Boulder) enti).doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);    
                 }
             }
         }
@@ -1101,41 +1020,6 @@ public class DungeonManiaController {
         }
     }
 
-    public Position getSpiderSpawn(List<Entity> entities) {
-
-        boolean posFound = false;
-        while (posFound == false) {
-            int x = getRandomNumber(0, 15);
-            int y = getRandomNumber(0, 15);
-            int check = 0;
-            Position pos = new Position(x, y);
-            Position posAbove = new Position(x, y + 1);
-            for (Entity entity : entities) {
-                // if the square is a boulder
-                if ((entity.getPosition().equals(pos)) && (entity.getType().equals("boulder"))) {
-                    check = 1;
-                    break;
-                } else if ((entity.getPosition().equals(posAbove)) && (entity.getType().equals("boulder"))) {
-                    check = 1;
-                    break;
-                }
-            }
-            if (check == 0) {
-                return pos;
-            }
-            // check if the square is a bouldeer
-            // check if the square above is a boulder
-        }
-        
-
-
-        return null;
-    }
-
-    public int getRandomNumber(int min, int max) {
-        return (int) ((Math.random() * (max - min)) + min);
-    }
-
     public void checkBoulderGoal(List<Entity> entities, Dungeon dungeon) {
 
         HashMap<Position, Integer> map = new HashMap<Position, Integer>();
@@ -1208,9 +1092,6 @@ public class DungeonManiaController {
 
         // case where no brackets
         returnGoal = returnGoal.replace(goal, "");
-
-        System.out.println(returnGoal);
-        System.out.println(goal);
 
         return returnGoal;
     }
@@ -1322,19 +1203,7 @@ public class DungeonManiaController {
         for (Entity entity : entities) {
             if (entity.getType().equals("hydra")) {
                 Hydra temp = (Hydra) entity;
-                for (Entity staticEntity: entities) {
-                    //If the hydra is on the swamp tile, slow it down
-                    if (staticEntity.getType().equals("swamp_tile") && staticEntity.getPosition().equals(temp.getPosition())) {
-                        SwampTile swampEntity = (SwampTile) staticEntity;
-                        if (temp.getTotalMovement() < swampEntity.getMovementFactor()) {
-                            temp.swampMove();
-                            swampMove = false;
-                            continue;
-                        } else {
-                            temp.resetTotalMovement();
-                        }
-                    }
-                }
+                swampMove = swampCanMove(temp, entities);
                 if (swampMove == false) {
                     continue;
                 }
@@ -1355,19 +1224,7 @@ public class DungeonManiaController {
         for (Entity entity : entities) {
             if (entity.getType().equals("zombie_toast")) {
                 ZombieToast temp = (ZombieToast) entity;
-                for (Entity staticEntity: entities) {
-                    //If the zombie is on the swamp tile, slow it down
-                    if (staticEntity.getType().equals("swamp_tile") && staticEntity.getPosition().equals(temp.getPosition())) {
-                        SwampTile swampEntity = (SwampTile) staticEntity;
-                        if (temp.getTotalMovement() < swampEntity.getMovementFactor()) {
-                            temp.swampMove();
-                            swampMove = false;
-                            continue;
-                        } else {
-                            temp.resetTotalMovement();
-                        }
-                    }
-                }
+                swampMove = swampCanMove(temp, entities);
                 if (swampMove == false) {
                     continue;
                 }
@@ -1384,23 +1241,12 @@ public class DungeonManiaController {
     public void mercenaryMovement(List<Entity> entities, Direction direction) {
         Position player = getPlayerPosition(entities);
         player = player.translateBy(direction);
+
         boolean swampMove = true;
         for (Entity entity : entities) {
             if (entity.getType().equals("mercenary")) {
                 Mercenary mercenaryEntity = (Mercenary) entity;
-                //check if the mercenary is on a swamp tile, if it is, check if it can move yet
-                for (Entity staticEntity : entities) {
-                    if (staticEntity.getType().equals("swamp_tile") && staticEntity.getPosition().equals(mercenaryEntity.getPosition())) {
-                        SwampTile swampEntity = (SwampTile) staticEntity;
-                        if (mercenaryEntity.getTotalMovement() < swampEntity.getMovementFactor()) {
-                            mercenaryEntity.swampMove();
-                            swampMove = false;
-                            continue;
-                        } else {
-                            mercenaryEntity.resetTotalMovement();
-                        }
-                    }
-                }
+                swampMove = swampCanMove(mercenaryEntity, entities);
                 if (swampMove == false) {
                     continue;
                 }             
@@ -1421,19 +1267,7 @@ public class DungeonManiaController {
         for (Entity entity : entities) {
             if (entity.getType().equals("assassin")) {
                 Assassin temp = (Assassin) entity;
-                for (Entity staticEntity: entities) {
-                    //If the assassin is on the swamp tile, slow it down
-                    if (staticEntity.getType().equals("swamp_tile") && staticEntity.getPosition().equals(temp.getPosition())) {
-                        SwampTile swampEntity = (SwampTile) staticEntity;
-                        if (temp.getTotalMovement() < swampEntity.getMovementFactor()) {
-                            temp.swampMove();
-                            swampMove = false;
-                            continue;
-                        } else {
-                            temp.resetTotalMovement();
-                        }
-                    }
-                }
+                swampMove = swampCanMove(temp, entities);
                 if (swampMove == false) {
                     continue;
                 }
@@ -1857,144 +1691,6 @@ public class DungeonManiaController {
         }
     }
 
-
-    /**
-     * attempts to explode bombs given a boulder position
-     * @param entities
-     * @param player
-     * @param main
-     * @param bou
-     * @param nearby
-     */
-    public void doExplode(List<Entity> entities, Character player,  Dungeon main, Entity bou, List<Entity> nearby) {
-        // pos = boulder position
-        Position boulderPos = bou.getPosition();
-        // find a switch
-
-        List<Entity> entitiesAtBoulder = main.getEntitiesAtPos(boulderPos);
-        Position N = boulderPos.translateBy(0, -1);
-        Position E = boulderPos.translateBy(1, 0);
-        Position S = boulderPos.translateBy(0, 1);
-        Position W = boulderPos.translateBy(-1, 0);
-        
-        List<Entity> entsAbove = main.getEntitiesAtPos(N);
-        List<Entity> entsRight = main.getEntitiesAtPos(E);
-        List<Entity> entsBelow = main.getEntitiesAtPos(S);
-        List<Entity> entsLeft = main.getEntitiesAtPos(W);
-
-        for (Entity currEnt : entitiesAtBoulder) {
-            if (currEnt.getType().equals("switch")) {
-                // see if there are bombs cardinally adjacent, if so, explode any adjacent bombs
-                if (isBombAtPos(entsAbove)) {
-                    explode(entsAbove, entities, N, main, player, nearby);
-                }
-                if (isBombAtPos(entsRight)) {
-                    explode(entsRight, entities, E, main, player, nearby);
-                    
-                } 
-                if (isBombAtPos(entsBelow)) {
-                    explode(entsBelow, entities, S, main, player, nearby);
-                    
-                } 
-                if (isBombAtPos(entsLeft)) {
-                    explode(entsLeft, entities, W, main, player, nearby);
-                }
-                
-            }
-        }
-    }
-    
-    /**
-     * returns whether a bomb is in the list of entities at a given position
-     * @param entities
-     * @return Boolean
-     */
-    public Boolean isBombAtPos(List<Entity> entities) {
-        for (Entity currEnt : entities) {
-            if (currEnt.getType().equals("bomb")) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * Explodes any bombs adjacent to a given bomb position
-     * @param entitiesAtPos
-     * @param entities
-     * @param pos
-     * @param main
-     * @param player
-     * @param NearbyEntities
-     */
-    public void explode(List<Entity> entitiesAtPos, List<Entity> entities, Position pos, Dungeon main, Character player, List<Entity> NearbyEntities) {
-        
-        Position N = pos.translateBy(0, -1);
-        Position NE = pos.translateBy(1, -1);
-        Position E = pos.translateBy(1, 0);
-        Position SE = pos.translateBy(1, 1);
-        Position S = pos.translateBy(0, 1);
-        Position SW = pos.translateBy(-1, 1);
-        Position W = pos.translateBy(-1, 0);
-        Position NW = pos.translateBy(-1, -1);
-        
-        List<Entity> entsN = main.getEntitiesAtPos(N);
-        List<Entity> entsNE = main.getEntitiesAtPos(NE);
-        List<Entity> entsE = main.getEntitiesAtPos(E);
-        List<Entity> entsSE = main.getEntitiesAtPos(SE);
-        List<Entity> entsS = main.getEntitiesAtPos(S);
-        List<Entity> entsSW = main.getEntitiesAtPos(SW);
-        List<Entity> entsW = main.getEntitiesAtPos(W);
-        List<Entity> entsNW = main.getEntitiesAtPos(NW);
-        List<Entity> entsO = entitiesAtPos;
-        // add all nearby non-player entities to the list of entities to be removed 
-        for (Entity ent : entsN) {
-            if (!ent.getType().equals("player")) {
-                NearbyEntities.add(ent);
-            }
-        }
-        for (Entity ent : entsNE) {
-            if (!ent.getType().equals("player")) {
-                NearbyEntities.add(ent);
-            }
-        }
-        for (Entity ent : entsE) {
-            if (!ent.getType().equals("player")) {
-                NearbyEntities.add(ent);
-            }
-        }
-        for (Entity ent : entsSE) {
-            if (!ent.getType().equals("player")) {
-                NearbyEntities.add(ent);
-            }
-        }
-        for (Entity ent : entsS) {
-            if (!ent.getType().equals("player")) {
-                NearbyEntities.add(ent);
-            }
-        }
-        for (Entity ent : entsSW) {
-            if (!ent.getType().equals("player")) {
-                NearbyEntities.add(ent);
-            }
-        }
-        for (Entity ent : entsW) {
-            if (!ent.getType().equals("player")) {
-                NearbyEntities.add(ent);
-            }
-        }
-        for (Entity ent : entsNW) {
-            if (!ent.getType().equals("player")) {
-                NearbyEntities.add(ent);
-            }
-        }
-        for (Entity ent : entsO) {
-            if (!ent.getType().equals("player")) {
-                NearbyEntities.add(ent);
-            }
-        }
-    }
-
     /**
      * This function checks whether the dungeon exists
      * @param dungeonName - this is the dungeon name
@@ -2372,4 +2068,29 @@ public class DungeonManiaController {
         }
 
     }
+
+    /**
+     * Checks if the entity could move away from the swamp tile 
+     * @param entity
+     * @param entities
+     * @return boolean
+     */
+    public boolean swampCanMove (MovingEntity entity, List<Entity> entities) {
+        boolean swampMove = true;
+        for (Entity staticEntity: entities) {
+            //If the spider is on the swamp tile, slow it down
+            if (staticEntity.getType().equals("swamp_tile") && staticEntity.getPosition().equals(entity.getPosition())) {
+                SwampTile swampEntity = (SwampTile) staticEntity;
+                if (entity.getTotalMovement() < swampEntity.getMovementFactor()) {
+                    entity.swampMove();
+                    swampMove = false;
+                    continue;
+                } else {
+                    entity.resetTotalMovement();
+                }
+            }
+        }
+        return swampMove;
+    }
+    
 }
