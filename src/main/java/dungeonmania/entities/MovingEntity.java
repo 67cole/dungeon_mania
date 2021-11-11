@@ -390,46 +390,6 @@ public abstract class MovingEntity implements Entity {
 
         return null;
     }
-    /**
-     * checkDoorLock checks for the next square if it's a door. If the door is locked,
-     * it should check for the specific key inside the characters inventory and open the door 
-     * if the key matches the door. Returns true if the door is open and false if not
-     * @param entityDoor
-     * @param entities
-     * @param main
-     * @return boolean
-     **/
-    public boolean checkDoorLock(Door entityDoor, List<Entity> entities, Dungeon main) {
-
-        // If the door is locked, look for the key inside the inventory. Unlock the door if its found
-        if (entityDoor.getLocked() == true) {
-            int keyType = entityDoor.getKeyType();
-            int keyNum = 0;
-            int remove = 0;
-            CollectableEntity itemKey = null;
-
-            for (CollectableEntity item : main.inventory) {
-                if (item.getType().equals("key")) {
-                    Key key = (Key) item;
-                    keyNum =  key.getKeyNum();
-                    //If the key and door match, open the door
-                    if (keyType == keyNum) {
-                        entityDoor.setLocked(false);
-                        remove = 1;
-                        itemKey = item;
-                    }
-                }
-            }
-            if (remove == 1) {
-                main.inventory.remove(itemKey);
-                main.setKeyStatus(true);
-                return true;
-            }
-            return false;
-        } else {
-            return true;
-        }
-    }
 
     /**
      * Checks if the position to be moved in is a door, if it is, return that door
@@ -442,9 +402,11 @@ public abstract class MovingEntity implements Entity {
 
         Door entityDoor = null;
         for (Entity entity: entities) {
-            if (entity.getPosition().equals(entityPosition) && entity.getType().equals("door")) {
-                entityDoor = (Door) entity;
-                return entityDoor;
+            if (entity.getPosition().equals(entityPosition)) {
+                if (entity.getType().equals("door") || entity.getType().equals("door_unlocked")) {
+                    entityDoor = (Door) entity;
+                    return entityDoor;
+                }        
             }
         }
         return entityDoor;
@@ -459,9 +421,11 @@ public abstract class MovingEntity implements Entity {
     public Door checkDoor(Position position, List<Entity> entities) {
         Door entityDoor = null;
         for (Entity entity: entities) {
-            if (entity.getPosition().equals(position) && entity.getType().equals("door")) {
-                entityDoor = (Door) entity;
-                return entityDoor;
+            if (entity.getPosition().equals(position)) {
+                if (entity.getType().equals("door") || entity.getType().equals("door_unlocked")) {
+                    entityDoor = (Door) entity;
+                    return entityDoor;
+                }        
             }
         }
         return entityDoor;

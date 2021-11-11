@@ -199,7 +199,9 @@ public class DungeonManiaController {
 
         List<StaticEntity> staticList = new ArrayList<StaticEntity>();
         for (Entity entity : currDungeon.getEntities()) {
-            if (entity.getType().equals("door") || entity.getType().equals("portal")) {
+            if (entity.getType().equals("door") || entity.getType().equals("BLUEportal") ||
+            entity.getType().equals("REDportal") || entity.getType().equals("YELLOWportal") ||
+            entity.getType().equals("GREYportal")) {
                 StaticEntity mv = (StaticEntity) entity;
                 staticList.add(mv);
             }
@@ -496,11 +498,13 @@ public class DungeonManiaController {
         Hydra hydraHolder = null;
         Assassin assassinHolder = null;
         Bomb bombHolder = null;
+        Door doorHolder = null;
         int zombieAddedLater = 0;
         int mercenaryAddedLater = 0;
         int hydraAddedLater = 0;
         int assassinAddedLater = 0;
         int EnemyCheck = 0;
+        boolean doorAddedLater = false;
         boolean invincibilityActive = false; 
         Character tempChar = null;
         Position playerSpawnPosition = null;
@@ -564,7 +568,17 @@ public class DungeonManiaController {
                 Door doorEntity = temp.checkDoor(movementDirection, entities); 
                 if (doorEntity != null) {
                     //If it is a door, check if its locked or not
-                    if(!temp.checkDoorLock(doorEntity, entities, main)) continue;
+                    if (doorEntity.getLocked() == true) {
+                        //check if a key exists, if it does, remove the key
+                        if (doorEntity.checkKey(main)) {
+                            doorHolder = doorEntity;
+                            doorAddedLater = true;
+                        }
+                        //If key doesnt exist, dont move
+                        else {
+                            continue;
+                        } 
+                    }
                 }
                 
                 List<Entity> interactingEntities = temp.checkNext(movementDirection, entities);
@@ -605,7 +619,8 @@ public class DungeonManiaController {
                         // If the character isnt dead, then the enemy has to have died in the case of battle
                         // Takes into the account of collectable item
                         else {
-                            List<String> nonRemovable = Arrays.asList("boulder", "portal", "switch", "door", "exit", "swamp_tile");
+                            List<String> nonRemovable = Arrays.asList("boulder", "BLUEportal", "REDportal","YELLOWportal","GREYportal",
+                            "switch", "door", "door_unlocked", "exit", "swamp_tile");
                             int dontRemove = 0;
                             for (String curr : nonRemovable) {
                                 if (interactingEntity.getType().equals(curr)) dontRemove = 1;
@@ -737,6 +752,12 @@ public class DungeonManiaController {
         if (hydraAddedLater == 1) main.addEntities(hydraHolder);
         if (assassinAddedLater == 1) main.addEntities(assassinHolder);
         if (spiderSpawned == 1) main.addEntities(spid);
+        if (doorAddedLater == true) {
+            main.removeEntity(doorHolder);
+            Door unlockedDoor = new Door(doorHolder.getPosition(),
+             "door_unlocked", doorHolder.getID(), doorHolder.getIsInteractable(), doorHolder.getKeyType(), false);
+            main.addEntities(unlockedDoor);
+        }
 
         
         Position playerPos = new Position(0, 0);
@@ -1456,7 +1477,7 @@ public class DungeonManiaController {
                         break;
                     case "portal":
                         String colour = entity.get("colour").getAsString();
-                        Portal portalEntity = new Portal(position, type, entityId, true, colour);
+                        Portal portalEntity = new Portal(position, colour+"portal", entityId, true, colour);
                         main.addEntities(portalEntity);
                         break;
                     case "zombie_toast_spawner":
@@ -1925,7 +1946,7 @@ public class DungeonManiaController {
                     break;
                 case "portal":
                     String colour = entity.get("colour").getAsString();
-                    Portal portalEntity = new Portal(position, type, entityId, true, colour);
+                    Portal portalEntity = new Portal(position, colour+"portal", entityId, true, colour);
                     main.addEntities(portalEntity);
                     break;
                 case "zombie_toast_spawner":
