@@ -4,6 +4,7 @@ import dungeonmania.util.Position;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import dungeonmania.entities.CollectableEntities.Sword;
 import dungeonmania.entities.BuildableEntities.Bow;
 import dungeonmania.entities.BuildableEntities.Shield;
@@ -54,6 +55,7 @@ public abstract class MovingEntity implements Entity {
      * Armour of the entity
      */
     private boolean armour = false;
+    private int totalMovement = 1;
 
     /**
      * Creates a moving entity that can be moved up, down, left and right into cardinally adjacent square
@@ -78,6 +80,7 @@ public abstract class MovingEntity implements Entity {
     
     public void moveEntity(Position direction) {}
 
+    public void moveSpider(List<Entity> entities, Entity entity){}
     /**
      * Move the position by one square up
      */
@@ -242,6 +245,27 @@ public abstract class MovingEntity implements Entity {
     public void setClockwise(boolean clockwise) {
     }
 
+    /**
+     * Adds onto totalmovement 
+     */
+    public void swampMove() {
+        totalMovement++;
+    }
+
+    /**
+     * Getter for total movement
+     */
+    public int getTotalMovement() {
+        return this.totalMovement;
+    }
+    /**
+     * Resets total movement back to original 
+
+     */
+    public void resetTotalMovement() {
+        this.totalMovement = 1;
+    }
+
 
     /**
      * checkMovement checks for the next square if it's a wall/boulder.
@@ -332,9 +356,9 @@ public abstract class MovingEntity implements Entity {
     public boolean checkMovement(Position position, List<Entity> entities) {
         
         for (Entity entity : entities) {
-            if (entity.getPosition().equals(position) && !entity.getType().equals("door") && !entity.getType().equals("switch") && !entity.getType().equals("player") && !entity.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity")) {
+            if (entity.getPosition().equals(position) && !entity.getType().equals("door") && !entity.getType().equals("switch") && !entity.getType().equals("player") 
+            && !entity.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity") && !entity.getType().equals("swamp_tile")) {
                 return false;
-            // If the square contains a door, check if its locked or not
             } 
         }
         return true;
@@ -366,46 +390,6 @@ public abstract class MovingEntity implements Entity {
 
         return null;
     }
-    /**
-     * checkDoorLock checks for the next square if it's a door. If the door is locked,
-     * it should check for the specific key inside the characters inventory and open the door 
-     * if the key matches the door. Returns true if the door is open and false if not
-     * @param entityDoor
-     * @param entities
-     * @param main
-     * @return boolean
-     **/
-    public boolean checkDoorLock(Door entityDoor, List<Entity> entities, Dungeon main) {
-
-        // If the door is locked, look for the key inside the inventory. Unlock the door if its found
-        if (entityDoor.getLocked() == true) {
-            int keyType = entityDoor.getKeyType();
-            int keyNum = 0;
-            int remove = 0;
-            CollectableEntity itemKey = null;
-
-            for (CollectableEntity item : main.inventory) {
-                if (item.getType().equals("key")) {
-                    Key key = (Key) item;
-                    keyNum =  key.getKeyNum();
-                    //If the key and door match, open the door
-                    if (keyType == keyNum) {
-                        entityDoor.setLocked(false);
-                        remove = 1;
-                        itemKey = item;
-                    }
-                }
-            }
-            if (remove == 1) {
-                main.inventory.remove(itemKey);
-                main.setKeyStatus(true);
-                return true;
-            }
-            return false;
-        } else {
-            return true;
-        }
-    }
 
     /**
      * Checks if the position to be moved in is a door, if it is, return that door
@@ -418,9 +402,11 @@ public abstract class MovingEntity implements Entity {
 
         Door entityDoor = null;
         for (Entity entity: entities) {
-            if (entity.getPosition().equals(entityPosition) && entity.getType().equals("door")) {
-                entityDoor = (Door) entity;
-                return entityDoor;
+            if (entity.getPosition().equals(entityPosition)) {
+                if (entity.getType().equals("door") || entity.getType().equals("door_unlocked")) {
+                    entityDoor = (Door) entity;
+                    return entityDoor;
+                }        
             }
         }
         return entityDoor;
@@ -435,9 +421,11 @@ public abstract class MovingEntity implements Entity {
     public Door checkDoor(Position position, List<Entity> entities) {
         Door entityDoor = null;
         for (Entity entity: entities) {
-            if (entity.getPosition().equals(position) && entity.getType().equals("door")) {
-                entityDoor = (Door) entity;
-                return entityDoor;
+            if (entity.getPosition().equals(position)) {
+                if (entity.getType().equals("door") || entity.getType().equals("door_unlocked")) {
+                    entityDoor = (Door) entity;
+                    return entityDoor;
+                }        
             }
         }
         return entityDoor;
@@ -660,19 +648,32 @@ public abstract class MovingEntity implements Entity {
             else {
                 characterHealth = characterHealth - ((enemyHealth * enemyAD) / 10);
             }
-            // Calculations for enemy
-            if (enemyArmour) {
-                enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
-                if (charHasBow) {
-                    enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
-                }
+
+            // Calculate if hydra will heal or not
+            Random random = new Random();
+            int HydraHealing = random.nextInt(2);
+            
+            // Calculations for if the enemy is a hydra and it heals 
+            if (this.getType().equals("hydra") && HydraHealing == 1) {
+                enemyHealth = hydraBattleHealing(enemyHealth, characterHealth, characterAD, weaponAtk, enemyArmour, charHasBow);
             }
+
+            // Otherwise, calculate normally for an enemy, or hydra when it doesn't heal
             else {
-                enemyHealth = enemyHealth - ((characterHealth * (characterAD + weaponAtk)) / 5);
-                if (charHasBow) {
+                if (enemyArmour) {
                     enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+                    if (charHasBow) {
+                        enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+                    }
+                }
+                else {
+                    enemyHealth = enemyHealth - ((characterHealth * (characterAD + weaponAtk)) / 5);
+                    if (charHasBow) {
+                        enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+                    }
                 }
             }
+
             // Check if character dies
             if (!checkAlive(characterHealth)) {
                 player.setAlive(false);
@@ -736,6 +737,59 @@ public abstract class MovingEntity implements Entity {
    
         // Now moving the enemy. Also check the movement once more as spider can be on wall
         if (longestDistance > originalDistance) setPosition(destination);
+    }
+
+    public int hydraBattleHealing (int enemyHealth, int characterHealth, int characterAD, int weaponAtk, boolean enemyArmour, boolean charHasBow) {
+        if (enemyArmour) {
+            enemyHealth = enemyHealth + ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+            if (charHasBow) {
+                enemyHealth = enemyHealth + ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+            }
+        }
+        else {
+            enemyHealth = enemyHealth + ((characterHealth * (characterAD + weaponAtk)) / 5);
+            if (charHasBow) {
+                enemyHealth = enemyHealth + ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
+            }
+        }
+
+        return enemyHealth;
+    }
+
+    /**
+     * Checks if the position to be moved in is a swamp tile, if it is, return that tile
+     * @param position
+     * @param entities
+     * @return swamp tile
+     */
+    public SwampTile checkSwamp(Position position, List<Entity> entities) {
+        SwampTile swampEntity =  null;
+        for (Entity entity: entities) {
+            if (entity.getPosition().equals(position) && entity.getType().equals("swamp_tile")) {
+                swampEntity = (SwampTile) entity;
+                return swampEntity;
+            }
+        }
+        return swampEntity;
+    }
+
+    /**
+     * Checks if the position to be moved in is a swamp tile, if it is, return that tile
+     * @param movementDirection
+     * @param entities
+     * @return swamp tile
+     */
+    public SwampTile checkSwamp(Direction movementDirection, List<Entity> entities) {
+        Position entityPosition = position.translateBy(movementDirection);
+
+        SwampTile swampEntity = null;
+        for (Entity entity: entities) {
+            if (entity.getPosition().equals(entityPosition) && entity.getType().equals("swamp_tile")) {
+                swampEntity = (SwampTile)entity;
+                return swampEntity;
+            }
+        }
+        return swampEntity;
     }
 
 }

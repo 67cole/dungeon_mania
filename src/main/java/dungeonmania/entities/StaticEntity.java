@@ -127,6 +127,10 @@ public abstract class StaticEntity implements Entity{
         return this.type;
     }
 
+    public void setType(String string) {
+        this.type = string;
+    }
+
     @Override
     public String getID() {
         return this.ID;
