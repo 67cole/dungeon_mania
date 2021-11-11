@@ -1,6 +1,7 @@
 package dungeonmania.entities;
 
 import dungeonmania.util.Position;
+import dungeonmania.util.Direction;
 
 import java.util.List;
 import java.util.Random;
@@ -28,6 +29,29 @@ public class Mercenary extends MovingEntity {
             setArmour(true);
         }
     }
+
+    /**
+     * Moves the mercenary around
+     * @param entities - The list of all entities in the dungeon
+     * @param direction - The direction of the character
+     */
+    public static void mercenaryMovement(List<Entity> entities, Direction direction) {
+        Position player = Character.getPlayerPosition(entities);
+        player = player.translateBy(direction);
+
+        boolean swampMove = true;
+        for (Entity entity : entities) {
+            if (entity.getType().equals("mercenary")) {
+                Mercenary mercenaryEntity = (Mercenary) entity;
+                swampMove = SwampTile.swampCanMove(mercenaryEntity, entities);
+                if (swampMove == false) {
+                    continue;
+                }             
+                mercenaryEntity.moveEntity(entities, player);
+            }
+        }
+    }
+
 
     /**
      * Moving the mercenary
@@ -78,5 +102,60 @@ public class Mercenary extends MovingEntity {
 
         // Now moving the mercenary
         if (shortestDistance < originalDistance) super.setPosition(destination);
+    }
+
+    /**
+     * Checks whether the place is close enough to the mercenary to bribe
+     * @param character - the character class
+     * @param interaction - the entity the character is interacting with, mercenary in this case
+     */
+    public static boolean playerProximityMercenary(Character character, Entity interaction) {
+        // First, wrap the entity and get its position
+        Mercenary mercenary = (Mercenary) interaction;
+        Position mercenaryPosition = mercenary.getPosition();
+
+        // Checking the positions around the mercenary
+        List<Position> adjacent = mercenaryPosition.getAdjacentPositions();
+
+        // Index 1, 3, 5, 7 are cardinally adjacent positions, so place into temporary list holder
+        List<Position> validPositions = new ArrayList<>();
+
+        // However, also add one tiles to the left, right, up and down as it is 2 cardinal tiles
+        validPositions.add(adjacent.get(1));
+        validPositions.add(adjacent.get(1).translateBy(0, -1));
+        validPositions.add(adjacent.get(3));
+        validPositions.add(adjacent.get(3).translateBy(1, 0));
+        validPositions.add(adjacent.get(5));
+        validPositions.add(adjacent.get(5).translateBy(0, 1));
+        validPositions.add(adjacent.get(7));
+        validPositions.add(adjacent.get(7).translateBy(-1, 0));
+
+        // Now, get player position and check if they're in any of these squares
+        Position characterPosition = character.getPosition();
+
+        for (Position position : validPositions) {
+            if (position.equals(characterPosition)) return true;
+        }
+
+        return false; 
+    }
+
+    /**
+     * This function checks whether there are any players in the mercenary's battle radius
+     * @param character - the player
+     * @param entities - the list of all entities
+     */
+    public static void mercenaryBattleRadiusChecker(MovingEntity character, List<Entity> entities) {
+        for (Entity entity : entities) {
+            if (entity.getType().equals("mercenary")) {
+                Position vector = Position.calculatePositionBetween(character.getPosition(), entity.getPosition());
+                double distance = Math.sqrt(Math.pow(vector.getX(), 2) + Math.pow(vector.getY(), 2));
+
+                if (distance < 4) {
+                    Mercenary temp = (Mercenary) entity;
+                    temp.moveEntity(entities, character.getPosition());
+                }
+            }
+        }
     }
 }
