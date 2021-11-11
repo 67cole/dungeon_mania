@@ -51,7 +51,7 @@ public class Portal extends StaticEntity {
             //Into position of the corresponding portal
             if (entity.getType().equals(type) && !entity.getPosition().equals(player.getPosition())) {             
                 Portal portal = (Portal) entity;
-                player.setPosition(portal.getPosition());
+                player.setPosition(portal.getPosition().translateBy(direction));
                 break;   
             }
         }
