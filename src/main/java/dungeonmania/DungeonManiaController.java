@@ -620,14 +620,13 @@ public class DungeonManiaController {
                         // Takes into the account of collectable item
                         else {
                             List<String> nonRemovable = Arrays.asList("boulder", "BLUEportal", "REDportal","YELLOWportal","GREYportal",
-                            "switch", "door", "door_unlocked", "exit", "swamp_tile");
+                            "switch", "door", "door_unlocked", "exit", "swamp_tile", "zombie_toast_spawner", "light_bulb_on","light_bulb_off");
                             int dontRemove = 0;
                             for (String curr : nonRemovable) {
                                 if (interactingEntity.getType().equals(curr)) dontRemove = 1;
                             }
                             if (dontRemove == 0) entitiesToBeRemoved.add(interactingEntity);
 
-                            // if (!interactingEntity.getType().equals("boulder")) entitiesToBeRemoved.add(interactingEntity);
                             // Accounting for chance to receive TheOneRing
                             if (interactingEntity.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
                                 Random random = new Random();
@@ -776,6 +775,7 @@ public class DungeonManiaController {
                 ArrayList<Position> adjacentPos = entPos.getCardinallyAdjacentPositions();
                 if (playerPos.equals(adjacentPos.get(0)) || playerPos.equals(adjacentPos.get(1)) || playerPos.equals(adjacentPos.get(2)) || playerPos.equals(adjacentPos.get(3))) {
                     ((Boulder) enti).doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);    
+                    ((Boulder) enti).LightUpBulb(entities, (Character) tempChar, main, enti, allNearbyEntities);
                 }
             }
         }
@@ -837,6 +837,10 @@ public class DungeonManiaController {
         System.out.println("passing thru interact");
         // Get entity list
         List<Entity> entities = currDungeon.getEntities();
+        // System.out.println("size of list: " + entities.size());
+        // for (Entity entity: entities) {
+        //     System.out.println(entity.getType() + "  " + entity.getID());
+        // }
 
         // Get inventory
         List<CollectableEntity> inventory = currDungeon.getInventory();
@@ -850,10 +854,13 @@ public class DungeonManiaController {
         }
 
         // Check what we are interacting with 
-        Entity interaction = IdToEntity(entityId, entities);
+        System.out.println(entityId);
+        Entity interaction= IdToEntity(entityId, entities);
+        System.out.println(interaction.getType());
 
         // Interaction with the mercenary
         if (interaction.getType().equals("mercenary")) {
+            System.out.println("Interacting with mercenary");
             
             // Check whether the player is close enough to the mercenary
             if (!playerProximityMercenary(character, interaction)) {
@@ -1546,6 +1553,11 @@ public class DungeonManiaController {
                         swamp.setMovementFactor(entity.get("movement_factor").getAsInt());
                         main.addEntities(swamp);
                         break;
+                    case "light_bulb_off":
+                        LightBulb bulb  = new LightBulb(position, type, entityId, false);
+                        main.addEntities(bulb);
+                        break;
+
                 }
             }
         } catch (Exception e) {
@@ -2023,9 +2035,10 @@ public class DungeonManiaController {
             switch (type) {
                 case "sword":
                     Sword sword = new Sword(position, type, entityId, true);
-                    main.inventory.add(sword);
                     sword.setAttack(entity.get("attack").getAsInt());
                     sword.setDurability(entity.get("durability").getAsInt());
+                    main.inventory.add(sword);
+                    
                     break;
                 case "bomb":
                     Bomb bomb = new Bomb(position, type, entityId, true);

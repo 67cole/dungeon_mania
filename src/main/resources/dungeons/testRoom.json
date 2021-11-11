@@ -199,6 +199,16 @@
         "x": 7,
         "y": 9,
         "type": "wall"
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "type": "treasure"
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "type": "treasure"
       }
     ]
 }
