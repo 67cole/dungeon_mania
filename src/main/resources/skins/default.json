@@ -40,6 +40,8 @@
         "key": "images/tileset/items/key_silver.png",
         "one_ring": "images/tileset/items/ring_0_special.png",
         "swamp_tile": "images/tileset/entities/swamp_tile.png",
+        "hydra": "images/tileset/entities/hydra.png",
+        "assassin": "images/tileset/entities/assassin.png",
         "light_bulb_off": "images/tileset/entities/lightbulb.png"
     }
 }
