@@ -242,6 +242,19 @@ public class Spider extends MovingEntity {
         return (int) ((Math.random() * (max - min)) + min);
     }
 
+    public static boolean checkMaxSpiders(List<Entity> entities) {
+        int noSpiders = 0;
+        for (Entity entity: entities) {
+            if (entity.getType().equals("spider")) {
+                noSpiders += 1;
+            }
+        }
+        if (noSpiders < 8) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
 
 }

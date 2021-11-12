@@ -79,8 +79,8 @@ public class DungeonManiaController {
      * returns gamemodes
      * @return List<String>
      */
-    public List<String> getGameModes() {
-        return Arrays.asList("Standard", "Peaceful", "Hard");
+    public static List<String> getGameModes() {
+        return Arrays.asList("standard", "peaceful", "hard");
     }
 
     /**
@@ -105,11 +105,11 @@ public class DungeonManiaController {
      */
     public DungeonResponse newGame(String dungeonName, String gameMode) throws IllegalArgumentException {    
         // INCOMPLETE *********
-        if (!dungeonNotValid(dungeonName)) {
+        if (!Dungeon.dungeonNotValid(dungeonName)) {
             throw new IllegalArgumentException("This dungeon does not exist.");
         }
 
-        if (!gameModeNotValid(gameMode)) {
+        if (!Dungeon.gameModeNotValid(gameMode)) {
             throw new IllegalArgumentException("This gamemode is not valid.");
         }
 
@@ -128,11 +128,11 @@ public class DungeonManiaController {
         currDungeon = main;
 
         switch (gameMode) {
-            case "Peaceful":
+            case "peaceful":
                 currDungeon.setPeaceful(true);
                 break;
 
-            case "Hard":
+            case "hard":
                 currDungeon.setHard(true);
                 break;
         }
@@ -144,8 +144,6 @@ public class DungeonManiaController {
             erList.add(er);
         }
         
-        // TODO: Sample goals
-
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
         lastTick = dr;
         
@@ -199,7 +197,9 @@ public class DungeonManiaController {
 
         List<StaticEntity> staticList = new ArrayList<StaticEntity>();
         for (Entity entity : currDungeon.getEntities()) {
-            if (entity.getType().equals("door") || entity.getType().equals("portal")) {
+            if (entity.getType().equals("door") || entity.getType().equals("BLUEportal") ||
+            entity.getType().equals("REDportal") || entity.getType().equals("YELLOWportal") ||
+            entity.getType().equals("GREYportal")) {
                 StaticEntity mv = (StaticEntity) entity;
                 staticList.add(mv);
             }
@@ -496,11 +496,13 @@ public class DungeonManiaController {
         Hydra hydraHolder = null;
         Assassin assassinHolder = null;
         Bomb bombHolder = null;
+        Door doorHolder = null;
         int zombieAddedLater = 0;
         int mercenaryAddedLater = 0;
         int hydraAddedLater = 0;
         int assassinAddedLater = 0;
         int EnemyCheck = 0;
+        boolean doorAddedLater = false;
         boolean invincibilityActive = false; 
         Character tempChar = null;
         Position playerSpawnPosition = null;
@@ -508,7 +510,7 @@ public class DungeonManiaController {
 
 
         // Get the character class
-        Character character = getCharacter(entities);
+        Character character = Character.getCharacter(entities);
         
         // Check potion duration and set it off if it expires
         potionTickAdder(character);
@@ -523,15 +525,15 @@ public class DungeonManiaController {
 
         // Checks if the character is invincible, then move the enemies
         if (character.isInvincible()) {
-            invincibilityPhase(character, entities, movementDirection);
+            InvincibilityPotion.invincibilityPhase(character, entities, movementDirection);
             invincibilityActive = true;
         }
 
         // Enemy movement goes first
-        if (!invincibilityActive) hydraMovement(entities, movementDirection);
-        if (!invincibilityActive) mercenaryMovement(entities, movementDirection);
-        if (!invincibilityActive) assassinMovement(entities, movementDirection);
-        if (!invincibilityActive) zombieMovement(entities, movementDirection);
+        if (!invincibilityActive) Hydra.hydraMovement(entities, movementDirection);
+        if (!invincibilityActive) Mercenary.mercenaryMovement(entities, movementDirection);
+        if (!invincibilityActive) Assassin.assassinMovement(entities, movementDirection);
+        if (!invincibilityActive) ZombieToast.zombieMovement(entities, movementDirection);
 
 
 
@@ -551,7 +553,7 @@ public class DungeonManiaController {
                     // Sets the status of player depending on potion
                     useItem(temp2, main, itemUsed);
                     // Sets the bomb 
-                    bombHolder = useBomb(temp2, main, itemUsed);
+                    bombHolder = Bomb.useBomb(temp2, main, itemUsed);
                 }
                 // Either the character moves or it doesnt.
                 // Check if its blocked by a wall, in which it doesnt move
@@ -565,12 +567,22 @@ public class DungeonManiaController {
                 Door doorEntity = temp.checkDoor(movementDirection, entities); 
                 if (doorEntity != null) {
                     //If it is a door, check if its locked or not
-                    if(!temp.checkDoorLock(doorEntity, entities, main)) continue;
+                    if (doorEntity.getLocked() == true) {
+                        //check if a key exists, if it does, remove the key
+                        if (doorEntity.checkKey(main)) {
+                            doorHolder = doorEntity;
+                            doorAddedLater = true;
+                        }
+                        //If key doesnt exist, dont move
+                        else {
+                            movementDirection = Direction.NONE;
+                        } 
+                    }
                 }
                 
                 List<Entity> interactingEntities = temp.checkNext(movementDirection, entities);
                 // Checking the bomb
-                boolean bombStatus = checkBomb(interactingEntities);
+                boolean bombStatus = Bomb.checkBomb(interactingEntities);
                 if (bombStatus) {
                     continue;
                 }
@@ -601,19 +613,24 @@ public class DungeonManiaController {
                         }
                         // If the character is invisible
                         else if (temp2.isInvisible()) {
+                            // Item still needs to be removed if it is picked up
+                            if (interactingEntity.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity")) {
+                                entitiesToBeRemoved.add(interactingEntity);
+                            }
                             continue;
                         }
                         // If the character isnt dead, then the enemy has to have died in the case of battle
                         // Takes into the account of collectable item
                         else {
-                            List<String> nonRemovable = Arrays.asList("boulder", "portal", "switch", "door", "exit", "swamp_tile");
+                            List<String> nonRemovable = Arrays.asList("boulder", "BLUEportal", "REDportal","YELLOWportal","GREYportal",
+                            "switch", "door", "door_unlocked", "exit", "swamp_tile", "zombie_toast_spawner", "light_bulb_on","light_bulb_off",
+                            "switch_door", "switchdoor_unlocked");
                             int dontRemove = 0;
                             for (String curr : nonRemovable) {
                                 if (interactingEntity.getType().equals(curr)) dontRemove = 1;
                             }
                             if (dontRemove == 0) entitiesToBeRemoved.add(interactingEntity);
 
-                            // if (!interactingEntity.getType().equals("boulder")) entitiesToBeRemoved.add(interactingEntity);
                             // Accounting for chance to receive TheOneRing
                             if (interactingEntity.getClass().getSuperclass().getName().equals("dungeonmania.entities.MovingEntity")) {
                                 Random random = new Random();
@@ -642,7 +659,7 @@ public class DungeonManiaController {
                                         main.inventory.add(armour);
                                     }
                                 }
-                                mercenaryBattleRadiusChecker(temp, entities);
+                                Mercenary.mercenaryBattleRadiusChecker(temp, entities);
                             }
                         }
                     }
@@ -655,7 +672,7 @@ public class DungeonManiaController {
             // Zombie Spawner Ticks
             if (entity.getType().equals("zombie_toast_spawner")) {
                 if ((currDungeon.getHard() && currDungeon.getTickCounter() % 15 == 0) || (!currDungeon.getHard() && currDungeon.getTickCounter() % 20 == 0)) {
-                    Position zombieSpawn = checkWhiteSpace(entity.getPosition(), entities);
+                    Position zombieSpawn = ZombieToastSpawner.checkWhiteSpace(entity.getPosition(), entities);
 
                     // If there is no white space around zombie spawner, don't spawn zombie
                     if (zombieSpawn == null) continue;
@@ -673,7 +690,7 @@ public class DungeonManiaController {
             if (entity.getType().equals("spider") && !invincibilityActive) {
                 boolean swampMove = true;
                 Spider temp = (Spider) entity;
-                swampMove = swampCanMove(temp, entities);
+                swampMove = SwampTile.swampCanMove(temp, entities);
                 if (swampMove == false) {
                     continue;
                 }
@@ -717,14 +734,14 @@ public class DungeonManiaController {
             String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
             currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
 
-            Position hydraSpawn = checkWhiteSpace(character.getPosition(), entities);
+            Position hydraSpawn = ZombieToastSpawner.checkWhiteSpace(character.getPosition(), entities);
             Hydra hydraEntity = new Hydra(hydraSpawn, "hydra", entityId, true);
             hydraHolder = hydraEntity;
             hydraAddedLater = 1;
         }
 
         // Spider spawner ticks
-        if ((checkMaxSpiders(entities) == false) && (currDungeon.getTickCounter() % 25 == 0)) {
+        if ((Spider.checkMaxSpiders(entities) == false) && (currDungeon.getTickCounter() % 25 == 0)) {
             String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
             currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
             Spider newSpider = new Spider(null, "spider", entityId, true);  
@@ -738,6 +755,12 @@ public class DungeonManiaController {
         if (hydraAddedLater == 1) main.addEntities(hydraHolder);
         if (assassinAddedLater == 1) main.addEntities(assassinHolder);
         if (spiderSpawned == 1) main.addEntities(spid);
+        if (doorAddedLater == true) {
+            main.removeEntity(doorHolder);
+            Door unlockedDoor = new Door(doorHolder.getPosition(),
+             "door_unlocked", doorHolder.getID(), doorHolder.getIsInteractable(), doorHolder.getKeyType(), false);
+            main.addEntities(unlockedDoor);
+        }
 
         
         Position playerPos = new Position(0, 0);
@@ -756,6 +779,31 @@ public class DungeonManiaController {
                 ArrayList<Position> adjacentPos = entPos.getCardinallyAdjacentPositions();
                 if (playerPos.equals(adjacentPos.get(0)) || playerPos.equals(adjacentPos.get(1)) || playerPos.equals(adjacentPos.get(2)) || playerPos.equals(adjacentPos.get(3))) {
                     ((Boulder) enti).doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);    
+                }
+            }
+        }
+
+
+        // Find switches to check lightbulb light up eligibility
+        for (Entity enti : entities) {
+            if (enti.getType().equals("light_bulb_on") || enti.getType().equals("light_bulb_off")) {
+                LightBulb bulbEntity = (LightBulb) enti;
+                if (bulbEntity.checkSwitchBoulder(main)) {
+                    bulbEntity.lightOn();
+                } else {
+                    bulbEntity.lightOff();
+                }
+            }
+        }
+
+        // Find switch doors to check unlock door eligibility
+        for (Entity enti : entities) {
+            if (enti.getType().equals("switch_door") || enti.getType().equals("switchdoor_unlocked")) {
+                SwitchDoor doorEntity = (SwitchDoor) enti;
+                if (doorEntity.checkSwitchBoulder(main)) {
+                    doorEntity.doorUnlock();
+                } else {
+                    doorEntity.doorLock();
                 }
             }
         }
@@ -822,26 +870,27 @@ public class DungeonManiaController {
         List<CollectableEntity> inventory = currDungeon.getInventory();
 
         // Get the character class
-        Character character = getCharacter(entities);
+        Character character = Character.getCharacter(entities);
 
         // Check if the entity exists within the dungeon
-        if (!entityIdCheck(entityId, entities)) {
+        if (!Dungeon.entityIdCheck(entityId, entities)) {
             throw new IllegalArgumentException("The entity does not exist.");
         }
 
         // Check what we are interacting with 
-        Entity interaction = IdToEntity(entityId, entities);
+        Entity interaction = Dungeon.IdToEntity(entityId, entities);
 
         // Interaction with the mercenary
         if (interaction.getType().equals("mercenary")) {
+            System.out.println("Interacting with mercenary");
             
             // Check whether the player is close enough to the mercenary
-            if (!playerProximityMercenary(character, interaction)) {
+            if (!Mercenary.playerProximityMercenary(character, interaction)) {
                 throw new InvalidActionException("The player is not close enough to the mercenary.");
             }
 
             // Check whether the player has enough gold to bribe the mercenary
-            if (!playerHasEnoughGold(inventory)) {
+            if (!Treasure.playerHasEnoughGold(inventory)) {
                 throw new InvalidActionException("The player does not have enough gold to bribe the mercenary.");
             }
 
@@ -853,17 +902,16 @@ public class DungeonManiaController {
         if (interaction.getType().equals("zombie_toast_spawner")) {
 
             // Check whether the player is close enough to the spawner
-            if (!playerProximitySpawner(character, interaction)) {
+            if (!ZombieToastSpawner.playerProximitySpawner(character, interaction)) {
                 throw new InvalidActionException("The player is not close enough to the spawner.");
             }
 
             // Check whether the player has a weapon to destroy the spawner
-            if (!playerHasSword(inventory)) {
+            if (!Sword.playerHasSword(inventory)) {
                 throw new InvalidActionException("The player does not have a weapon to destory the spawner.");
             }
 
-            System.out.println("lolfewlfw");
-            ZombieToastSpawner.interactWithSpawner(inventory, interaction, currDungeon);
+            interactWithSpawner(inventory, interaction);
         }
 
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
@@ -900,11 +948,11 @@ public class DungeonManiaController {
                 if (wood >= 1 && arrow >= 3) {
                     break;
                 }
-                if (item.getType().equals("wood") && wood < 2) {
+                if (item.getType().equals("wood") && wood < 1) {
                     itemsToBeRemoved.add(item);
                     wood++;
                 }
-                if (item.getType().equals("arrow") && arrow < 4) {
+                if (item.getType().equals("arrow") && arrow < 3) {
                     itemsToBeRemoved.add(item);
                     arrow++;
                 }
@@ -923,19 +971,19 @@ public class DungeonManiaController {
             int treasure = 0;
             int wood = 0;
             for (CollectableEntity item: currDungeon.inventory) {
-                if (wood >= 2 && treasure >= 1 && key >= 1) {
+                if (wood >= 2 && (treasure >= 1 || key >= 1)) {
                     break;
                 }
-                if (item.getType().equals("wood") && wood < 3) {
+                if (item.getType().equals("wood") && wood < 2) {
                     itemsToBeRemoved.add(item);
                     wood++;
                 }
-                if (item.getType().equals("key") && key < 2 && treasure < 2) {
+                if (item.getType().equals("key") && key < 1 && treasure < 1) {
                     itemsToBeRemoved.add(item);
                     currDungeon.setKeyStatus(true);
                     key++;
                 }
-                 if (item.getType().equals("treasure") && treasure < 2 && key < 2) {
+                if (item.getType().equals("treasure") && treasure < 1 && key < 1) {
                     itemsToBeRemoved.add(item);
                     treasure++;
                 }
@@ -946,11 +994,110 @@ public class DungeonManiaController {
             currDungeon.inventory.add(shield);
             currDungeon.buildables.remove(buildable);
         }
-
+        if (buildable.equals("midnight_armour")) {
+            String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+            currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+            for (CollectableEntity item: currDungeon.inventory) {
+                if (item.getType().equals("armour")) {
+                    itemsToBeRemoved.add(item);
+                    break;
+                }
+            }
+            // Position needs to be stated as checkNext requires a position to run
+            Position tempPos = new Position(-1, -1);
+            MidnightArmour mArmour = new MidnightArmour(tempPos, "midnight_armour", entityId, true);
+            currDungeon.inventory.add(mArmour);
+            currDungeon.buildables.remove(buildable);
+        }
+        if (buildable.equals("sceptre")) {
+            String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+            currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+            // Removing the items
+            int key = 0;
+            int treasure = 0;
+            int wood = 0;
+            int arrow = 0;
+            for (CollectableEntity item: currDungeon.inventory) {
+                if ((wood >= 1 || arrow >= 2) && (key >= 1 || treasure >= 1)) {
+                    break;
+                }
+                if (item.getType().equals("wood") && wood < 1 && arrow < 1) {
+                    itemsToBeRemoved.add(item);
+                    wood++;
+                }
+                if (item.getType().equals("arrow") && arrow <= 2 && wood < 1) {
+                    itemsToBeRemoved.add(item);
+                    arrow++;
+                }
+                if (item.getType().equals("key") && key < 1 && treasure < 1) {
+                    itemsToBeRemoved.add(item);
+                    currDungeon.setKeyStatus(true);
+                    key++;
+                }
+                if (item.getType().equals("treasure") && treasure < 1 && key < 1) {
+                    itemsToBeRemoved.add(item);
+                    treasure++;
+                }
+            }
+            Position tempPos = new Position(-1, -1);
+            Sceptre sceptre = new Sceptre(tempPos, "sceptre", entityId, true);
+            currDungeon.inventory.add(sceptre);
+            currDungeon.buildables.remove(buildable);
+        }
+        // Removing the items
         for (CollectableEntity item: itemsToBeRemoved) {
             currDungeon.inventory.remove(item);
         }
 
+        // Check if buildables can still be made
+        int wood = 0;
+        int arrow = 0;
+        int key = 0;
+        int armour = 0;
+        int treasure = 0;
+        int sunStone = 0;
+        for (CollectableEntity item: currDungeon.inventory) {
+            switch(item.getType()) {
+                case "wood":
+                    wood++;
+                    break;
+                case "arrow":
+                    arrow++;
+                    break;
+                case "key":
+                    key++;
+                    break;
+                case "treasure":
+                    treasure++;
+                    break;
+                case "sun_stone":
+                    sunStone++;
+                    break;
+                case "armour":
+                    armour++;
+                    break;
+            }
+        }
+        List<String> newBuildables = new ArrayList<String>();
+        // Checking Bow
+        if (wood >= 1 && arrow >= 3) {
+            newBuildables.add("bow");
+        } 
+        // Checking Shield
+        if (wood >= 2 && (treasure >= 1 || key == 1)) {
+            newBuildables.add("shield");
+        } 
+        // Checking Sceptre
+        if ((wood >= 1 || arrow >= 2) && (key >= 1 || treasure >= 1) && sunStone >= 1) {
+            newBuildables.add("sceptre");
+        } 
+        // Checking MidnightArmour
+        if (armour >= 1 && sunStone >= 1) {
+            if (zombieChecker(currDungeon.getEntities())) {
+                newBuildables.add("midnight_armour");
+            }
+        }
+        currDungeon.setBuildables(newBuildables);
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
         for(Entity entity: currDungeon.getEntities()) {
             EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
@@ -970,6 +1117,53 @@ public class DungeonManiaController {
         return dr;
     }
 
+    public DungeonResponse generateDungeon(int xStart, int yStart, int xEnd, int yEnd, String gameMode) throws IllegalArgumentException {
+        if (!Dungeon.gameModeNotValid(gameMode)) {
+            throw new IllegalArgumentException("This gamemode is not valid.");
+        }
+
+        List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
+        List<String> emptyBuildables = new ArrayList<String>();
+
+        // Create the unique identifier for the new dungeon
+        String dungeonName = "Maze" + dungeonCounter;
+        String dungeonId = String.format("dungeon%d", dungeonCounter);
+        dungeonCounter += 1;
+
+        // Make a new dungeon object and add it to the dungeons list
+        String goals = ":exit";
+        Dungeon main = new Dungeon(dungeonName, dungeonId, goals);
+        dungeons.add(main);
+        currDungeon = main;
+
+        switch (gameMode) {
+            case "peaceful":
+                currDungeon.setPeaceful(true);
+                break;
+
+            case "hard":
+                currDungeon.setHard(true);
+                break;
+        }
+
+
+        List<EntityResponse> erList = new ArrayList<EntityResponse>();
+        for (Entity entity: main.getEntities()) {
+            EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
+            erList.add(er);
+        }
+        
+
+        Maze maze = new Maze(xStart, yStart, xEnd, yEnd);
+        boolean map[][] = maze.getMap();
+
+        addEntitiesToMaze(main, map, xStart, yStart, xEnd, yEnd);
+
+        DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
+        lastTick = dr;
+        
+        return dr;
+    }
 
 
     /**
@@ -980,46 +1174,6 @@ public class DungeonManiaController {
      * 
      */
 
-
-    /**
-     * Check if white space is empty or not
-     */
-    public Position checkWhiteSpace(Position position, List<Entity> entities) {
-        List<Position> adjacents = position.getAdjacentPositions();
-
-        // List Position 1, 3, 5, 7 are adjacent
-        for (int i = 1; i < adjacents.size(); i = i + 2) {
-            Position temp = adjacents.get(i);
-            int check = 0;
-
-            for (Entity entity : entities) {
-                if (entity.getPosition().equals(temp)) {
-                    check = 1; 
-                    break;
-                } 
-            }
-
-            if (check == 0) {
-                return temp;
-            }
-        }   
-
-        return null;
-    }
-
-    public boolean checkMaxSpiders(List<Entity> entities) {
-        int noSpiders = 0;
-        for (Entity entity: entities) {
-            if (entity.getType().equals("spider")) {
-                noSpiders += 1;
-            }
-        }
-        if (noSpiders < 8) {
-            return false;
-        } else {
-            return true;
-        }
-    }
 
     public void checkBoulderGoal(List<Entity> entities, Dungeon dungeon) {
 
@@ -1144,20 +1298,6 @@ public class DungeonManiaController {
     }
 
     /**
-     * Helper Function that returns the players position 
-     * @param entities
-     * @return position
-     */
-    public Position getPlayerPosition(List<Entity> entities) {
-        for (Entity player: entities) {
-            if (player.getType().equals("player")) {
-                return player.getPosition();
-            } 
-        }
-        return null;
-    }
-
-    /**
      * This function checks whether or not the item given in tick is valid
      * @param itemUsed
      */
@@ -1192,124 +1332,6 @@ public class DungeonManiaController {
         return false;
     }
 
-    /**
-     * Moves the hydra around
-     * @param entities - The list of all entities in the dungeon
-     * @param direction - The direction of the character
-     */
-    public void hydraMovement (List<Entity> entities, Direction direction) {
-        Position player = getPlayerPosition(entities);
-        player = player.translateBy(direction);
-        boolean swampMove = true;
-        for (Entity entity : entities) {
-            if (entity.getType().equals("hydra")) {
-                Hydra temp = (Hydra) entity;
-                swampMove = swampCanMove(temp, entities);
-                if (swampMove == false) {
-                    continue;
-                }
-                temp.moveEntity(entities, player);
-            }
-        }
-    }
-
-    /**
-     * Moves the zombie around
-     * @param entities - The list of all entities in the dungeon
-     * @param direction - The direction of the character
-     */
-    public void zombieMovement (List <Entity> entities, Direction direction) {
-        Position player = getPlayerPosition(entities);
-        player = player.translateBy(direction);
-        boolean swampMove = true;
-        for (Entity entity : entities) {
-            if (entity.getType().equals("zombie_toast")) {
-                ZombieToast temp = (ZombieToast) entity;
-                swampMove = swampCanMove(temp, entities);
-                if (swampMove == false) {
-                    continue;
-                }
-                temp.moveEntity(entities, player);
-            }
-        }
-    }
-
-    /**
-     * Moves the mercenary around
-     * @param entities - The list of all entities in the dungeon
-     * @param direction - The direction of the character
-     */
-    public void mercenaryMovement(List<Entity> entities, Direction direction) {
-        Position player = getPlayerPosition(entities);
-        player = player.translateBy(direction);
-
-        boolean swampMove = true;
-        for (Entity entity : entities) {
-            if (entity.getType().equals("mercenary")) {
-                Mercenary mercenaryEntity = (Mercenary) entity;
-                swampMove = swampCanMove(mercenaryEntity, entities);
-                if (swampMove == false) {
-                    continue;
-                }             
-                mercenaryEntity.moveEntity(entities, player);
-            }
-        }
-    }
-
-    /**
-     * Moves the assassin around
-     * @param entities - The list of all entities in the dungeon
-     * @param direction - The direction of the character
-     */
-    public void assassinMovement(List<Entity> entities, Direction direction) {
-        Position player = getPlayerPosition(entities);
-        player = player.translateBy(direction);
-        boolean swampMove = true;
-        for (Entity entity : entities) {
-            if (entity.getType().equals("assassin")) {
-                Assassin temp = (Assassin) entity;
-                swampMove = swampCanMove(temp, entities);
-                if (swampMove == false) {
-                    continue;
-                }
-                temp.moveEntity(entities, player);
-            }
-        }
-    }
-
-
-
-    /**
-     * Moves the enemies around if the character is invincible
-     * @param character - The character class
-     * @param entities - The list of all entities
-     */
-    public void invincibilityPhase(Character character, List<Entity> entities, Direction direction) {
-        Position player = getPlayerPosition(entities);
-        player = player.translateBy(direction);
-
-        for (Entity entity : entities) {
-            if (entity.getType().equals("zombie_toast") || entity.getType().equals("spider") || entity.getType().equals("mercenary")) {
-                MovingEntity temp = (MovingEntity) entity;
-                temp.runEnemy(entities, player);
-            }
-        }
-    }
-
-    
-    
-    /**
-     * Searches for a key, returns true if the key could be found
-     * @param inventory
-     */
-    public boolean keyChecker(List<CollectableEntity> inventory) {
-        for (CollectableEntity item: inventory) {
-            if (item.getType().equals("key")) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * Removes an entity from Entities List
@@ -1324,7 +1346,7 @@ public class DungeonManiaController {
                         if (main.getKeyStatus()) {
                             main.setKeyStatus(false);
                         }
-                        else if (keyChecker(main.inventory)) {
+                        else if (CollectableEntity.keyChecker(main.inventory)) {
                             return;
                         }
                     }
@@ -1369,44 +1391,9 @@ public class DungeonManiaController {
             }
         }
     }
-    /**
-     * Checks if the bomb is activated
-     * @param player - the character
-     * @param main - the dungeon
-     * @param itemUsed - the item that is used
-     * @return Bomb
-     */
-    public Bomb useBomb(Character player, Dungeon main, String itemUsed) {
-        if (itemUsed != null) {
-            for (CollectableEntity entity2: main.inventory) {
-                if (entity2.getID().equals(itemUsed)) {
-                    if (entity2.getType().equals("bomb")) {
-                        Bomb bomb = (Bomb) entity2;
-                        Bomb newBomb = new Bomb(player.getPosition(), bomb.getType(), bomb.getID(), bomb.getIsInteractable());
-                        newBomb.setActivated(true);
-                        main.inventory.remove(bomb);
-                        return newBomb;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-    /**
-     * Checks if the bomb is activated
-     * @param entity - the item
-     * @return boolean 
-     */
-    public boolean isBombActivated(Entity entity) {
-        if (entity.getType().equals("bomb")) {
-            Bomb bomb = (Bomb) entity;
-            if (bomb.isActivated()) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
+
+
+ 
     /**
      * Helper Function that takes in the json file and adds all entities into entities list
      * @param dungeonName
@@ -1457,7 +1444,7 @@ public class DungeonManiaController {
                         break;
                     case "portal":
                         String colour = entity.get("colour").getAsString();
-                        Portal portalEntity = new Portal(position, type, entityId, true, colour);
+                        Portal portalEntity = new Portal(position, colour+"portal", entityId, true, colour);
                         main.addEntities(portalEntity);
                         break;
                     case "zombie_toast_spawner":
@@ -1526,6 +1513,23 @@ public class DungeonManiaController {
                         swamp.setMovementFactor(entity.get("movement_factor").getAsInt());
                         main.addEntities(swamp);
                         break;
+                    case "light_bulb_off":
+                        LightBulb bulb  = new LightBulb(position, type, entityId, false);
+                        main.addEntities(bulb);
+                        break;
+                    case "sun_stone":
+                        SunStone sunStone  = new SunStone(position, type, entityId, false);
+                        main.addEntities(sunStone);
+                        break;
+                    case "armour":
+                        Armour armour  = new Armour(position, type, entityId, false);
+                        main.addEntities(armour);
+                        break;
+                    case "switch_door":
+                        SwitchDoor switchDoor = new SwitchDoor(position, type, entityId, false, true);
+                        main.addEntities(switchDoor);
+                        break;
+
                 }
             }
         } catch (Exception e) {
@@ -1629,36 +1633,6 @@ public class DungeonManiaController {
 
     }
 
-    /**
-     * checks if a bomb is activated
-     * @param interactingEntities
-     * @return boolean
-     */
-    public boolean checkBomb(List<Entity> interactingEntities) {
-        for (Entity interactingEntity: interactingEntities) {
-            if (interactingEntity != null) {
-                if (isBombActivated(interactingEntity)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * returns the character
-     * @param entities
-     * @return Character
-     */
-    public Character getCharacter(List <Entity> entities) {
-        for (Entity entity : entities) {
-            if (entity.getType().equals("player")) {
-                return (Character) entity; 
-            }
-        }
-
-        return null;
-    }
 
     /**
      * This function adds on a tick if the character is invincible or invisible
@@ -1690,173 +1664,6 @@ public class DungeonManiaController {
         if (currDungeon.getInvincibilityPotionCounter() % 10 == 0) {
             character.setIsInvincible(false);
         }
-    }
-
-    /**
-     * This function checks whether the dungeon exists
-     * @param dungeonName - this is the dungeon name
-     */
-    public boolean dungeonNotValid(String dungeonName) {
-       
-        return true;
-    }
-
-    /**
-     * This function checks whether the gamemode is valid
-     * @param gameMode - this is the gameMode
-     */
-    public boolean gameModeNotValid(String gameMode) {
-        for (String gamemodeState : getGameModes()) {
-            if (gamemodeState.equals(gameMode)) return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * This function checks whether there are any players in the mercenary's battle radius
-     * @param character - the player
-     */
-    public void mercenaryBattleRadiusChecker(MovingEntity character, List<Entity> entities) {
-        for (Entity entity : entities) {
-            if (entity.getType().equals("mercenary")) {
-                Position vector = Position.calculatePositionBetween(character.getPosition(), entity.getPosition());
-                double distance = Math.sqrt(Math.pow(vector.getX(), 2) + Math.pow(vector.getY(), 2));
-
-                if (distance < 4) {
-                    Mercenary temp = (Mercenary) entity;
-                    temp.moveEntity(entities, character.getPosition());
-                }
-            }
-        }
-    }
-
-    /**
-     * Checks whether the entityID is valid or not
-     * @param entityId - the id given in the argument 
-     * @param entities - the list of all entities in the dungeon
-     */
-    public boolean entityIdCheck(String entityId, List<Entity> entities) {
-        for (Entity entity : entities) {
-            if (entity.getID().equals(entityId)) return true;
-        }
-
-        return false; 
-    }
-
-    /**
-     * Return the entity we are interacting with
-     * @param entityId
-     * @param entities
-     * @return entity
-     */
-    public Entity IdToEntity(String entityId, List<Entity> entities) {
-        for (Entity entity : entities) {
-            if (entity.getID().equals(entityId)) return entity; 
-        }
-
-        // Returning null will never occur
-        return null;
-    }
-
-
-    /**
-     * Checks whether the place is close enough to the mercenary to bribe
-     * @param character - the character class
-     * @param interaction - the entity the character is interacting with, mercenary in this case
-     */
-    public boolean playerProximityMercenary(Character character, Entity interaction) {
-        // First, wrap the entity and get its position
-        Mercenary mercenary = (Mercenary) interaction;
-        Position mercenaryPosition = mercenary.getPosition();
-
-        // Checking the positions around the mercenary
-        List<Position> adjacent = mercenaryPosition.getAdjacentPositions();
-
-        // Index 1, 3, 5, 7 are cardinally adjacent positions, so place into temporary list holder
-        List<Position> validPositions = new ArrayList<>();
-
-        // However, also add one tiles to the left, right, up and down as it is 2 cardinal tiles
-        validPositions.add(adjacent.get(1));
-        validPositions.add(adjacent.get(1).translateBy(0, -1));
-        validPositions.add(adjacent.get(3));
-        validPositions.add(adjacent.get(3).translateBy(1, 0));
-        validPositions.add(adjacent.get(5));
-        validPositions.add(adjacent.get(5).translateBy(0, 1));
-        validPositions.add(adjacent.get(7));
-        validPositions.add(adjacent.get(7).translateBy(-1, 0));
-
-        // Now, get player position and check if they're in any of these squares
-        Position characterPosition = character.getPosition();
-
-        for (Position position : validPositions) {
-            if (position.equals(characterPosition)) return true;
-        }
-
-        return false; 
-    }
-
-    /**
-     * Checks whether the player is close enough to the spawner
-     * @param character - the character class
-     * @param interaction - the entity the character is interacting with, spawner in this case
-     */
-    public boolean playerProximitySpawner(Character character, Entity interaction) {
-        // First, wrap the entity and get its position
-        ZombieToastSpawner spawner = (ZombieToastSpawner) interaction;
-        Position spawnerPosition = spawner.getPosition();
-
-        // Checking the positions around the spawner
-        List<Position> adjacent = spawnerPosition.getAdjacentPositions();
-
-        // Index 1, 3, 5, 7 are cardinally adjacent positions, so place into temporary list holder
-        List<Position> validPositions = new ArrayList<>();
-        validPositions.add(adjacent.get(1));
-        validPositions.add(adjacent.get(3));
-        validPositions.add(adjacent.get(5));
-        validPositions.add(adjacent.get(7));
-
-        // Now, get player position and check if they're in any of these squares
-        Position characterPosition = character.getPosition();
-
-        for (Position position : validPositions) {
-            if (position.equals(characterPosition)) return true;
-        }
-
-        return false; 
-    }
-
-    /**
-     * Checks whether the player has enough gold to bribe the mercenary
-     * @param inventory - the player's inventory
-     */
-    public boolean playerHasEnoughGold(List<CollectableEntity> inventory) {
-        // Gold counter
-        int totalGold = 0;
-
-        // Checks for gold in the inventory
-        for (CollectableEntity item : inventory) {
-            if (item.getType().equals("treasure")) {
-                totalGold++;
-            }
-        }
-
-        if (totalGold >= 2) return true;
-
-        return false;
-    }
-
-    /**
-     * Checks whether the player has a sword to destory the spawner
-     * @param inventory - the player's inventory
-     */
-    public boolean playerHasSword(List<CollectableEntity> inventory) {
-        // Checks for a sword in the inventory
-        for (CollectableEntity item : inventory) {
-            if (item.getType().equals("sword")) return true;
-        }
-
-        return false;
     }
 
 
@@ -1926,7 +1733,7 @@ public class DungeonManiaController {
                     break;
                 case "portal":
                     String colour = entity.get("colour").getAsString();
-                    Portal portalEntity = new Portal(position, type, entityId, true, colour);
+                    Portal portalEntity = new Portal(position, colour+"portal", entityId, true, colour);
                     main.addEntities(portalEntity);
                     break;
                 case "zombie_toast_spawner":
@@ -2003,9 +1810,10 @@ public class DungeonManiaController {
             switch (type) {
                 case "sword":
                     Sword sword = new Sword(position, type, entityId, true);
-                    main.inventory.add(sword);
                     sword.setAttack(entity.get("attack").getAsInt());
                     sword.setDurability(entity.get("durability").getAsInt());
+                    main.inventory.add(sword);
+                    
                     break;
                 case "bomb":
                     Bomb bomb = new Bomb(position, type, entityId, true);
@@ -2071,28 +1879,84 @@ public class DungeonManiaController {
     }
 
     /**
-     * Checks if the entity could move away from the swamp tile 
-     * @param entity
-     * @param entities
-     * @return boolean
+     * Interacts with the spawner - destroying it and removing a durability off the sword
+     * @param inventory - the player's inventory
+     * @param interaction - the interactable entity
      */
-    public boolean swampCanMove (MovingEntity entity, List<Entity> entities) {
-        boolean swampMove = true;
-        for (Entity staticEntity: entities) {
-            //If the spider is on the swamp tile, slow it down
-            if (staticEntity.getType().equals("swamp_tile") && staticEntity.getPosition().equals(entity.getPosition())) {
-                SwampTile swampEntity = (SwampTile) staticEntity;
-                if (entity.getTotalMovement() < swampEntity.getMovementFactor()) {
-                    entity.swampMove();
-                    swampMove = false;
-                    continue;
-                } else {
-                    entity.resetTotalMovement();
+    public void interactWithSpawner(List<CollectableEntity> inventory, Entity interaction) {
+        // Remove the spawner
+        currDungeon.removeEntity(interaction);
+
+        // Take off one durability of the sword
+        for (CollectableEntity item : inventory) {
+            if (item.getType().equals("sword")) {
+                Sword sword = (Sword) interaction;
+                sword.reduceDurability();
+
+                if (sword.checkDurability() != null) {
+                    currDungeon.inventory.remove(item);
                 }
+
+                return;
             }
         }
-        return swampMove;
     }
-    
-    
+    /**
+     * Searches for a zombie
+     * @param entites - list of entities in the dungeon
+     */
+    public boolean zombieChecker(List<Entity> entities) {
+        for (Entity entity: entities) {
+            if (entity.getType().equals("zombie_toast")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Helper function that takes in the randomly generated maze and adds all entities into entities list
+     * @param main
+     * @param map[][]
+     * @param xStart
+     * @param yStart
+     * @param xEnd
+     * @param yEnd
+     */
+    public void addEntitiesToMaze(Dungeon main, boolean map[][], int xStart, int yStart, int xEnd, int yEnd) {
+        for (int row = 0; row < map.length; row++) {
+
+            for (int col = 0; col < map[row].length; col++) {
+
+                Position position = new Position(col, row);
+
+                if (col == yStart && row == xStart) {
+                    String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                    currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+                    
+                    Character characterEntity = new Character(position, "player", entityId, false);
+                    main.addEntities(characterEntity);  
+                    characterEntity.setSpawn(position);
+                }
+
+                else if (col == yEnd && row == xEnd) {
+                    String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                    currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+
+                    Exit exitEntity = new Exit(position, "exit", entityId, false);
+                    main.addEntities(exitEntity);
+                }
+
+                else if (map[row][col] == false || row == 0 || row == 49 ||  col == 0 || col == 49) {
+                    String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                    currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+
+                    Wall wallEntity = new Wall(position, "wall", entityId , false);
+                    main.addEntities(wallEntity);   
+                }
+
+            }
+        }
+    }
+
 }

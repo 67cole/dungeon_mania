@@ -30,6 +30,32 @@ public class ZombieToast extends MovingEntity {
         }
     }
 
+    /**
+     * Moves the zombie around
+     * @param entities - The list of all entities in the dungeon
+     * @param direction - The direction of the character
+     */
+    public static void zombieMovement (List <Entity> entities, Direction direction) {
+        Position player = Character.getPlayerPosition(entities);
+        player = player.translateBy(direction);
+        boolean swampMove = true;
+        for (Entity entity : entities) {
+            if (entity.getType().equals("zombie_toast")) {
+                ZombieToast temp = (ZombieToast) entity;
+                swampMove = SwampTile.swampCanMove(temp, entities);
+                if (swampMove == false) {
+                    continue;
+                }
+                temp.moveEntity(entities, player);
+            }
+        }
+    }
+
+    /**
+     * Moves the zombie around
+     * @param entities - The list of all entities in the dungeon
+     * @param playerPosition - The position of the player where they are walking to
+     */
     public void moveEntity(List<Entity> entities, Position playerPosition) {
         // For now, zombies travel randomely
         Random random = new Random();

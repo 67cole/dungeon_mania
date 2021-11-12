@@ -3,6 +3,8 @@ package dungeonmania.entities.CollectableEntities;
 import dungeonmania.entities.CollectableEntity;
 import dungeonmania.util.Position;
 
+import java.util.List;
+
 public class Key extends CollectableEntity{
     /**
      * Key number of key
