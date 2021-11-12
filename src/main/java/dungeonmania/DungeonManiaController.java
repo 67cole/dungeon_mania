@@ -18,6 +18,7 @@ import dungeonmania.util.Position;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -148,7 +149,8 @@ public class DungeonManiaController {
 
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
         lastTick = dr;
-        
+        clearDatabase();
+        addToRewindDatabase();
         return dr;
     }
 
@@ -829,6 +831,7 @@ public class DungeonManiaController {
             erList, irList, currDungeon.buildables, currDungeon.getDungeonGoals());
 
         lastTick = dr;
+        addToRewindDatabase();
         return dr;
     }
 
@@ -993,6 +996,7 @@ public class DungeonManiaController {
             erList, irList, currDungeon.buildables, currDungeon.getDungeonGoals());
         
         lastTick = dr;
+        addToRewindDatabase();
         return dr;
     }
 
@@ -1026,6 +1030,246 @@ public class DungeonManiaController {
      * 
      * 
      */
+
+    public void clearDatabase() {
+
+        String filename = "src\\main\\java\\dungeonmania\\rewindDatabase.json";
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(filename, false);
+            fileOutputStream.close();
+        } catch (Exception e) {}
+
+
+    }
+
+
+    public void addToRewindDatabase() {
+
+
+        String filename = "src\\main\\java\\dungeonmania\\rewindDatabase.json";
+
+        Gson gson = new Gson();
+        String json = gson.toJson(lastTick);
+        JsonObject jsonObj = gson.fromJson(json, JsonElement.class).getAsJsonObject();
+
+        // Add loadName
+        jsonObj.addProperty("tick", currDungeon.getTickCounter());
+        jsonObj.addProperty("entityCounter", currDungeon.getEntityCounter());
+        jsonObj.addProperty("tickCounter", currDungeon.getTickCounter());
+        jsonObj.addProperty("keyStatus", currDungeon.getKeyStatus());
+        jsonObj.addProperty("invisibilityPotionCounter", currDungeon.getInvisibilityPotionCounter());
+        jsonObj.addProperty("invincibilityPotionCounter", currDungeon.getInvincibilityPotionCounter());
+
+        JsonArray jsonEntities = jsonObj.get("entities").getAsJsonArray();
+        JsonArray jsonInventory = jsonObj.get("inventory").getAsJsonArray();
+
+        // List of entities that have extra attributes
+        List<MovingEntity> mvList = new ArrayList<MovingEntity>();
+        for (Entity entity : currDungeon.getEntities()) {
+            if (entity.getType().equals("player") || entity.getType().equals("mercenary") ||
+            entity.getType().equals("spider") || entity.getType().equals("zombie_toast")) {
+                MovingEntity mv = (MovingEntity) entity;
+                mvList.add(mv);
+            }
+        }
+
+        List<CollectableEntity> collectableList = new ArrayList<CollectableEntity>();
+        for (Entity entity : currDungeon.getEntities()) {
+            if (entity.getType().equals("sword") || entity.getType().equals("key") ||
+            entity.getType().equals("armour") || entity.getType().equals("bomb") || 
+            entity.getType().equals("bow") || entity.getType().equals("shield")) {
+                CollectableEntity mv = (CollectableEntity) entity;
+                collectableList.add(mv);
+            }
+        }
+
+        List<StaticEntity> staticList = new ArrayList<StaticEntity>();
+        for (Entity entity : currDungeon.getEntities()) {
+            if (entity.getType().equals("door") || entity.getType().equals("BLUEportal") ||
+            entity.getType().equals("REDportal") || entity.getType().equals("YELLOWportal") ||
+            entity.getType().equals("GREYportal")) {
+                StaticEntity mv = (StaticEntity) entity;
+                staticList.add(mv);
+            }
+        }
+
+        // Give any moving entities attack and health
+        for (int i = 0; i < jsonEntities.size(); i++) {
+            JsonObject jEntity = jsonEntities.get(i).getAsJsonObject();
+
+            if (jEntity.get("type").getAsString().equals("player")) {
+                for (MovingEntity mvEntity : mvList) {
+                    if (mvEntity.getType().equals("player")) {
+                        jEntity.addProperty("attack", mvEntity.getAttack());
+                        jEntity.addProperty("health", mvEntity.getHealth());
+                    }
+                }
+            }
+            else if (jEntity.get("type").getAsString().equals("mercenary")) {
+                for (MovingEntity mvEntity : mvList) {
+                    if (mvEntity.getType().equals("mercenary")) {
+                        jEntity.addProperty("attack", mvEntity.getAttack());
+                        jEntity.addProperty("health", mvEntity.getHealth());
+                    }
+                }
+            }
+            else if (jEntity.get("type").getAsString().equals("spider")) {
+                for (MovingEntity mvEntity : mvList) {
+                    if (mvEntity.getType().equals("spider")) {
+                        jEntity.addProperty("attack", mvEntity.getAttack());
+                        jEntity.addProperty("health", mvEntity.getHealth());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("sword")) {
+                for (CollectableEntity coEntity : collectableList) {
+                    if (coEntity.getType().equals("sword")) {
+                        Sword temp = (Sword) coEntity;
+                        jEntity.addProperty("attack", temp.getAttack());
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("key")) {
+                for (CollectableEntity coEntity : collectableList) {
+                    if (coEntity.getID().equals(jEntity.get("id").getAsString())) {
+                        Key temp = (Key) coEntity;
+                        jEntity.addProperty("keyNum", temp.getKeyNum());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("armour")) {
+                for (CollectableEntity coEntity : collectableList) {
+                    if (coEntity.getType().equals("armour")) {
+                        Armour temp = (Armour) coEntity;
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("bomb")) {
+                for (CollectableEntity coEntity : collectableList) {
+                    if (coEntity.getType().equals("bomb")) {
+                        Bomb temp = (Bomb) coEntity;
+                        jEntity.addProperty("activated", temp.isActivated());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("door")) {
+                for (StaticEntity stEntity : staticList) {
+                    if (stEntity.getID().equals(jEntity.get("id").getAsString())) {
+                        Door temp = (Door) stEntity;
+                        jEntity.addProperty("keyType", temp.getKeyType());
+                        jEntity.addProperty("locked", temp.getLocked());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("portal")) {
+                for (StaticEntity stEntity : staticList) {
+                    if (stEntity.getType().equals("portal")) {
+                        Portal temp = (Portal) stEntity;
+                        jEntity.addProperty("colour", temp.getColour());
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < jsonInventory.size(); i++) {
+            JsonObject jEntity = jsonInventory.get(i).getAsJsonObject();
+
+            if (jEntity.get("type").getAsString().equals("sword")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("sword")) {
+                        Sword temp = (Sword) coEntity;
+                        jEntity.addProperty("attack", temp.getAttack());
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("key")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("key")) {
+                        Key temp = (Key) coEntity;
+                        jEntity.addProperty("keyNum", temp.getKeyNum());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("armour")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("armour")) {
+                        Armour temp = (Armour) coEntity;
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("bomb")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("bomb")) {
+                        Bomb temp = (Bomb) coEntity;
+                        jEntity.addProperty("activated", temp.isActivated());
+                    }
+                }
+            }
+            else if (jEntity.get("type").getAsString().equals("bow")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("bow")) {
+                        Bow temp = (Bow) coEntity;
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
+            else if (jEntity.get("type").getAsString().equals("shield")) {
+                for (CollectableEntity coEntity : currDungeon.getInventory()) {
+                    if (coEntity.getType().equals("shield")) {
+                        Shield temp = (Shield) coEntity;
+                        jEntity.addProperty("durability", temp.getDurability());
+                    }
+                }
+            }
+
+        }
+        
+        File newFile = new File(filename);
+
+        String json2 = "";
+
+        if (newFile.length() == 0) {
+            JsonArray jsonArray = new JsonArray();
+            jsonArray.add(jsonObj);
+            json2 = gson.toJson(jsonArray);
+        }
+
+        else {
+            try {
+                JsonArray jsonArray = JsonParser.parseReader(new FileReader(filename)).getAsJsonArray();
+                jsonArray.add(jsonObj);
+                json2 = gson.toJson(jsonArray);
+            } catch (Exception e) {}
+        }
+
+        FileOutputStream fileOutputStream = null;
+
+        try {
+            fileOutputStream = new FileOutputStream(filename, false);
+            fileOutputStream.write(json2.getBytes());
+            fileOutputStream.close();
+        } catch (Exception e) {}
+
+    }
+
+
+
+
 
 
     public void checkBoulderGoal(List<Entity> entities, Dungeon dungeon) {
@@ -1292,7 +1536,7 @@ public class DungeonManiaController {
                         break;
                     case "door":
                         int keyType = entity.get("key").getAsInt();
-                        Door doorEntity = new Door(position, type, entityId, true, keyType, false);
+                        Door doorEntity = new Door(position, type, entityId, false, keyType, true);
                         main.addEntities(doorEntity);
                         break;
                     case "portal":
