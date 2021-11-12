@@ -775,7 +775,19 @@ public class DungeonManiaController {
                 ArrayList<Position> adjacentPos = entPos.getCardinallyAdjacentPositions();
                 if (playerPos.equals(adjacentPos.get(0)) || playerPos.equals(adjacentPos.get(1)) || playerPos.equals(adjacentPos.get(2)) || playerPos.equals(adjacentPos.get(3))) {
                     ((Boulder) enti).doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);    
-                    ((Boulder) enti).LightUpBulb(entities, (Character) tempChar, main, enti, allNearbyEntities);
+                }
+            }
+        }
+
+
+        // Find switches to check lightbulb light up eligibility and door open eligibility
+        for (Entity enti : entities) {
+            if (enti.getType().equals("light_bulb_on") || enti.getType().equals("light_bulb_off")) {
+                LightBulb bulbEntity = (LightBulb) enti;
+                if (bulbEntity.checkSwitchBoulder(entities, main)) {
+                    bulbEntity.lightOn();
+                } else {
+                    bulbEntity.lightOff();
                 }
             }
         }
@@ -837,10 +849,6 @@ public class DungeonManiaController {
         System.out.println("passing thru interact");
         // Get entity list
         List<Entity> entities = currDungeon.getEntities();
-        // System.out.println("size of list: " + entities.size());
-        // for (Entity entity: entities) {
-        //     System.out.println(entity.getType() + "  " + entity.getID());
-        // }
 
         // Get inventory
         List<CollectableEntity> inventory = currDungeon.getInventory();
@@ -887,7 +895,6 @@ public class DungeonManiaController {
                 throw new InvalidActionException("The player does not have a weapon to destory the spawner.");
             }
 
-            System.out.println("lolfewlfw");
             interactWithSpawner(inventory, interaction);
         }
 
