@@ -1842,12 +1842,10 @@ public class DungeonManiaController {
                         LightBulb bulb  = new LightBulb(position, type, entityId, false);
                         main.addEntities(bulb);
                         break;
-<<<<<<< HEAD
                     case "time_turner":
                         TimeTurner tt = new TimeTurner(position, type, entityId, false);
                         main.addEntities(tt);
                         break;
-=======
                     case "sun_stone":
                         SunStone sunStone  = new SunStone(position, type, entityId, false);
                         main.addEntities(sunStone);
@@ -1861,7 +1859,6 @@ public class DungeonManiaController {
                         main.addEntities(switchDoor);
                         break;
 
->>>>>>> master
                 }
             }
         } catch (Exception e) {
