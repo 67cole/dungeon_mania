@@ -80,5 +80,36 @@ public class Character extends MovingEntity {
                 break;
         }   
     }
+
+    /**
+     * returns the character
+     * @param entities
+     * @return Character
+     */
+    public static Character getCharacter(List <Entity> entities) {
+        for (Entity entity : entities) {
+            if (entity.getType().equals("player")) {
+                return (Character) entity; 
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Helper Function that returns the players position 
+     * @param entities
+     * @return position
+     */
+    public static Position getPlayerPosition(List<Entity> entities) {
+        for (Entity player: entities) {
+            if (player.getType().equals("player")) {
+                return player.getPosition();
+            } 
+        }
+
+        return null;
+    }
  
 }
