@@ -449,6 +449,9 @@ public class DungeonManiaController {
 
         lastTick = newGame;
 
+        // clearDatabase();
+        // addToRewindDatabase();
+
         return newGame;
     }
 
@@ -1008,12 +1011,11 @@ public class DungeonManiaController {
             throw new IllegalArgumentException("Ticks must be greater than 0");
         }
 
-        
+        if (currDungeon.getTickCounter() - ticks < 0) {
+            throw new IllegalArgumentException("Cannot go to a negative tick");
+        }
 
-
-
-
-        return null;
+        return rewindGame(currDungeon.getTickCounter() - ticks);
     }
 
 
@@ -1043,6 +1045,64 @@ public class DungeonManiaController {
 
     }
 
+    public DungeonResponse rewindGame(int ticks) {
+
+        System.out.println("entered 1046");
+        String filename = "src\\main\\java\\dungeonmania\\rewindDatabase.json";
+        JsonObject dungeon;
+        List<EntityResponse> erList= new ArrayList<EntityResponse>();
+        List<ItemResponse> irList= new ArrayList<ItemResponse>();
+        try {
+            JsonArray jsonArray = JsonParser.parseReader(new FileReader(filename)).getAsJsonArray();
+            for (int i = 0; i < jsonArray.size(); i++) {
+                dungeon = jsonArray.get(i).getAsJsonObject();
+                if (dungeon.get("tickCounter").getAsInt() == ticks) {
+                    System.out.println("entered correct object here");
+                    // in the correct dungeon object
+                    Dungeon main = new Dungeon(dungeon.get("dungeonName").getAsString()
+                    , dungeon.get("dungeonId").getAsString(), dungeon.get("goals").getAsString());
+                    main.setTickCounter(dungeon.get("tickCounter").getAsInt());
+                    main.setEntityCounter(dungeon.get("entityCounter").getAsInt());
+                    main.setKeyStatus(dungeon.get("keyStatus").getAsBoolean());
+                    main.setInvincibilityCounter(dungeon.get("invincibilityPotionCounter").getAsInt());
+                    main.setInvisibilityPotionCounter(dungeon.get("invisibilityPotionCounter").getAsInt());
+
+
+                    currDungeon = main;
+                    JsonArray entitiesList = dungeon.get("entities").getAsJsonArray();
+                    JsonArray inventoryList = dungeon.get("inventory").getAsJsonArray();
+                    JsonArray buildableList = dungeon.get("buildables").getAsJsonArray();
+                    addEntitiesInventory(main, entitiesList, inventoryList, buildableList);
+                    for(Entity entity: main.getEntities()) {
+                        EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
+                        erList.add(er);
+                    }
+                    for(CollectableEntity coEntity: main.getInventory()) {
+                        ItemResponse ir = new ItemResponse(coEntity.getID(), coEntity.getType());
+                        irList.add(ir);
+                    }
+                    break;
+                }
+            }
+        
+        
+        } catch (Exception e) {}
+
+        // TO DO inventory attributes e..g., armor durability
+
+        DungeonResponse newGame = new DungeonResponse(currDungeon.getDungeonId(), currDungeon.getDungeonName(),
+        erList, irList, currDungeon.getBuildables(), currDungeon.getDungeonGoals());
+
+        lastTick = newGame;
+
+        // clearDatabase();
+        // addToRewindDatabase();
+
+        return newGame;
+    }
+
+
+
 
     public void addToRewindDatabase() {
 
@@ -1054,7 +1114,6 @@ public class DungeonManiaController {
         JsonObject jsonObj = gson.fromJson(json, JsonElement.class).getAsJsonObject();
 
         // Add loadName
-        jsonObj.addProperty("tick", currDungeon.getTickCounter());
         jsonObj.addProperty("entityCounter", currDungeon.getEntityCounter());
         jsonObj.addProperty("tickCounter", currDungeon.getTickCounter());
         jsonObj.addProperty("keyStatus", currDungeon.getKeyStatus());
@@ -1318,9 +1377,10 @@ public class DungeonManiaController {
         // ( AND (Z OR F))
         String returnGoal = dungeon.getDungeonGoals();
 
+        System.out.println(returnGoal);
         returnGoal = returnGoal.replace("(" + goal + ")", "");
         returnGoal = returnGoal.replace(goal + " AND ", "");
-        returnGoal = returnGoal.replace(" AND" + goal, "");
+        returnGoal = returnGoal.replace(" AND " + goal, "");
 
         returnGoal = returnGoal.replace(" AND (" + goal + " OR " + ":mercenary)", "");
         returnGoal = returnGoal.replace(" AND (" + goal + " OR " + ":treasure)", "");
