@@ -54,6 +54,12 @@ public class Door extends StaticEntity {
      * @return boolean
      **/
     public boolean checkKey(Dungeon main) {
+        for (CollectableEntity item : main.inventory) {
+            if (item.getType().equals("sun_stone")) {
+                this.setLocked(false);
+                return true;
+            }
+        }
         int remove = 0;
         int keyNum = 0;
         int keyType = this.getKeyType();
