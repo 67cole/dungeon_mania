@@ -507,10 +507,6 @@ public class DungeonManiaController {
         main = currDungeon;
 
 
-        int[][] dungeonArray = currDungeon.dungeonArray(entities);
-        currDungeon.printDungeon(dungeonArray);
-
-
         // Get the character class
         Character character = getCharacter(entities);
         
@@ -1276,7 +1272,7 @@ public class DungeonManiaController {
                 if (swampMove == false) {
                     continue;
                 }
-                temp.moveEntity();
+                temp.moveEntity(entities, player);
             }
         }
     }

@@ -56,10 +56,9 @@ public class Mercenary extends MovingEntity {
     }
 
     public int cost (List<Entity> entities, Position source, Position dest) {
-
         for (Entity ent : entities) {
+            // if swamp tile, return movement factor instead of 1 (movement factor counts as distance of 2)
             if (ent.getPosition().equals(dest) && ent.getType().equals("swamp_tile")) {
-                System.out.println("HELALEPOWKADPOAKSD");
                 return ((SwampTile) ent).getMovementFactor();
             }
         }
@@ -82,20 +81,15 @@ public class Mercenary extends MovingEntity {
         dist.put(source, (double) 0);
         
         Queue<Position> posQueue = new LinkedList<Position>();
-        // let queuePos be a queue of every position in the grid
-        // for (Position pos : posList) {
-        //     posQueue.add(pos);
-        // }
         posQueue.add(source);
-        // Queue<Position> unvisited = posQueue;
-        // iterate through each position thru queuePos, use temp as reference
-        // pop items off temp (think of it as unvisited)
+        // start with source, and add neighbours onto queue
         while(posQueue.size() > 0) {
             // find next unvisited node with smallest dist
             Position pos = posQueue.poll();
             List<Position> cardinalNeighbours = getCardinalNeighbours(pos);
             for (Position currNeighbour : cardinalNeighbours) {
                 if (!dist.containsKey(currNeighbour)) continue;
+                // cost returns movement factor is swamp tile is present at neighbour
                 int moveCost = cost(entities, pos, currNeighbour);
                 if (dist.get(pos) + moveCost < dist.get(currNeighbour)) {
                     dist.put(currNeighbour, dist.get(pos) + moveCost);
@@ -114,7 +108,6 @@ public class Mercenary extends MovingEntity {
             return null;
         }
         while (!curr.equals(source)) {
-            System.out.println(curr);
             previous = curr;
             curr = prev.get(curr);
         }
