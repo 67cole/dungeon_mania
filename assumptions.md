@@ -110,3 +110,20 @@ LightBulb
 
 Switch doors
     - Switch doors can only be opened when switch next to it has a boulder on top, otherwise it goes back to being locked
+
+Midnight Armour
+    -   No Durability as it requires a rare item(Sun Stone) to be crafted.
+
+Sceptre
+    -   No Durability as it requires a rare item(Sun Stone) to be crafted.
+
+Buildables
+    -   Works in a FIFO format where the oldest items are used first in crafting.
+
+Andurill
+    -   No Durability as it is a Rare item
+    
+Sun Stone
+    -   The Sun Stone is not prioritized in crafting.
+    -   Not removed when used in crafting
+
