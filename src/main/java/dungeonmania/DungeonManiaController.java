@@ -620,7 +620,7 @@ public class DungeonManiaController {
                         // Takes into the account of collectable item
                         else {
                             List<String> nonRemovable = Arrays.asList("boulder", "BLUEportal", "REDportal","YELLOWportal","GREYportal",
-                            "switch", "door", "door_unlocked", "exit", "swamp_tile", "zombie_toast_spawner", "light_bulb_on","light_bulb_off");
+                            "switch", "door", "door_unlocked", "exit", "swamp_tile", "zombie_toast_spawner", "light_bulb_on","light_bulb_off", "switch_door");
                             int dontRemove = 0;
                             for (String curr : nonRemovable) {
                                 if (interactingEntity.getType().equals(curr)) dontRemove = 1;
@@ -783,11 +783,15 @@ public class DungeonManiaController {
         // Find switches to check lightbulb light up eligibility and door open eligibility
         for (Entity enti : entities) {
             if (enti.getType().equals("light_bulb_on") || enti.getType().equals("light_bulb_off")) {
+                System.out.println("Recognise light bulb");
                 LightBulb bulbEntity = (LightBulb) enti;
                 if (bulbEntity.checkSwitchBoulder(entities, main)) {
+                    System.out.println("Boulder on switch, hence turn on");
                     bulbEntity.lightOn();
+                    System.out.println(bulbEntity.getType());
                 } else {
                     bulbEntity.lightOff();
+                    System.out.println("Boulder not on switch, hence turn off");
                 }
             }
         }
@@ -1354,6 +1358,10 @@ public class DungeonManiaController {
                     case "light_bulb_off":
                         LightBulb bulb  = new LightBulb(position, type, entityId, false);
                         main.addEntities(bulb);
+                        break;
+                    case "switch_door":
+                        SwitchDoor switchDoor = new SwitchDoor(position, type, entityId, false, true);
+                        main.addEntities(switchDoor);
                         break;
 
                 }
