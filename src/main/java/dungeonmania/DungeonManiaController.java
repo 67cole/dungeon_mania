@@ -508,6 +508,8 @@ public class DungeonManiaController {
         Position playerSpawnPosition = null;
         main = currDungeon;
 
+        
+
 
         // Get the character class
         Character character = Character.getCharacter(entities);
@@ -807,6 +809,8 @@ public class DungeonManiaController {
                 }
             }
         }
+
+       
         // add all nearby entities to the bomb to entiitesToBeRemoved
         entitiesToBeRemoved.addAll(allNearbyEntities);
         // Remove the collectible from the map

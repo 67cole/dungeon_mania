@@ -672,7 +672,7 @@ public abstract class MovingEntity implements Entity {
             else {
                 characterHealth = characterHealth - ((enemyHealth * enemyAD) / 10);
             }
-
+            
             // Calculate if hydra will heal or not
             Random random = new Random();
             int HydraHealing = random.nextInt(2);
