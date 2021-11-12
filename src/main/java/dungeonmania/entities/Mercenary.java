@@ -55,6 +55,18 @@ public class Mercenary extends MovingEntity {
 
     }
 
+    public int cost (List<Entity> entities, Position source, Position dest) {
+
+        for (Entity ent : entities) {
+            if (ent.getPosition().equals(dest) && ent.getType().equals("swamp_tile")) {
+                System.out.println("HELALEPOWKADPOAKSD");
+                return ((SwampTile) ent).getMovementFactor();
+            }
+        }
+
+        return 1;
+    }
+
     public Position djikstra(List<Position> posList, Position source, List<Entity> entities) {
         
         // create hashmap of dist and prev
@@ -83,15 +95,10 @@ public class Mercenary extends MovingEntity {
             Position pos = posQueue.poll();
             List<Position> cardinalNeighbours = getCardinalNeighbours(pos);
             for (Position currNeighbour : cardinalNeighbours) {
-                if (!dist.containsKey(currNeighbour)) {
-                    continue;
-                }
-
-                if (dist.get(pos) + 1 < dist.get(currNeighbour)) {
-                    // System.out.print(currNeighbour);
-                    // System.out.printf(" ");
-                    // System.out.println(pos);
-                    dist.put(currNeighbour, dist.get(pos) + 1);
+                if (!dist.containsKey(currNeighbour)) continue;
+                int moveCost = cost(entities, pos, currNeighbour);
+                if (dist.get(pos) + moveCost < dist.get(currNeighbour)) {
+                    dist.put(currNeighbour, dist.get(pos) + moveCost);
                     prev.put(currNeighbour, pos);
                     posQueue.add(currNeighbour);
                 }
@@ -134,40 +141,10 @@ public class Mercenary extends MovingEntity {
 
         List<Position> posList = posList(entities);
 
-        // HashMap<Position, Position> prev = djikstra(posList, super.getPosition());
-        // if (prev.get(playerPosition) != null) {
-        //     System.out.println("USING DJIKSTRA\n\n\n");
-        //     // iteratively search for the starting move for mercenary
-        //     int mercenaryFound = 0;
-        //     Position mercPos = super.getPosition();
-        //     System.out.printf("mercPos is ");
-        //     System.out.println(mercPos);
-        //     System.out.println("Printed merc pos");
-        //     Position currDestination = playerPosition;
-        //     System.out.println("Player position is: " + playerPosition);
-        //     while (mercenaryFound == 0) {
-        //         Position curr = prev.get(currDestination);
-        //         System.out.println("Currdestination is: " + currDestination);
-        //         currDestination = curr;
-        //         System.out.println("curr is: " + curr);
-        //         System.out.println("mercPos is: " + mercPos);
-        //         System.out.println(prev);
-        //         if (curr.equals(mercPos)) {
-        //             super.setPosition(curr);
-        //             mercenaryFound = 1;
-        //         }
-        //     }
         Position newPos = djikstra(posList, super.getPosition(), entities);
-        System.out.println(super.getPosition());
-        System.out.println("new pos: " + newPos);
         if (newPos != null) {
-            System.out.println("DJIKSTRIJAOSDIJOAIWDJOIMADOIDoi");
             super.setPosition(newPos);
         } else {
-            // TODO: NEW FUNCTION
-            // Position movementDir = djikstra(entities, playerPosition);
-            // super.setPosition(super.getPosition().translateBy(movementDir));
-
             Position current = super.getPosition();
 
             // Get the adjacent positions around mercenary
