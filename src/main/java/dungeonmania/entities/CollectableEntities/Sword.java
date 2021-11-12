@@ -3,6 +3,8 @@ package dungeonmania.entities.CollectableEntities;
 import dungeonmania.entities.CollectableEntity;
 import dungeonmania.util.Position;
 
+import java.util.List;
+
 public class Sword extends CollectableEntity{
     public final static int ATTACK = 3;
 
@@ -73,5 +75,19 @@ public class Sword extends CollectableEntity{
             return this;
         }
         return null;
+    }
+
+
+    /**
+     * Checks whether the player has a sword to destory the spawner
+     * @param inventory - the player's inventory
+     */
+    public static boolean playerHasSword(List<CollectableEntity> inventory) {
+        // Checks for a sword in the inventory
+        for (CollectableEntity item : inventory) {
+            if (item.getType().equals("sword")) return true;
+        }
+
+        return false;
     }
 }

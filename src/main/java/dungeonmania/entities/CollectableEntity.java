@@ -122,8 +122,8 @@ public abstract class CollectableEntity implements Entity {
         if (wood >= 1 && arrow >= 3 && bow != 1) {
             main.buildables.add("bow");
         } 
-        // Creating a shield  if shield does not already exist in buildables
-        if (wood >= 2 && (treasure >= 1 || key == 1)&& shield != 1) {
+        // Creating a shield if shield does not already exist in buildables
+        if (wood >= 2 && (treasure >= 1 || key == 1 || sunStone >= 1)&& shield != 1) {
             main.buildables.add("shield");
         } 
         // Creating a sceptre if sceptre does not already exist in buildables
@@ -150,7 +150,7 @@ public abstract class CollectableEntity implements Entity {
      * Searches for a key
      * @param inventory - inventory of the player
      */
-    public boolean keyChecker(List<CollectableEntity> inventory) {
+    public static boolean keyChecker(List<CollectableEntity> inventory) {
         for (CollectableEntity item: inventory) {
             if (item.getType().equals("key")) {
                 return true;

@@ -1,9 +1,9 @@
 package dungeonmania.entities.RareCollectableEntities;
 
-import dungeonmania.entities.CollectableEntity;
+import dungeonmania.entities.CollectableEntities.Sword;
 import dungeonmania.util.Position;
 
-public class Anduril extends CollectableEntity{
+public class Anduril extends Sword{
     /**
      * Creates the Anduril
      * @param position - the current position in the dungeon
@@ -13,5 +13,6 @@ public class Anduril extends CollectableEntity{
      */
     public Anduril(Position position, String type, String ID, boolean IsInteractable) {
         super(position ,type, ID, IsInteractable);
+        this.setAttack((this.getAttack() * 5) / 2);
     }
 }

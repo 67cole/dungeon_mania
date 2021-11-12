@@ -289,6 +289,10 @@ public abstract class MovingEntity implements Entity {
                         return false;
                     }
 
+                    if (entity.getType().equals("switch_door") && entity.getPosition().equals(attemptedMove)) {
+                        return false;
+                    }
+
                 }
                 break;
 
@@ -301,6 +305,9 @@ public abstract class MovingEntity implements Entity {
                     }
 
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove1)) {
+                        return false;
+                    }
+                    if (entity.getType().equals("switch_door") && entity.getPosition().equals(attemptedMove1)) {
                         return false;
                     }
 
@@ -318,6 +325,9 @@ public abstract class MovingEntity implements Entity {
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove2)) {
                         return false;
                     }
+                    if (entity.getType().equals("switch_door") && entity.getPosition().equals(attemptedMove2)) {
+                        return false;
+                    }
 
                 }
                 break;
@@ -332,6 +342,9 @@ public abstract class MovingEntity implements Entity {
                     }
 
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove3)) {
+                        return false;
+                    }
+                    if (entity.getType().equals("switch_door") && entity.getPosition().equals(attemptedMove3)) {
                         return false;
                     }
 
@@ -584,8 +597,10 @@ public abstract class MovingEntity implements Entity {
             // Simulate a round of battle
             int weaponAtk = 0;
             boolean charHasArmour = false;
+            boolean charHasMArmour = false;
             boolean charHasShield = false;
             boolean charHasBow = false;
+            boolean charHasAnduril = false;
             boolean enemyArmour = false;
             Sword swordHolder = null;
             Armour armourHolder = null;
@@ -607,6 +622,9 @@ public abstract class MovingEntity implements Entity {
                     armour.reduceDurability();
                     armourHolder = armour.checkDurability();
                 }
+                if (item.getType().equals("midnight_armour")) {
+                    charHasMArmour = true;
+                }
                 if (item.getType().equals("bow")) {
                     Bow bow = (Bow) item;
                     charHasBow = true;
@@ -618,6 +636,9 @@ public abstract class MovingEntity implements Entity {
                     charHasShield = true;
                     shield.reduceDurability();
                     shieldHolder = shield.checkDurability();
+                }
+                if (item.getType().equals("anduril")) {
+                    charHasAnduril = true;
                 }
             }
             if (swordHolder != null) {
@@ -637,6 +658,9 @@ public abstract class MovingEntity implements Entity {
             int enemyHealth = this.getHealth();
             int enemyAD = this.getAttack();
             // Calculations for character
+            if (charHasMArmour) {
+                enemyAD = enemyAD / 4;
+            }
             if (charHasArmour) {
                 if (charHasShield) {
                     characterHealth = characterHealth - ((enemyHealth * (enemyAD / 4)) / 10);
@@ -652,7 +676,15 @@ public abstract class MovingEntity implements Entity {
             // Calculate if hydra will heal or not
             Random random = new Random();
             int HydraHealing = random.nextInt(2);
-            
+
+            // If andurill is in inventory, set healing to 0
+            if (charHasAnduril) {
+                HydraHealing = 0;
+                // If enemy is a boss, character AD is tripled
+                if (this.getType().equals("assassin") || this.getType().equals("hydra")) {
+                    characterAD = characterAD * 3;
+                }
+            }
             // Calculations for if the enemy is a hydra and it heals 
             if (this.getType().equals("hydra") && HydraHealing == 1) {
                 enemyHealth = hydraBattleHealing(enemyHealth, characterHealth, characterAD, weaponAtk, enemyArmour, charHasBow);
@@ -660,6 +692,9 @@ public abstract class MovingEntity implements Entity {
 
             // Otherwise, calculate normally for an enemy, or hydra when it doesn't heal
             else {
+                if (charHasMArmour) {
+                    characterAD = characterAD + 6;
+                }
                 if (enemyArmour) {
                     enemyHealth = enemyHealth - ((characterHealth * ((characterAD + weaponAtk) / 2)) / 5);
                     if (charHasBow) {

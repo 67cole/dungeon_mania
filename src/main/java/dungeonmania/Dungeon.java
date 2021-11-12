@@ -172,4 +172,58 @@ public class Dungeon {
 
         return entitiesAtPos;
     }
+
+    /**
+     * This function checks whether the dungeon exists
+     * @param dungeonName - this is the dungeon name
+     */
+    public static boolean dungeonNotValid(String dungeonName) {
+       
+        return true;
+    }
+
+    /**
+     * This function checks whether the gamemode is valid
+     * @param gameMode - this is the gameMode
+     */
+    public static boolean gameModeNotValid(String gameMode) {
+        for (String gamemodeState : DungeonManiaController.getGameModes()) {
+            if (gamemodeState.equals(gameMode)) return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Checks whether the entityID is valid or not
+     * @param entityId - the id given in the argument 
+     * @param entities - the list of all entities in the dungeon
+     */
+    public static boolean entityIdCheck(String entityId, List<Entity> entities) {
+        for (Entity entity : entities) {
+            if (entity.getID().equals(entityId)) return true;
+        }
+
+        return false; 
+    }
+
+    /**
+     * Return the entity we are interacting with
+     * @param entityId
+     * @param entities
+     * @return entity
+     */
+    public static Entity IdToEntity(String entityId, List<Entity> entities) {
+        for (Entity entity : entities) {
+            if (entity.getID().equals(entityId)) return entity; 
+        }
+
+        // Returning null will never occur
+        return null;
+    }
+
+
+
+    
 }
