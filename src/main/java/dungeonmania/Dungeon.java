@@ -116,6 +116,11 @@ public class Dungeon {
         return buildables;
     }
 
+    public void setBuildables(List<String> buildables) {
+        this.buildables = buildables;
+        return;
+    }
+
     public boolean getPeaceful() {
         return peaceful; 
     }

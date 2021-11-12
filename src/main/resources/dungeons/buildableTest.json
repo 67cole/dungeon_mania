@@ -41,6 +41,16 @@
         "x": 8,
         "y": 1,
         "type": "treasure"
+      },
+      {
+        "x": 9,
+        "y": 1,
+        "type": "sun_stone"
+      },
+      {
+        "x": 10,
+        "y": 1,
+        "type": "armour"
       }
     ]
 }
