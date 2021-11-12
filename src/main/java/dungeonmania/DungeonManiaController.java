@@ -81,7 +81,7 @@ public class DungeonManiaController {
      * @return List<String>
      */
     public static List<String> getGameModes() {
-        return Arrays.asList("Standard", "Peaceful", "Hard");
+        return Arrays.asList("standard", "peaceful", "hard");
     }
 
     /**
@@ -129,11 +129,11 @@ public class DungeonManiaController {
         currDungeon = main;
 
         switch (gameMode) {
-            case "Peaceful":
+            case "peaceful":
                 currDungeon.setPeaceful(true);
                 break;
 
-            case "Hard":
+            case "hard":
                 currDungeon.setHard(true);
                 break;
         }
@@ -145,8 +145,6 @@ public class DungeonManiaController {
             erList.add(er);
         }
         
-        // TODO: Sample goals
-
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
         lastTick = dr;
         clearDatabase();
@@ -581,7 +579,7 @@ public class DungeonManiaController {
                         }
                         //If key doesnt exist, dont move
                         else {
-                            continue;
+                            movementDirection = Direction.NONE;
                         } 
                     }
                 }
@@ -619,13 +617,18 @@ public class DungeonManiaController {
                         }
                         // If the character is invisible
                         else if (temp2.isInvisible()) {
+                            // Item still needs to be removed if it is picked up
+                            if (interactingEntity.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity")) {
+                                entitiesToBeRemoved.add(interactingEntity);
+                            }
                             continue;
                         }
                         // If the character isnt dead, then the enemy has to have died in the case of battle
                         // Takes into the account of collectable item
                         else {
                             List<String> nonRemovable = Arrays.asList("boulder", "BLUEportal", "REDportal","YELLOWportal","GREYportal",
-                            "switch", "door", "door_unlocked", "exit", "swamp_tile", "zombie_toast_spawner", "light_bulb_on","light_bulb_off");
+                            "switch", "door", "door_unlocked", "exit", "swamp_tile", "zombie_toast_spawner", "light_bulb_on","light_bulb_off",
+                            "switch_door", "switchdoor_unlocked");
                             int dontRemove = 0;
                             for (String curr : nonRemovable) {
                                 if (interactingEntity.getType().equals(curr)) dontRemove = 1;
@@ -780,7 +783,31 @@ public class DungeonManiaController {
                 ArrayList<Position> adjacentPos = entPos.getCardinallyAdjacentPositions();
                 if (playerPos.equals(adjacentPos.get(0)) || playerPos.equals(adjacentPos.get(1)) || playerPos.equals(adjacentPos.get(2)) || playerPos.equals(adjacentPos.get(3))) {
                     ((Boulder) enti).doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);    
-                    ((Boulder) enti).LightUpBulb(entities, (Character) tempChar, main, enti, allNearbyEntities);
+                }
+            }
+        }
+
+
+        // Find switches to check lightbulb light up eligibility
+        for (Entity enti : entities) {
+            if (enti.getType().equals("light_bulb_on") || enti.getType().equals("light_bulb_off")) {
+                LightBulb bulbEntity = (LightBulb) enti;
+                if (bulbEntity.checkSwitchBoulder(main)) {
+                    bulbEntity.lightOn();
+                } else {
+                    bulbEntity.lightOff();
+                }
+            }
+        }
+
+        // Find switch doors to check unlock door eligibility
+        for (Entity enti : entities) {
+            if (enti.getType().equals("switch_door") || enti.getType().equals("switchdoor_unlocked")) {
+                SwitchDoor doorEntity = (SwitchDoor) enti;
+                if (doorEntity.checkSwitchBoulder(main)) {
+                    doorEntity.doorUnlock();
+                } else {
+                    doorEntity.doorLock();
                 }
             }
         }
@@ -843,10 +870,6 @@ public class DungeonManiaController {
         System.out.println("passing thru interact");
         // Get entity list
         List<Entity> entities = currDungeon.getEntities();
-        // System.out.println("size of list: " + entities.size());
-        // for (Entity entity: entities) {
-        //     System.out.println(entity.getType() + "  " + entity.getID());
-        // }
 
         // Get inventory
         List<CollectableEntity> inventory = currDungeon.getInventory();
@@ -894,7 +917,6 @@ public class DungeonManiaController {
                 throw new InvalidActionException("The player does not have a weapon to destory the spawner.");
             }
 
-            System.out.println("lolfewlfw");
             interactWithSpawner(inventory, interaction);
         }
 
@@ -932,11 +954,11 @@ public class DungeonManiaController {
                 if (wood >= 1 && arrow >= 3) {
                     break;
                 }
-                if (item.getType().equals("wood") && wood < 2) {
+                if (item.getType().equals("wood") && wood < 1) {
                     itemsToBeRemoved.add(item);
                     wood++;
                 }
-                if (item.getType().equals("arrow") && arrow < 4) {
+                if (item.getType().equals("arrow") && arrow < 3) {
                     itemsToBeRemoved.add(item);
                     arrow++;
                 }
@@ -955,19 +977,19 @@ public class DungeonManiaController {
             int treasure = 0;
             int wood = 0;
             for (CollectableEntity item: currDungeon.inventory) {
-                if (wood >= 2 && treasure >= 1 && key >= 1) {
+                if (wood >= 2 && (treasure >= 1 || key >= 1)) {
                     break;
                 }
-                if (item.getType().equals("wood") && wood < 3) {
+                if (item.getType().equals("wood") && wood < 2) {
                     itemsToBeRemoved.add(item);
                     wood++;
                 }
-                if (item.getType().equals("key") && key < 2 && treasure < 2) {
+                if (item.getType().equals("key") && key < 1 && treasure < 1) {
                     itemsToBeRemoved.add(item);
                     currDungeon.setKeyStatus(true);
                     key++;
                 }
-                 if (item.getType().equals("treasure") && treasure < 2 && key < 2) {
+                if (item.getType().equals("treasure") && treasure < 1 && key < 1) {
                     itemsToBeRemoved.add(item);
                     treasure++;
                 }
@@ -978,11 +1000,110 @@ public class DungeonManiaController {
             currDungeon.inventory.add(shield);
             currDungeon.buildables.remove(buildable);
         }
-
+        if (buildable.equals("midnight_armour")) {
+            String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+            currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+            for (CollectableEntity item: currDungeon.inventory) {
+                if (item.getType().equals("armour")) {
+                    itemsToBeRemoved.add(item);
+                    break;
+                }
+            }
+            // Position needs to be stated as checkNext requires a position to run
+            Position tempPos = new Position(-1, -1);
+            MidnightArmour mArmour = new MidnightArmour(tempPos, "midnight_armour", entityId, true);
+            currDungeon.inventory.add(mArmour);
+            currDungeon.buildables.remove(buildable);
+        }
+        if (buildable.equals("sceptre")) {
+            String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+            currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+            // Removing the items
+            int key = 0;
+            int treasure = 0;
+            int wood = 0;
+            int arrow = 0;
+            for (CollectableEntity item: currDungeon.inventory) {
+                if ((wood >= 1 || arrow >= 2) && (key >= 1 || treasure >= 1)) {
+                    break;
+                }
+                if (item.getType().equals("wood") && wood < 1 && arrow < 1) {
+                    itemsToBeRemoved.add(item);
+                    wood++;
+                }
+                if (item.getType().equals("arrow") && arrow <= 2 && wood < 1) {
+                    itemsToBeRemoved.add(item);
+                    arrow++;
+                }
+                if (item.getType().equals("key") && key < 1 && treasure < 1) {
+                    itemsToBeRemoved.add(item);
+                    currDungeon.setKeyStatus(true);
+                    key++;
+                }
+                if (item.getType().equals("treasure") && treasure < 1 && key < 1) {
+                    itemsToBeRemoved.add(item);
+                    treasure++;
+                }
+            }
+            Position tempPos = new Position(-1, -1);
+            Sceptre sceptre = new Sceptre(tempPos, "sceptre", entityId, true);
+            currDungeon.inventory.add(sceptre);
+            currDungeon.buildables.remove(buildable);
+        }
+        // Removing the items
         for (CollectableEntity item: itemsToBeRemoved) {
             currDungeon.inventory.remove(item);
         }
 
+        // Check if buildables can still be made
+        int wood = 0;
+        int arrow = 0;
+        int key = 0;
+        int armour = 0;
+        int treasure = 0;
+        int sunStone = 0;
+        for (CollectableEntity item: currDungeon.inventory) {
+            switch(item.getType()) {
+                case "wood":
+                    wood++;
+                    break;
+                case "arrow":
+                    arrow++;
+                    break;
+                case "key":
+                    key++;
+                    break;
+                case "treasure":
+                    treasure++;
+                    break;
+                case "sun_stone":
+                    sunStone++;
+                    break;
+                case "armour":
+                    armour++;
+                    break;
+            }
+        }
+        List<String> newBuildables = new ArrayList<String>();
+        // Checking Bow
+        if (wood >= 1 && arrow >= 3) {
+            newBuildables.add("bow");
+        } 
+        // Checking Shield
+        if (wood >= 2 && (treasure >= 1 || key == 1)) {
+            newBuildables.add("shield");
+        } 
+        // Checking Sceptre
+        if ((wood >= 1 || arrow >= 2) && (key >= 1 || treasure >= 1) && sunStone >= 1) {
+            newBuildables.add("sceptre");
+        } 
+        // Checking MidnightArmour
+        if (armour >= 1 && sunStone >= 1) {
+            if (zombieChecker(currDungeon.getEntities())) {
+                newBuildables.add("midnight_armour");
+            }
+        }
+        currDungeon.setBuildables(newBuildables);
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
         for(Entity entity: currDungeon.getEntities()) {
             EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
@@ -1003,6 +1124,53 @@ public class DungeonManiaController {
         return dr;
     }
 
+    public DungeonResponse generateDungeon(int xStart, int yStart, int xEnd, int yEnd, String gameMode) throws IllegalArgumentException {
+        if (!Dungeon.gameModeNotValid(gameMode)) {
+            throw new IllegalArgumentException("This gamemode is not valid.");
+        }
+
+        List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
+        List<String> emptyBuildables = new ArrayList<String>();
+
+        // Create the unique identifier for the new dungeon
+        String dungeonName = "Maze" + dungeonCounter;
+        String dungeonId = String.format("dungeon%d", dungeonCounter);
+        dungeonCounter += 1;
+
+        // Make a new dungeon object and add it to the dungeons list
+        String goals = ":exit";
+        Dungeon main = new Dungeon(dungeonName, dungeonId, goals);
+        dungeons.add(main);
+        currDungeon = main;
+
+        switch (gameMode) {
+            case "peaceful":
+                currDungeon.setPeaceful(true);
+                break;
+
+            case "hard":
+                currDungeon.setHard(true);
+                break;
+        }
+
+
+        List<EntityResponse> erList = new ArrayList<EntityResponse>();
+        for (Entity entity: main.getEntities()) {
+            EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
+            erList.add(er);
+        }
+        
+
+        Maze maze = new Maze(xStart, yStart, xEnd, yEnd);
+        boolean map[][] = maze.getMap();
+
+        addEntitiesToMaze(main, map, xStart, yStart, xEnd, yEnd);
+
+        DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
+        lastTick = dr;
+        
+        return dr;
+    }
 
     // either 1 tick or 5 ticks
     public DungeonResponse rewind(int ticks) throws IllegalArgumentException {
@@ -1674,10 +1842,26 @@ public class DungeonManiaController {
                         LightBulb bulb  = new LightBulb(position, type, entityId, false);
                         main.addEntities(bulb);
                         break;
+<<<<<<< HEAD
                     case "time_turner":
                         TimeTurner tt = new TimeTurner(position, type, entityId, false);
                         main.addEntities(tt);
                         break;
+=======
+                    case "sun_stone":
+                        SunStone sunStone  = new SunStone(position, type, entityId, false);
+                        main.addEntities(sunStone);
+                        break;
+                    case "armour":
+                        Armour armour  = new Armour(position, type, entityId, false);
+                        main.addEntities(armour);
+                        break;
+                    case "switch_door":
+                        SwitchDoor switchDoor = new SwitchDoor(position, type, entityId, false, true);
+                        main.addEntities(switchDoor);
+                        break;
+
+>>>>>>> master
                 }
             }
         } catch (Exception e) {
@@ -2055,6 +2239,62 @@ public class DungeonManiaController {
             }
         }
     }
+    /**
+     * Searches for a zombie
+     * @param entites - list of entities in the dungeon
+     */
+    public boolean zombieChecker(List<Entity> entities) {
+        for (Entity entity: entities) {
+            if (entity.getType().equals("zombie_toast")) {
+                return false;
+            }
+        }
+        return true;
+    }
 
+    /**
+     * Helper function that takes in the randomly generated maze and adds all entities into entities list
+     * @param main
+     * @param map[][]
+     * @param xStart
+     * @param yStart
+     * @param xEnd
+     * @param yEnd
+     */
+    public void addEntitiesToMaze(Dungeon main, boolean map[][], int xStart, int yStart, int xEnd, int yEnd) {
+        for (int row = 0; row < map.length; row++) {
+
+            for (int col = 0; col < map[row].length; col++) {
+
+                Position position = new Position(col, row);
+
+                if (col == yStart && row == xStart) {
+                    String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                    currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+                    
+                    Character characterEntity = new Character(position, "player", entityId, false);
+                    main.addEntities(characterEntity);  
+                    characterEntity.setSpawn(position);
+                }
+
+                else if (col == yEnd && row == xEnd) {
+                    String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                    currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+
+                    Exit exitEntity = new Exit(position, "exit", entityId, false);
+                    main.addEntities(exitEntity);
+                }
+
+                else if (map[row][col] == false || row == 0 || row == 49 ||  col == 0 || col == 49) {
+                    String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                    currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+
+                    Wall wallEntity = new Wall(position, "wall", entityId , false);
+                    main.addEntities(wallEntity);   
+                }
+
+            }
+        }
+    }
 
 }
