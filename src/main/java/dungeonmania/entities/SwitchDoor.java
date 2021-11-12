@@ -5,24 +5,26 @@ import java.util.List;
 import dungeonmania.Dungeon;
 import dungeonmania.util.Position;
 
-public class LightBulb extends StaticEntity {
+public class SwitchDoor extends StaticEntity{
 
-    public LightBulb(Position position, String type, String ID, boolean isInteractable) {
+    private boolean locked;
+    public SwitchDoor(Position position, String type, String ID, boolean isInteractable, boolean locked) {
         super(position,type, ID, isInteractable);
-    }  
-
-    /**
-     * Turns lightbulb on
-     */
-    public void lightOn () {
-        this.setType("light_bulb_on");
+        this.locked = locked;
     }
 
     /**
-     * Turns lightbulb off
+     * Unlocks door
      */
-    public void lightOff () {
-        this.setType("light_bulb_off");
+    public void doorUnlock() {
+        this.setType("switchdoor_unlocked");
+    }
+
+    /**
+     * Locks door
+     */
+    public void doorLock() {
+        this.setType("switch_door");
     }
 
     /**
@@ -72,4 +74,5 @@ public class LightBulb extends StaticEntity {
         
         return false;
     }
+
 }
