@@ -100,21 +100,6 @@ public class Boulder extends StaticEntity{
         }
         return false;
     }
-
-    /**
-     * returns the lightbulb entity if its next to the switch
-     * @param entities
-     * @return LightBulb
-     */
-    public LightBulb isBulbAtPos(List<Entity> entities) {
-        for (Entity currEnt : entities) {
-            if (currEnt.getType().equals("light_bulb_off")) {
-                LightBulb bulbEntity = (LightBulb) currEnt;
-                return bulbEntity;
-            }
-        }
-        return null;
-    }
     
     /**
      * Explodes any bombs adjacent to a given bomb position
@@ -192,53 +177,4 @@ public class Boulder extends StaticEntity{
             }
         }
     }
-    /**
-     * Explodes any bombs adjacent to a given bomb position
-     * @param entitiesAtPos
-     * @param entities
-     * @param pos
-     * @param main
-     * @param player
-     * @param NearbyEntities
-     */
-    public void LightUpBulb(List<Entity> entities, Character player,  Dungeon main, Entity boulder, List<Entity> nearby) {
-        // pos = boulder position
-        Position boulderPos = boulder.getPosition();
-        // find a switch
-
-        List<Entity> entitiesAtBoulder = main.getEntitiesAtPos(boulderPos);
-        Position N = boulderPos.translateBy(0, -1);
-        Position E = boulderPos.translateBy(1, 0);
-        Position S = boulderPos.translateBy(0, 1);
-        Position W = boulderPos.translateBy(-1, 0);
-        
-        List<Entity> entsAbove = main.getEntitiesAtPos(N);
-        List<Entity> entsRight = main.getEntitiesAtPos(E);
-        List<Entity> entsBelow = main.getEntitiesAtPos(S);
-        List<Entity> entsLeft = main.getEntitiesAtPos(W);
-
-        for (Entity currEnt : entitiesAtBoulder) {
-            if (currEnt.getType().equals("switch")) {
-                // see if there are bombs cardinally adjacent, if so, explode any adjacent bombs
-                if (isBulbAtPos(entsAbove) != null) {
-                    LightBulb bulb = isBulbAtPos(entsAbove);
-                    bulb.lightOn();            
-                }
-                if (isBulbAtPos(entsRight) != null) {
-                    LightBulb bulb = isBulbAtPos(entsRight);
-                    bulb.lightOn();   
-                } 
-                if (isBulbAtPos(entsBelow) != null) {
-                    LightBulb bulb = isBulbAtPos(entsBelow);
-                    bulb.lightOn();  
-                } 
-                if (isBulbAtPos(entsLeft) != null) {
-                    LightBulb bulb = isBulbAtPos(entsLeft);
-                    bulb.lightOn();  
-                }
-                
-            }
-        }
-    }
-
 }
