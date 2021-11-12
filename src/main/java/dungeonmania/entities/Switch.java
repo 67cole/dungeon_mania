@@ -4,20 +4,28 @@ import java.util.List;
 import dungeonmania.util.Position;
 
 public class Switch extends StaticEntity {
-    
+    private String logic;
+
+
+
     /**
      * Constructor for Switch
      * @param position
      * @param type
      * @param ID
      * @param IsInteractable
+     * @param logic
      */
-    public Switch(Position position, String type, String ID, boolean isInteractable) {
-        super(position,type, ID, isInteractable);
+    public Switch(Position position, String type, String ID, boolean isInteractable, String logic) {
+        super(position, type, ID, isInteractable);
+        this.logic = logic;
     }
-
     
 
+    public String getLogic() {
+        return this.logic;
+    }
+    
     /**
      * Determines if a boulder is present on a switch
      * @param entities

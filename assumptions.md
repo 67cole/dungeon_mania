@@ -122,7 +122,7 @@ Buildables
 
 Andurill
     -   No Durability as it is a Rare item
-    
+
 Sun Stone
     -   The Sun Stone is not prioritized in crafting.
     -   Not removed when used in crafting
