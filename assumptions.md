@@ -103,3 +103,10 @@ Interacting
 SwampTiles
     -   The movement factor determines the number of ticks it takes for a non-character entity to traverse to
     a new position, for example , once an entity lands on a swamp tile with a movement factor of 2, the entity would leave that tile on the second tick
+
+LightBulb
+    - All lightbulbs given in the json files for starting the game are turned off
+    - Lightbulbs would turn off when the switch next to it no longer has a boulder on top
+
+Switch doors
+    - Switch doors can only be opened when switch next to it has a boulder on top, otherwise it goes back to being locked

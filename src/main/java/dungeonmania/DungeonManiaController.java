@@ -1369,7 +1369,7 @@ public class DungeonManiaController {
                         main.addEntities(bulb);
                         break;
                     case "switch_door":
-                        SwitchDoor switchDoor = new SwitchDoor(position, type, entityId, false, true);
+                        SwitchDoor switchDoor = new SwitchDoor(position, type, entityId, false);
                         main.addEntities(switchDoor);
                         break;
 
