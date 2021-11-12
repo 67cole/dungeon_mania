@@ -4,6 +4,7 @@ import dungeonmania.util.Position;
 import java.util.ArrayList;
 import java.util.List;
 
+import dungeonmania.response.models.DungeonResponse;
 import dungeonmania.response.models.ItemResponse;
 import dungeonmania.entities.CollectableEntity;
 import dungeonmania.entities.Entity;
@@ -218,7 +219,4 @@ public class Dungeon {
         return null;
     }
 
-
-
-    
 }

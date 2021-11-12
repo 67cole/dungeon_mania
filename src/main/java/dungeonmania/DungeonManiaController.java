@@ -995,6 +995,14 @@ public class DungeonManiaController {
         return dr;
     }
 
+    public DungeonResponse generateDungeon(int xStart, int yStart, int xEnd, int yEnd, String gameMode) throws IllegalArgumentException {
+        
+
+
+        return null;
+    }
+
+
 
 
     /**
