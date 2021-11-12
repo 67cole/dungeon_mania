@@ -80,7 +80,7 @@ public class DungeonManiaController {
      * @return List<String>
      */
     public static List<String> getGameModes() {
-        return Arrays.asList("Standard", "Peaceful", "Hard");
+        return Arrays.asList("standard", "peaceful", "hard");
     }
 
     /**
@@ -128,11 +128,11 @@ public class DungeonManiaController {
         currDungeon = main;
 
         switch (gameMode) {
-            case "Peaceful":
+            case "peaceful":
                 currDungeon.setPeaceful(true);
                 break;
 
-            case "Hard":
+            case "hard":
                 currDungeon.setHard(true);
                 break;
         }
@@ -144,8 +144,6 @@ public class DungeonManiaController {
             erList.add(er);
         }
         
-        // TODO: Sample goals
-
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
         lastTick = dr;
         
@@ -1015,6 +1013,53 @@ public class DungeonManiaController {
         return dr;
     }
 
+    public DungeonResponse generateDungeon(int xStart, int yStart, int xEnd, int yEnd, String gameMode) throws IllegalArgumentException {
+        if (!Dungeon.gameModeNotValid(gameMode)) {
+            throw new IllegalArgumentException("This gamemode is not valid.");
+        }
+
+        List<ItemResponse> emptyInventory = new ArrayList<ItemResponse>();
+        List<String> emptyBuildables = new ArrayList<String>();
+
+        // Create the unique identifier for the new dungeon
+        String dungeonName = "Maze" + dungeonCounter;
+        String dungeonId = String.format("dungeon%d", dungeonCounter);
+        dungeonCounter += 1;
+
+        // Make a new dungeon object and add it to the dungeons list
+        String goals = ":exit";
+        Dungeon main = new Dungeon(dungeonName, dungeonId, goals);
+        dungeons.add(main);
+        currDungeon = main;
+
+        switch (gameMode) {
+            case "peaceful":
+                currDungeon.setPeaceful(true);
+                break;
+
+            case "hard":
+                currDungeon.setHard(true);
+                break;
+        }
+
+
+        List<EntityResponse> erList = new ArrayList<EntityResponse>();
+        for (Entity entity: main.getEntities()) {
+            EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
+            erList.add(er);
+        }
+        
+
+        Maze maze = new Maze(xStart, yStart, xEnd, yEnd);
+        boolean map[][] = maze.getMap();
+
+        addEntitiesToMaze(main, map, xStart, yStart, xEnd, yEnd);
+
+        DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
+        lastTick = dr;
+        
+        return dr;
+    }
 
 
     /**
@@ -1745,5 +1790,49 @@ public class DungeonManiaController {
         }
     }
 
+    /**
+     * Helper function that takes in the randomly generated maze and adds all entities into entities list
+     * @param main
+     * @param map[][]
+     * @param xStart
+     * @param yStart
+     * @param xEnd
+     * @param yEnd
+     */
+    public void addEntitiesToMaze(Dungeon main, boolean map[][], int xStart, int yStart, int xEnd, int yEnd) {
+        for (int row = 0; row < map.length; row++) {
+
+            for (int col = 0; col < map[row].length; col++) {
+
+                Position position = new Position(col, row);
+
+                if (col == yStart && row == xStart) {
+                    String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                    currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+                    
+                    Character characterEntity = new Character(position, "player", entityId, false);
+                    main.addEntities(characterEntity);  
+                    characterEntity.setSpawn(position);
+                }
+
+                else if (col == yEnd && row == xEnd) {
+                    String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                    currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+
+                    Exit exitEntity = new Exit(position, "exit", entityId, false);
+                    main.addEntities(exitEntity);
+                }
+
+                else if (map[row][col] == false || row == 0 || row == 49 ||  col == 0 || col == 49) {
+                    String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
+                    currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
+
+                    Wall wallEntity = new Wall(position, "wall", entityId , false);
+                    main.addEntities(wallEntity);   
+                }
+
+            }
+        }
+    }
 
 }
