@@ -834,6 +834,8 @@ public class DungeonManiaController {
 
 
     public DungeonResponse interact(String entityId) throws IllegalArgumentException, InvalidActionException {
+        // interact works with only zombie spawner and mercenary - so maybe set isInteractable for the rest to false.....?
+
         System.out.println("passing thru interact");
         // Get entity list
         List<Entity> entities = currDungeon.getEntities();
