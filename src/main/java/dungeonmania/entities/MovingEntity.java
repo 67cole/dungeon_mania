@@ -289,6 +289,10 @@ public abstract class MovingEntity implements Entity {
                         return false;
                     }
 
+                    if (entity.getType().equals("switch_door") && entity.getPosition().equals(attemptedMove)) {
+                        return false;
+                    }
+
                 }
                 break;
 
@@ -301,6 +305,9 @@ public abstract class MovingEntity implements Entity {
                     }
 
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove1)) {
+                        return false;
+                    }
+                    if (entity.getType().equals("switch_door") && entity.getPosition().equals(attemptedMove1)) {
                         return false;
                     }
 
@@ -318,6 +325,9 @@ public abstract class MovingEntity implements Entity {
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove2)) {
                         return false;
                     }
+                    if (entity.getType().equals("switch_door") && entity.getPosition().equals(attemptedMove2)) {
+                        return false;
+                    }
 
                 }
                 break;
@@ -332,6 +342,9 @@ public abstract class MovingEntity implements Entity {
                     }
 
                     if (entity.getType().equals("wall") && entity.getPosition().equals(attemptedMove3)) {
+                        return false;
+                    }
+                    if (entity.getType().equals("switch_door") && entity.getPosition().equals(attemptedMove3)) {
                         return false;
                     }
 

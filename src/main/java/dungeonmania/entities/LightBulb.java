@@ -11,11 +11,16 @@ public class LightBulb extends StaticEntity {
         super(position,type, ID, isInteractable);
     }  
 
-
+    /**
+     * Turns lightbulb on
+     */
     public void lightOn () {
         this.setType("light_bulb_on");
     }
 
+    /**
+     * Turns lightbulb off
+     */
     public void lightOff () {
         this.setType("light_bulb_off");
     }
@@ -26,7 +31,7 @@ public class LightBulb extends StaticEntity {
      * @param entities
      * @return boolean
      */
-    public boolean checkSwitchBoulder(List<Entity> entities, Dungeon main) {
+    public boolean checkSwitchBoulder(Dungeon main) {
         //Get all entities that are cardinally adjacent to the lightbulb
         Position N = super.getPosition().translateBy(0, -1);
         Position E = super.getPosition().translateBy(1, 0);
