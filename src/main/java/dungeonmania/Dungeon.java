@@ -3,10 +3,14 @@ package dungeonmania;
 import dungeonmania.util.Position;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.HashMap; 
 
 import dungeonmania.response.models.ItemResponse;
 import dungeonmania.entities.CollectableEntity;
 import dungeonmania.entities.Entity;
+
 
 
 public class Dungeon {
@@ -209,6 +213,18 @@ public class Dungeon {
         return array;
     }
 
+    public Position[][] posGrid(List<Entity> entities) {
+        Position[][] array = new Position[16][18];
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 18; j++) {
+                array[i][j] = new Position(j, i);
+            }
+        }
+        return array;
+    }
+
+    
+
     public void printDungeon(int[][] dungeonArray) {
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 18; j++) {
@@ -229,7 +245,7 @@ public class Dungeon {
         int [][] adjMatrix = new int[288][288];
         for (int row = 0; row < 288; row++) {
             for (int col = 0; col < 288; col++) {
-                adjMatrix[row][col] = 9;
+                adjMatrix[row][col] = 99;
                 if (col == row) adjMatrix[row][col] = 0;
             }
         }
@@ -239,18 +255,18 @@ public class Dungeon {
                 if (grid[row][col] == 0) {
                     // check up
                     if (row > 0 && grid[row - 1][col] == 0) {
-                        adjMatrix[node][node - 6] = 1;
-                        adjMatrix[node - 6][node] = 1;
+                        adjMatrix[node][node - 18] = 1;
+                        adjMatrix[node - 18][node] = 1;
                     }
 
                     // check down
-                    if (row < 4 && grid[row + 1][col] == 0) {
-                        adjMatrix[node][node + 6] = 1;
-                        adjMatrix[node + 6][node] = 1;
+                    if (row < 16 && grid[row + 1][col] == 0) {
+                        adjMatrix[node][node + 18] = 1;
+                        adjMatrix[node + 18][node] = 1;
                     }
 
                     // check right
-                    if (col < 5 && grid[row][col + 1] == 0) {
+                    if (col < 18 && grid[row][col + 1] == 0) {
                         adjMatrix[node][node + 1] = 1;
                         adjMatrix[node + 1][node] = 1;
                     }
@@ -271,18 +287,29 @@ public class Dungeon {
         return adjMatrix;
     }
 
-    public Position djikstra(List<Entity> entities, Position startPos, Position endPos) {
-        int[][] dungeon = this.getDungeonMap();
-        int[][] adj = this.getAdjMap();
+    
 
+  
 
-        // 1st col - vertex
-        // 2nd col - shortest distance from startPos
-        // 3rd col - previous vertex
-        int[][] info = new int[288][3];
+    public List<Integer> unvisitedNeighbours(Queue<Integer> unvisited, int[][] adj, int currNode) {
 
+        List<Integer> unvNeigh = new ArrayList<Integer>();
+        // if not top row
+        if (currNode > 17) unvNeigh.add(currNode - 18);
+        // if not left side
+        if (!(currNode % 18 == 0)) unvNeigh.add(currNode - 1);
+        // if not right side
+        if (!((currNode + 1) % 18 == 0)) unvNeigh.add(currNode + 1);
+        // if not bottom row
+        if (currNode + 18 < 288) unvNeigh.add(currNode + 18);
 
-        return null;
+        return unvNeigh;
     }
+
+    public boolean isUnvisited(Queue<Integer> unvisited, int node) {
+
+        return false;
+    }
+
 
 }
