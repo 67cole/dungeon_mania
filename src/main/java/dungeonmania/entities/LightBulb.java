@@ -10,12 +10,10 @@ import dungeonmania.util.Position;
 public class LightBulb extends StaticEntity {
 
     Queue<Wire> wireQueue = new LinkedList<Wire>();
-    private String logic;
 
     
-    public LightBulb(Position position, String type, String ID, boolean isInteractable, String logic) {
+    public LightBulb(Position position, String type, String ID, boolean isInteractable) {
         super(position,type, ID, isInteractable);
-        this.logic = logic;
     }  
     /**
      * Turns lightbulb on
@@ -31,9 +29,6 @@ public class LightBulb extends StaticEntity {
         this.setType("light_bulb_off");
     }
     
-    public String getLogic() {
-        return this.logic;
-    }
     /**
      * Checks for switches and boulders cardinally adjacent to the lightbulbs
      * @param main

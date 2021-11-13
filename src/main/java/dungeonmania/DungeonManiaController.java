@@ -1445,7 +1445,6 @@ public class DungeonManiaController {
                 int y = entity.get("y").getAsInt();
                 Position position = new Position(x,y);;
                 String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
-                String logic = entity.get("logic").getAsString();
                 currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1);
                 switch(type) {
                     case "player":
@@ -1466,7 +1465,7 @@ public class DungeonManiaController {
                         main.addEntities(boulderEntity);
                         break;
                     case "switch":
-                        Switch switchEntity = new Switch(position, type, entityId, true, logic);       
+                        Switch switchEntity = new Switch(position, type, entityId, true);       
                         main.addEntities(switchEntity);
                         break;
                     case "door":
@@ -1546,7 +1545,7 @@ public class DungeonManiaController {
                         main.addEntities(swamp);
                         break;
                     case "light_bulb_off":
-                        LightBulb bulb  = new LightBulb(position, type, entityId, false, logic);
+                        LightBulb bulb  = new LightBulb(position, type, entityId, false);
                         main.addEntities(bulb);
                         break;
                     case "sun_stone":
@@ -1724,7 +1723,6 @@ public class DungeonManiaController {
             String type = entity.get("type").getAsString();
             String entityId = entity.get("id").getAsString();
             JsonObject posObj = entity.get("position").getAsJsonObject();
-            String logic = entity.get("logic").getAsString();
             int x = posObj.get("x").getAsInt();
             int y = posObj.get("y").getAsInt();
             Position position = new Position(x,y);
@@ -1756,7 +1754,7 @@ public class DungeonManiaController {
                     main.addEntities(boulderEntity);
                     break;
                 case "switch":
-                    Switch switchEntity = new Switch(position, type, entityId, true, logic);
+                    Switch switchEntity = new Switch(position, type, entityId, true);
                     main.addEntities(switchEntity);
                     break;
                 case "door":    

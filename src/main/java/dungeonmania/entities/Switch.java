@@ -4,7 +4,6 @@ import java.util.List;
 import dungeonmania.util.Position;
 
 public class Switch extends StaticEntity {
-    private String logic;
 
 
 
@@ -16,14 +15,8 @@ public class Switch extends StaticEntity {
      * @param IsInteractable
      * @param logic
      */
-    public Switch(Position position, String type, String ID, boolean isInteractable, String logic) {
+    public Switch(Position position, String type, String ID, boolean isInteractable) {
         super(position, type, ID, isInteractable);
-        this.logic = logic;
-    }
-    
-
-    public String getLogic() {
-        return this.logic;
     }
     
     /**
