@@ -103,3 +103,51 @@ MercenaryTest > 3-2 Testing mercenaries cannot move through boulders and walls F
 FAILURE
 DONE
 Test 3-3
+
+MercenaryTest > Testing bribing a mercenary ensures there is no battle FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.get(Optional.java:141)
+        at dungeonmania.controllerTest.MercenaryTest.testMercenaryBribing(MercenaryTest.java:68)
+FAILURE
+DONE
+Test 3-4
+
+MercenaryTest > Testing mercenaries spawn with armour FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.MercenaryTest.testMercenarySpawningWithArmour(MercenaryTest.java:98)
+FAILURE
+DONE
+Test 4-1
+
+CollectablesTest > 4-1 Testing picking up all types of collectables FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.CollectablesTest.testCollectablePickup(CollectablesTest.java:26)
+FAILURE
+DONE
+Test 4-2
+
+CollectablesTest > 4-2 Test picking up a key puts the key in the inventory FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.CollectablesTest.testKeyInInventory(CollectablesTest.java:47)
+FAILURE
+DONE
+Test 4-3
+
+CollectablesTest > 4-3 Test invisibility potions ensure battles do not occur FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.CollectablesTest.testInvisibilityPotion(CollectablesTest.java:70)
+FAILURE
+DONE
+Test 4-4
