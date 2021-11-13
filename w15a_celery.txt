@@ -151,3 +151,55 @@ CollectablesTest > 4-3 Test invisibility potions ensure battles do not occur FAI
 FAILURE
 DONE
 Test 4-4
+
+CollectablesTest > 4-4 Test invincibility potions cause enemies to run away FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.CollectablesTest.testInvincibilityPotion(CollectablesTest.java:99)
+FAILURE
+DONE
+Test 5-1
+
+PortalsTest > 5-1 Test portals work both ways FAILED
+    java.util.NoSuchElementException: No value present
+        at java.base/java.util.Optional.get(Optional.java:141)
+        at dungeonmania.controllerTest.PortalsTest.testTeleportationBothWays(PortalsTest.java:32)
+FAILURE
+DONE
+Test 5-2
+
+PortalsTest > 5-2 Test player cannot teleport into a wall FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.PortalsTest.testCannotTeleportIntoWall(PortalsTest.java:61)
+FAILURE
+DONE
+Test 6-1
+
+SpiderTest > 6-1 Test basic movement of spiders FAILED
+    java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+        at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64)
+        at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70)
+        at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:248)
+        at java.base/java.util.Objects.checkIndex(Objects.java:359)
+        at java.base/java.util.ArrayList.get(ArrayList.java:427)
+        at dungeonmania.controllerTest.SpiderTest.testSpiderBasicMovement(SpiderTest.java:34)
+FAILURE
+DONE
+Test 6-2
+
+SpiderTest > 6-2 Test spiders can traverse through walls FAILED
+    java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+        at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64)
+        at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70)
+        at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:248)
+        at java.base/java.util.Objects.checkIndex(Objects.java:359)
+        at java.base/java.util.ArrayList.get(ArrayList.java:427)
+        at dungeonmania.controllerTest.SpiderTest.testSpiderTraverseWall(SpiderTest.java:71)
+FAILURE
+DONE
+Test 6-3
