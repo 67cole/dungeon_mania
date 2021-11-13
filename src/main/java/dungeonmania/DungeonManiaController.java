@@ -149,6 +149,7 @@ public class DungeonManiaController {
         lastTick = dr;
         clearDatabase();
         addToRewindDatabase();
+        
         return dr;
     }
 
