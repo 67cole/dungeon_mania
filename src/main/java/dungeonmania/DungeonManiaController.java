@@ -1190,6 +1190,11 @@ public class DungeonManiaController {
                 break;
         }
 
+        Maze maze = new Maze(xStart, yStart, xEnd, yEnd);
+        boolean map[][] = maze.getMap();
+
+        addEntitiesToMaze(main, map, xStart, yStart, xEnd, yEnd);
+
 
         List<EntityResponse> erList = new ArrayList<EntityResponse>();
         for (Entity entity: main.getEntities()) {
@@ -1198,10 +1203,6 @@ public class DungeonManiaController {
         }
         
 
-        Maze maze = new Maze(xStart, yStart, xEnd, yEnd);
-        boolean map[][] = maze.getMap();
-
-        addEntitiesToMaze(main, map, xStart, yStart, xEnd, yEnd);
 
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
         lastTick = dr;
