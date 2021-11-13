@@ -479,7 +479,7 @@ public class DungeonManiaController {
      * @throws IllegalArgumentException
      * @throws InvalidActionException
      */
-    public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {    
+    public DungeonResponse tick(String itemUsed, Direction movementDirection) throws IllegalArgumentException, InvalidActionException {   
         if (!itemUsedInvalid(itemUsed)) {
             throw new IllegalArgumentException("The item used is invalid.");
          }
@@ -631,7 +631,7 @@ public class DungeonManiaController {
                         else {
                             List<String> nonRemovable = Arrays.asList("boulder", "BLUEportal", "REDportal","YELLOWportal","GREYportal",
                             "switch", "door", "door_unlocked", "exit", "swamp_tile", "zombie_toast_spawner", "light_bulb_on","light_bulb_off",
-                            "switch_door", "switchdoor_unlocked");
+                            "switch_door", "switchdoor_unlocked", "wire");
                             int dontRemove = 0;
                             for (String curr : nonRemovable) {
                                 if (interactingEntity.getType().equals(curr)) dontRemove = 1;
@@ -795,11 +795,41 @@ public class DungeonManiaController {
         for (Entity enti : entities) {
             if (enti.getType().equals("light_bulb_on") || enti.getType().equals("light_bulb_off")) {
                 LightBulb bulbEntity = (LightBulb) enti;
-                if (bulbEntity.checkSwitchBoulder(main)) {
-                    bulbEntity.lightOn();
-                } else {
-                    bulbEntity.lightOff();
-                }
+                //String logic = bulbEntity.getLogic();
+                //if (logic == null) {
+                    //Check if there are any switches+boulders next to the lightbulb
+                    if (bulbEntity.checkSwitchBoulder(main)) {
+                        bulbEntity.lightOn();
+                    //Otherwise, check if the lightbulb is next to any wires that are connected to switches+boulders
+                    } else if (bulbEntity.checkWires(main)) {  
+                        bulbEntity.lightOn();
+                    } else {
+                        bulbEntity.lightOff();
+                    }
+                // } else {
+                //     switch (logic) {
+                //         case "and":
+                //             if (bulbEntity.checkMultipleSwitch(main)) {
+                //                 bulbEntity.lightOn();
+                //             }
+                //             if (bulbEntity.checkMultipleWires(main)) {
+                //                 bulbEntity.lightOn();
+                //             } else {
+                //                 bulbEntity.lightOff();
+                //             }
+                //             break;
+                //         case "or":
+                //             break;
+                //         case "xor":
+                //             break;
+                //         case "not":
+                //             break;
+                //         case "co_and":
+                //             break;
+                //     }
+                    
+                // }
+                
             }
         }
 
@@ -808,6 +838,8 @@ public class DungeonManiaController {
             if (enti.getType().equals("switch_door") || enti.getType().equals("switchdoor_unlocked")) {
                 SwitchDoor doorEntity = (SwitchDoor) enti;
                 if (doorEntity.checkSwitchBoulder(main)) {
+                    doorEntity.doorUnlock();
+                } else if (doorEntity.checkWires(main)) {
                     doorEntity.doorUnlock();
                 } else {
                     doorEntity.doorLock();
@@ -1860,10 +1892,13 @@ public class DungeonManiaController {
                         main.addEntities(armour);
                         break;
                     case "switch_door":
-                        SwitchDoor switchDoor = new SwitchDoor(position, type, entityId, false, true);
+                        SwitchDoor switchDoor = new SwitchDoor(position, type, entityId, false);
                         main.addEntities(switchDoor);
                         break;
-
+                    case "wire":
+                        Wire wire =  new Wire(position, type, entityId, false);
+                        main.addEntities(wire);
+                        break;
                 }
             }
         } catch (Exception e) {

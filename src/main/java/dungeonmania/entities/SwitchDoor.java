@@ -1,16 +1,18 @@
 package dungeonmania.entities;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import dungeonmania.Dungeon;
 import dungeonmania.util.Position;
 
 public class SwitchDoor extends StaticEntity{
+    
+    Queue<Wire> wireQueue = new LinkedList<Wire>();
 
-    private boolean locked;
-    public SwitchDoor(Position position, String type, String ID, boolean isInteractable, boolean locked) {
+    public SwitchDoor(Position position, String type, String ID, boolean isInteractable) {
         super(position,type, ID, isInteractable);
-        this.locked = locked;
     }
 
     /**
@@ -75,4 +77,68 @@ public class SwitchDoor extends StaticEntity{
         return false;
     }
 
+    /**
+     * Checks for wires cardinally adjacent to the lightbulb
+     * @param main
+     * @param entities
+     * @return boolean
+     */
+    public boolean checkWires(Dungeon main) {
+        //Get all entities that are cardinally adjacent to the lightbulb
+        
+        Position N = super.getPosition().translateBy(0, -1);
+        Position E = super.getPosition().translateBy(1, 0);
+        Position S = super.getPosition().translateBy(0, 1);
+        Position W = super.getPosition().translateBy(-1, 0);
+        
+        List<Entity> entsAbove = main.getEntitiesAtPos(N);
+        List<Entity> entsRight = main.getEntitiesAtPos(E);
+        List<Entity> entsBelow = main.getEntitiesAtPos(S);
+        List<Entity> entsLeft = main.getEntitiesAtPos(W);  
+        
+        Wire wireEntity = findWire(entsAbove);
+        Wire wireEntity1 = findWire(entsRight);
+        Wire wireEntity2 = findWire(entsBelow);
+        Wire wireEntity3 = findWire(entsLeft);
+
+        if (wireEntity != null) {
+            wireQueue.add(wireEntity);
+            if (wireEntity.checkSwitch(wireQueue, main)) {
+                return true;
+            }
+        }
+        if (wireEntity1 != null) {
+            wireQueue.add(wireEntity1);
+            if (wireEntity1.checkSwitch(wireQueue, main)) {
+                return true;
+            }
+        }
+        if (wireEntity2 != null) {
+            wireQueue.add(wireEntity2);
+            if (wireEntity2.checkSwitch(wireQueue, main)) {
+                return true;
+            }
+        }
+        if (wireEntity3 != null) {
+            wireQueue.add(wireEntity3);
+            if (wireEntity3.checkSwitch(wireQueue, main)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks for wires in a list of entities
+     * @param posEntities
+     * @return Wire
+     */
+    public Wire findWire(List<Entity> posEntities) {
+        for (Entity entity: posEntities) {
+            if (entity.getType().equals("wire")) {
+                return ((Wire)entity);
+            }
+        }
+        return null; 
+    }
 }

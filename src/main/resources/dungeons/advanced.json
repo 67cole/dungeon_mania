@@ -594,6 +594,11 @@
       "x": 17,
       "y": 15,
       "type": "wall"
+    },
+    {
+      "x": 11,
+      "y": 10,
+      "type": "invincibility_potion"
     }
   ],
   "goal-condition": {
