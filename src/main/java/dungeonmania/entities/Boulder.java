@@ -1,12 +1,17 @@
 package dungeonmania.entities;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Collection;
 
 import dungeonmania.util.Direction;
 import dungeonmania.util.Position;
 import dungeonmania.Dungeon;
 
 public class Boulder extends StaticEntity{
+
     public Boulder(Position position, String type, String ID, boolean isInteractable) {
         super(position,type, ID, isInteractable);
     }
@@ -33,9 +38,8 @@ public class Boulder extends StaticEntity{
             case NONE:
                 break;
         }   
-    }
-    
-    
+        
 
+    }
 
 }

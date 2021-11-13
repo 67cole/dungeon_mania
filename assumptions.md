@@ -18,12 +18,13 @@ Spider
 
     -   The spider's starting health is 1
     -   The spider's starting attack is 1
-    -   Spiders can't spawn on edge of dungeon 
     -   The max amount of spiders is 8
     -   A spider cannot spawn on or under a boulder
     -   When the player drinks an invincibility potion, the spiders will break out of the cycle and run as far as it can. Once invincibility potion ends, it will begin the cycle again at its new location
     -   The spider can run outside the map whilst invincibility is still active
+    -   The spider can spawn on the edge of the dungeon and travel outside the dungeon
     -   Spiders spawn every 25 ticks
+    -   spiders cant go through doors
 
 Mercenary
 
@@ -71,3 +72,6 @@ Battle
 
     -   The character can only have one battle at a time in ONE tick, so if a mercenary moves on top of the character mid battle, it will battle in the next tick, or if a spider jumps on top mid battle, it will crawl away unless the character moves on top of their path next tick.
 
+Bomb explosions
+    -   if a boulder activates a switch with multiple cardinally adjacent bombs, explode each one
+    -   if pushing a boulder onto a switch involves picking up a cardinally adjacent bomb, pick it up and explode it
