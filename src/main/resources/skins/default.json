@@ -1,7 +1,8 @@
 {
     "main_menu": {
-        "background_image": "images/backgrounds/main_menu.png",
-        "text_color": "white"
+        "background_image": "images/backgrounds/dungeonbackground.png",
+        "text_color": "white",
+        "background_music": "audio/menuMusic.mp3"
     },
     "game": {
         "background_image": {
@@ -12,10 +13,11 @@
         },
         "resolution_px": 16,
         "item_box": "images/ui/box.png",
-        "text_color": "white"
+        "text_color": "white",
+        "background_music": "audio/dungeonMusic.mp3"
     },
     "entities": {
-        "boulder": "images/tileset/entities/boulder_00.png",
+        "boulder": "images/tileset/entities/boulder.png",
         "bow": "images/tileset/items/bow_0.png",
         "player": "images/tileset/entities/entity.png",
         "bomb": "images/tileset/items/bomb.png",

@@ -1,11 +1,11 @@
 {
     "main_menu": {
-        "font": "alagard.ttf",
-        "title": "Dungeon Mania",
+        "font": "Minecraft.ttf",
+        "title": "Click Frenzy",
         "subtitle_1": "Frontend created by:\n Braedon Wooding, George Litsas, Nick Patrikeos, Noa Challis",
-        "subtitle_2": "Backend created by: <Winston Liang, Jonathan Qiu, Thomas Chen, Colin Ngo, Jeremy Lee>",
+        "subtitle_2": "Backend created by: https://www.ozbargain.com.au/",
         "buttons": {
-            "generate_game": "Generate Game",
+            "generate_game": "Generate New Game",
             "new_game": "Start New Game",
             "load_game": "Load Game",
             "quit_game": "Quit Game",
