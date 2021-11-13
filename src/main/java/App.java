@@ -126,6 +126,10 @@ public class App {
             return callUsingSessionAndArgument(request, (dmc) -> dmc.interact(request.queryParams("entityId")));
         }, gson::toJson);
 
+        Spark.post("/api/game/rewind/", "application/json", (request, response) -> {
+            return callUsingSessionAndArgument(request, (dmc) -> dmc.rewind(Integer.parseInt(request.queryParams("ticks"))));
+        }, gson::toJson);
+
         Scintilla.start();
     }
 }

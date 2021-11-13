@@ -3,16 +3,23 @@ package dungeonmania;
 import dungeonmania.util.Position;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.HashMap; 
 
 import dungeonmania.response.models.ItemResponse;
 import dungeonmania.entities.CollectableEntity;
 import dungeonmania.entities.Entity;
 
 
+
 public class Dungeon {
 
     // Keep track of all entities in the dungeon
     private List<Entity> entities = new ArrayList<Entity>();
+    private int[][] dungeonMap = new int[16][18];
+    private int[][] adjMap = new int[288][288];
+
     public  List<CollectableEntity> inventory = new ArrayList<CollectableEntity>();
     public  List<String> buildables = new ArrayList<String>();
 

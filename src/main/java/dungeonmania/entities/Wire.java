@@ -12,7 +12,12 @@ public class Wire extends StaticEntity {
     public Wire(Position position, String type, String ID, boolean isInteractable) {
         super(position, type, ID, isInteractable);
     }
-    
+    /**
+     * Uses recursion to loop through wires to find a switch+boulder
+     * @param wireQueue
+     * @param main
+     * @return boolean
+     */
     public boolean checkSwitch(Queue<Wire> wireQueue, Dungeon main) {
         List<Wire> prevList = new ArrayList<Wire>();
         while (!(wireQueue.isEmpty())) {
@@ -27,6 +32,13 @@ public class Wire extends StaticEntity {
         
     }
 
+    /**
+     * Checks a specific wire's adjacent entities, if there the entities include a switch+boulder, return true
+     * otherwise return false, if there are wires within those entities add those wires into the queue
+     * @param wireQueue
+     * @param main
+     * @return boolean
+     */
     public boolean checkAdjacentEntities(Dungeon main, Queue<Wire> wireQueue, List<Wire> prevList) {
         
         //Get all entities that are cardinally adjacent to the Wire
@@ -64,6 +76,11 @@ public class Wire extends StaticEntity {
 
     }
 
+    /**
+     * Finds a wire within a list of entities
+     * @param posEntities
+     * @return Wire
+     */
 
     public Wire findWire(List<Entity> posEntities) {
         for (Entity entity: posEntities) {

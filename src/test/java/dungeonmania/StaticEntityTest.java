@@ -143,7 +143,7 @@ public class StaticEntityTest {
         assertTrue(entityInPlace(pos2, tickHolder, "mercenary"));
 
         tickHolder =  controller.tick(null, Direction.UP);
-        assertFalse(entityInPlace(close, tickHolder, "mercenary"));
+        assertTrue(entityInPlace(close, tickHolder, "mercenary"));
         assertTrue(entityInPlace(pos2, tickHolder, "mercenary"));
     
     }
