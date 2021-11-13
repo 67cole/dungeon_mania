@@ -1655,7 +1655,7 @@ public class DungeonManiaController {
      */
     public String getGoalsFromJson(String dungeonName)  {
         String returnGoal = "";
-        String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
+        String filename = "src\\test\\resources\\dungeons\\" + dungeonName + ".json";
         try {
             JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
             JsonObject goalCondition = jsonObject.get("goal-condition").getAsJsonObject();
