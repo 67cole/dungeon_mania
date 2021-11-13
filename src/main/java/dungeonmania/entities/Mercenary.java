@@ -58,7 +58,7 @@ public class Mercenary extends MovingEntity {
     public int cost (List<Entity> entities, Position source, Position dest) {
         for (Entity ent : entities) {
             // if swamp tile, return movement factor instead of 1 (movement factor counts as distance of 2)
-            if (ent.getPosition().equals(dest) && ent.getType().equals("swamp_tile")) {
+            if (ent.getPosition().equals(source) && ent.getType().equals("swamp_tile")) {
                 return ((SwampTile) ent).getMovementFactor();
             }
         }
