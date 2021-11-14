@@ -61,7 +61,7 @@ public class MovingEntityTest {
         Position toBePos = new Position(1,1);
         assertTrue(entityInPlace(toBePos, newDungeon, "player"));
         DungeonResponse tickHolder = null;
-        for (int i = 0; i < 75; i++) {
+        for (int i = 0; i < 40; i++) {
             tickHolder =  controller.tick(null, Direction.DOWN);
         }
 
@@ -137,13 +137,14 @@ public class MovingEntityTest {
         controller.newGame("testRoom", "standard");
 
         DungeonResponse tickHolder = null;
-
+        
         tickHolder =  controller.tick(null, Direction.UP);
         Position close = new Position(5,4);
+        
         assertTrue(entityInPlace(close, tickHolder, "mercenary"));
 
         tickHolder =  controller.tick(null, Direction.UP);
-        Position close2 = new Position(4,4);
+        Position close2 = new Position(5, 3);
         assertTrue(entityInPlace(close2, tickHolder, "mercenary"));
     }
 
@@ -161,7 +162,8 @@ public class MovingEntityTest {
         assertTrue(entityInPlace(close, tickHolder, "mercenary"));
 
         tickHolder =  controller.tick(null, Direction.RIGHT);
-        Position moveFaster = new Position(4,3);
+        Position moveFaster = new Position(5,2);
+        
         assertTrue(entityInPlace(moveFaster, tickHolder, "mercenary"));
     }
 
@@ -293,6 +295,7 @@ public class MovingEntityTest {
                 return true;
             }
         }
+        
         return false;
     }
 
