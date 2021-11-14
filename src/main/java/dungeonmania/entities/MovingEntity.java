@@ -594,6 +594,7 @@ public abstract class MovingEntity implements Entity {
                 this.setAlive(false);
                 return;
             }
+            
             // Simulate a round of battle
             int weaponAtk = 0;
             boolean charHasArmour = false;
@@ -657,6 +658,12 @@ public abstract class MovingEntity implements Entity {
             int characterAD = player.getAttack();
             int enemyHealth = this.getHealth();
             int enemyAD = this.getAttack();
+            // Searching for the mercenaries
+            // Applying ally damage to enemy first
+            List<Mercenary> friendlyMercenaries = getMercenary(entities);
+            for (Mercenary merc: friendlyMercenaries) {
+                enemyHealth = enemyHealth - ((merc.getHealth() * (merc.getAttack())) / 5);
+            }
             // Calculations for character
             if (charHasMArmour) {
                 enemyAD = enemyAD / 4;
@@ -827,4 +834,21 @@ public abstract class MovingEntity implements Entity {
         return swampEntity;
     }
 
+    /**
+     * Get Mercenary
+     * @param entities
+     * @return List<Mercenary>
+     */
+    public List<Mercenary> getMercenary(List<Entity> entities) {
+        List<Mercenary> mercenaryList = new ArrayList<Mercenary>();
+        // Look for a friendly Mercenary
+        for (Entity entityMercenary: entities) {
+            if (entityMercenary.getType().equals("mercenary")) {
+               if (((Mercenary) entityMercenary).getFriendly() == true) {
+                   mercenaryList.add((Mercenary) entityMercenary);
+               }
+            }
+        }
+        return mercenaryList;
+    }
 }
