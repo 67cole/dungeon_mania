@@ -25,7 +25,7 @@ public class MovingEntityTest {
     @Test 
     public void testPlayerMovement() {
         DungeonManiaController controller = new DungeonManiaController();
-        DungeonResponse newDungeon = controller.newGame("testRoom", "Standard");
+        DungeonResponse newDungeon = controller.newGame("testRoom", "standard");
         Position toBePos = new Position(1,1);
         assertTrue(entityInPlace(toBePos, newDungeon, "player"));
 
@@ -57,7 +57,7 @@ public class MovingEntityTest {
     @Test
     public void testMercenarySpawn() {
         DungeonManiaController controller = new DungeonManiaController();
-        DungeonResponse newDungeon = controller.newGame("advanced-2", "Peaceful");
+        DungeonResponse newDungeon = controller.newGame("advanced-2", "peaceful");
         Position toBePos = new Position(1,1);
         assertTrue(entityInPlace(toBePos, newDungeon, "player"));
         DungeonResponse tickHolder = null;
@@ -73,7 +73,7 @@ public class MovingEntityTest {
     @Test
     public void testZombieSpawnStandard() {
         DungeonManiaController controller = new DungeonManiaController();
-        DungeonResponse newDungeon = controller.newGame("testRoom", "Standard");
+        DungeonResponse newDungeon = controller.newGame("testRoom", "standard");
         Position toBePos = new Position(1,1);
         assertTrue(entityInPlace(toBePos, newDungeon, "player"));
         DungeonResponse tickHolder = null;
@@ -91,7 +91,7 @@ public class MovingEntityTest {
     @Test
     public void testZombieSpawnHard() {
         DungeonManiaController controller = new DungeonManiaController();
-        DungeonResponse newDungeon = controller.newGame("testRoom", "Hard");
+        DungeonResponse newDungeon = controller.newGame("testRoom", "hard");
         Position toBePos = new Position(1,1);
         assertTrue(entityInPlace(toBePos, newDungeon, "player"));
         DungeonResponse tickHolder = null;
@@ -109,7 +109,7 @@ public class MovingEntityTest {
     @Test
     public void testZombieMovement() {
         DungeonManiaController controller = new DungeonManiaController();
-        controller.newGame("testRoom", "Standard");
+        controller.newGame("testRoom", "standard");
 
         DungeonResponse tickHolder = null;
 
@@ -134,7 +134,7 @@ public class MovingEntityTest {
     @Test
     public void testMercenaryMovement() {
         DungeonManiaController controller = new DungeonManiaController();
-        controller.newGame("testRoom", "Standard");
+        controller.newGame("testRoom", "standard");
 
         DungeonResponse tickHolder = null;
 
@@ -152,7 +152,7 @@ public class MovingEntityTest {
     @Test
     public void testMercenaryBattleRadius() {
         DungeonManiaController controller = new DungeonManiaController();
-        controller.newGame("testRoom", "Standard");
+        controller.newGame("testRoom", "standard");
 
         DungeonResponse tickHolder = null;
 
@@ -169,7 +169,7 @@ public class MovingEntityTest {
     @Test 
     public void testMovementofInvincibilityPotion() {
         DungeonManiaController controller = new DungeonManiaController();
-        controller.newGame("testRoom", "Standard");
+        controller.newGame("testRoom", "standard");
 
         DungeonResponse tickHolder = null;
         tickHolder =  controller.tick(null, Direction.DOWN);
@@ -241,7 +241,7 @@ public class MovingEntityTest {
     @Test
     public void mercenaryPeaceful() {
         DungeonManiaController controller = new DungeonManiaController();
-        DungeonResponse newDungeon = controller.newGame("testRoom", "Peaceful");
+        DungeonResponse newDungeon = controller.newGame("testRoom", "peaceful");
         Position toBePos = new Position(1,1);
         assertTrue(entityInPlace(toBePos, newDungeon, "player"));
         DungeonResponse tickHolder = null;
@@ -259,7 +259,7 @@ public class MovingEntityTest {
     @Test
     public void testSpiderSpawn() {
         DungeonManiaController controller = new DungeonManiaController();
-        DungeonResponse newDungeon = controller.newGame("advanced-2", "Standard");
+        DungeonResponse newDungeon = controller.newGame("advanced-3", "standard");
         DungeonResponse tickHolder = null;
         for (int i = 0; i < 27; i++) {
             tickHolder =  controller.tick(null, Direction.LEFT);
