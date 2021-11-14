@@ -261,13 +261,13 @@ public class MovingEntityTest {
 
     @Test
     public void testSpiderSpawn() {
-        DungeonManiaController controller = new DungeonManiaController();
-        DungeonResponse newDungeon = controller.newGame("advanced-2", "standard");
+        DungeonManiaController control = new DungeonManiaController();
+        DungeonResponse newDungeon = control.newGame("advanced-2", "standard");
         DungeonResponse tickHolder = null;
         for (int i = 0; i < 25; i++) {
-            tickHolder =  controller.tick(null, Direction.LEFT);
+            tickHolder =  control.tick(null, Direction.LEFT);
         }
-        Dungeon dung = controller.getCurrDungeon();
+        Dungeon dung = control.getCurrDungeon();
         List<Entity> entities = dung.getEntities();
         Position spiderPos = new Position(0, 0);
         for (Entity currEnt : entities) {

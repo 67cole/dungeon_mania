@@ -513,10 +513,7 @@ public class DungeonManiaController {
         Character tempChar = null;
         Position playerSpawnPosition = null;
         main = currDungeon;
-
         
-
-
         // Get the character class
         Character character = Character.getCharacter(entities);
         
@@ -820,29 +817,6 @@ public class DungeonManiaController {
                     } else {
                         bulbEntity.lightOff();
                     }
-                // } else {
-                //     switch (logic) {
-                //         case "and":
-                //             if (bulbEntity.checkMultipleSwitch(main)) {
-                //                 bulbEntity.lightOn();
-                //             }
-                //             if (bulbEntity.checkMultipleWires(main)) {
-                //                 bulbEntity.lightOn();
-                //             } else {
-                //                 bulbEntity.lightOff();
-                //             }
-                //             break;
-                //         case "or":
-                //             break;
-                //         case "xor":
-                //             break;
-                //         case "not":
-                //             break;
-                //         case "co_and":
-                //             break;
-                //     }
-                    
-                // }
                 
             }
         }
