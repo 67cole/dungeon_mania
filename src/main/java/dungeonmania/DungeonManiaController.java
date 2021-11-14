@@ -147,7 +147,7 @@ public class DungeonManiaController {
         
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
         lastTick = dr;
-        clearDatabase();
+        clearRewindDatabase();
         addToRewindDatabase();
         
         return dr;
@@ -519,6 +519,7 @@ public class DungeonManiaController {
         List<Entity> entities = currDungeon.getEntities();
         Dungeon main = null;
         List<Entity> entitiesToBeRemoved = new ArrayList<Entity>();
+        List<Entity> entitiesToBeAdded = new ArrayList<Entity>();
         List<Entity> allNearbyEntities = new ArrayList<Entity>();
         currDungeon.setTickCounter(currDungeon.getTickCounter() + 1);
         Spider spid = null;
@@ -540,12 +541,9 @@ public class DungeonManiaController {
         Position playerSpawnPosition = null;
         main = currDungeon;
 
-        
-
-
         // Get the character class
         Character character = Character.getCharacter(entities);
-        
+
         // Check potion duration and set it off if it expires
         potionTickAdder(character);
         potionChecker(character);
@@ -555,7 +553,6 @@ public class DungeonManiaController {
 
         // If the gamemode is hard, always turn off invincibility
         if (currDungeon.getHard()) character.setIsInvincible(false);
-
 
         // Checks if the character is invincible, then move the enemies
         if (character.isInvincible()) {
@@ -568,8 +565,6 @@ public class DungeonManiaController {
         if (!invincibilityActive) Mercenary.mercenaryMovement(entities, movementDirection);
         if (!invincibilityActive) Assassin.assassinMovement(entities, movementDirection);
         if (!invincibilityActive) ZombieToast.zombieMovement(entities, movementDirection);
-
-
 
         for (Entity entity : entities) {
             // Mercenary should only spawn if there is an enemy for the dungeon
@@ -644,7 +639,7 @@ public class DungeonManiaController {
                                     main.inventory.remove(item);
                                     entitiesToBeRemoved.add(item);
                                     Character respawnedCharacter = new Character(temp.getPosition(), temp.getType(), temp.getID(), temp.getIsInteractable());
-                                    main.addEntities(respawnedCharacter);
+                                    entitiesToBeAdded.add(respawnedCharacter);
                                     break;
                                 }
                             }
@@ -805,7 +800,6 @@ public class DungeonManiaController {
             main.addEntities(unlockedDoor);
         }
 
-        
         Position playerPos = new Position(0, 0);
         for (Entity ent : entities) {
             if (ent.getType().equals("player")) playerPos = ent.getPosition();
@@ -818,14 +812,26 @@ public class DungeonManiaController {
         for (Entity enti : entities) {
             // if boulder, check that the boulder has a switch and explode any nearby bombs
             if (enti.getType().equals("boulder")) {
+                Entity bombEnt = null;
+                // checks if the square player is moving onto has a bomb, which shouldnt be picked up
+                for (Entity currEnt : entities) {
+                    if (currEnt.getType().equals("player")) {
+                        Position playerPosition = currEnt.getPosition();
+                        for (Entity bomb : entities) {
+                            if (bomb.getType().equals("bomb") && playerPosition.equals(bomb.getPosition())) {
+                                bombEnt = bomb;
+                            }
+                        }
+                    }
+                }
                 Position entPos = enti.getPosition();
                 ArrayList<Position> adjacentPos = entPos.getCardinallyAdjacentPositions();
                 if (playerPos.equals(adjacentPos.get(0)) || playerPos.equals(adjacentPos.get(1)) || playerPos.equals(adjacentPos.get(2)) || playerPos.equals(adjacentPos.get(3))) {
-                    ((Boulder) enti).doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);    
+                    ((Boulder) enti).doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);  
+                    currDungeon.inventory.remove(bombEnt);  
                 }
             }
         }
-
 
         // Find switches to check lightbulb light up eligibility
         for (Entity enti : entities) {
@@ -841,31 +847,7 @@ public class DungeonManiaController {
                         bulbEntity.lightOn();
                     } else {
                         bulbEntity.lightOff();
-                    }
-                // } else {
-                //     switch (logic) {
-                //         case "and":
-                //             if (bulbEntity.checkMultipleSwitch(main)) {
-                //                 bulbEntity.lightOn();
-                //             }
-                //             if (bulbEntity.checkMultipleWires(main)) {
-                //                 bulbEntity.lightOn();
-                //             } else {
-                //                 bulbEntity.lightOff();
-                //             }
-                //             break;
-                //         case "or":
-                //             break;
-                //         case "xor":
-                //             break;
-                //         case "not":
-                //             break;
-                //         case "co_and":
-                //             break;
-                //     }
-                    
-                // }
-                
+                    }              
             }
         }
 
@@ -882,12 +864,12 @@ public class DungeonManiaController {
                 }
             }
         }
-
-       
         // add all nearby entities to the bomb to entiitesToBeRemoved
         entitiesToBeRemoved.addAll(allNearbyEntities);
         // Remove the collectible from the map
         entityRemover(entitiesToBeRemoved, main);
+        // Adding entities to the map
+        entityAdder(entitiesToBeAdded, main);
         
         // Adding the bomb to the map
         if (bombHolder != null) {
@@ -895,8 +877,6 @@ public class DungeonManiaController {
         }
 
         // The Goal Checker Central
-
-
         // Check boulders
         if (main.getDungeonGoals().contains("boulder")) {
             checkBoulderGoal(entities, main);
@@ -909,27 +889,20 @@ public class DungeonManiaController {
             checkTreasureGoal(entities, main);
         }
 
-
         // Check enemies
         if (main.getDungeonGoals().contains("mercenary")) {
             checkEnemiesGoal(entities, main);
         } 
-
-
-
-
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
         for(Entity entity: main.getEntities()) {
             EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
             erList.add(er);
         }
-
         List<ItemResponse> irList= new ArrayList<ItemResponse>();
         for(CollectableEntity collectableEntity: main.inventory) {
             ItemResponse ir = new ItemResponse(collectableEntity.getID(), collectableEntity.getType());
             irList.add(ir);
         }
-
         DungeonResponse dr = new DungeonResponse(currDungeon.getDungeonId(), currDungeon.getDungeonName(),
             erList, irList, currDungeon.buildables, currDungeon.getDungeonGoals());
 
@@ -965,6 +938,26 @@ public class DungeonManiaController {
             if (!Treasure.playerHasEnoughGold(inventory)) {
                 throw new InvalidActionException("The player does not have enough gold to bribe the mercenary.");
             }
+            interactWithMercenary(inventory, interaction);
+
+
+
+        }
+
+        // Interaction with the assassin
+        if (interaction.getType().equals("assassin")) {
+            System.out.println("Interacting with assassin");
+            
+            // Check whether the player is close enough to the mercenary
+            if (!Mercenary.playerProximityMercenary(character, interaction)) {
+                throw new InvalidActionException("The player is not close enough to the mercenary.");
+            }
+
+            // Check whether the player has enough gold to bribe the mercenary
+            if (!Treasure.playerHasEnoughGold(inventory)) {
+                throw new InvalidActionException("The player does not have enough gold to bribe the mercenary.");
+            }
+            interactWithAssassin(inventory, interaction);
 
             interactWithMercenary(inventory, interaction);
 
@@ -1268,7 +1261,7 @@ public class DungeonManiaController {
      * 
      */
 
-    public void clearDatabase() {
+    public void clearRewindDatabase() {
 
         String filename = "src\\main\\java\\dungeonmania\\rewindDatabase.json";
         FileOutputStream fileOutputStream = null;
@@ -1277,7 +1270,15 @@ public class DungeonManiaController {
             fileOutputStream.close();
         } catch (Exception e) {}
 
+    }
 
+    public void clearDatabase() {
+        String filename = "src\\main\\java\\dungeonmania\\database.json";
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(filename, false);
+            fileOutputStream.close();
+        } catch (Exception e) {}
     }
 
     public DungeonResponse rewindGame(int ticks) {
@@ -1750,6 +1751,17 @@ public class DungeonManiaController {
             }
         }
     }
+
+     /**
+     * Removes an entity from Entities List
+     * @param entityList - the list of entities to be removed in the dungeon
+     * @param main - the dungeon
+     */
+    public void entityAdder(List<Entity> entityList, Dungeon main) {
+        for (Entity entityToBeAdded: entityList) {
+            main.addEntities(entityToBeAdded);
+        }
+    }
     /**
      * Uses the item in the inventory
      * @param player - the character
@@ -2123,9 +2135,7 @@ public class DungeonManiaController {
                 case "door":    
                     int keyType = entity.get("keyType").getAsInt();
                     boolean locked = entity.get("locked").getAsBoolean();
-
                     Door doorEntity = new Door(position, type, entityId, false, keyType, locked);
-
                     main.addEntities(doorEntity);
                     break;
                 case "REDportal":
@@ -2348,6 +2358,38 @@ public class DungeonManiaController {
         }
     }
 
+    /**
+     * Removes items required to bribe assassin from inventory and bribe the mercenary
+     * @param inventory
+     * @param interaction
+     */
+    public void interactWithAssassin(List<CollectableEntity> inventory, Entity interaction) {
+        Treasure coinHolder = null;
+        //Remove 2 coins from inventory after interacting with mercenary
+        for (int i = 0; i < 2; i++) {
+            for (CollectableEntity item: inventory) {
+                if (item.getType().equals("treasure")) {
+                    coinHolder = (Treasure)item;
+                }
+            } 
+            inventory.remove(coinHolder); 
+        }
+        TheOneRing ringHolder = null;
+        for (CollectableEntity item: inventory) {
+            if (item.getType().equals("one_ring")) {
+                ringHolder = (TheOneRing) item;
+            }
+        }
+        inventory.remove(ringHolder);
+        Assassin assassinEntity = (Assassin) interaction;
+        assassinEntity.setFriendly(true);
+    }
+
+    /**
+     * Removes items required to bribe mercenary from inventory and bribe the mercenary
+     * @param inventory
+     * @param interaction
+     */
     public void interactWithMercenary(List<CollectableEntity> inventory, Entity interaction) {
         Treasure coinHolder = null;
         //Remove 2 coins from inventory after interacting with mercenary

@@ -56,6 +56,7 @@ TheOneRing
 
     -   Assumes the inventory is kept after respawn
     -   5 percent chance to receive after a successfull battle
+    -   When character uses one ring, the mob that it is fighting stays alive
 
 InvincibilityPotion
 
@@ -78,7 +79,6 @@ Battle
 
 Bomb explosions
     -   if a boulder activates a switch with multiple cardinally adjacent bombs, explode each one
-    -   if pushing a boulder onto a switch involves picking up a cardinally adjacent bomb, pick it up and explode it
 
 Hydra
 
@@ -126,4 +126,8 @@ Andurill
 Sun Stone
     -   The Sun Stone is not prioritized in crafting.
     -   Not removed when used in crafting
+
+Rewind (Time Turner)
+    - Cannot go to a negative tick
+    - If there has been x amount of ticks, cannot rewind for any n > x.
 

@@ -16,7 +16,7 @@ public class CollectableEntityTest {
     // Testing pickup of bomb and sword
     public void testCollectableItem() {
         DungeonManiaController controller = new DungeonManiaController();
-        controller.newGame("collectableTest", "Peaceful");
+        controller.newGame("collectableTest", "peaceful");
         DungeonResponse tickHolder = null;
         tickHolder =  controller.tick(null, Direction.RIGHT);
         // Testing arrow pickup
@@ -105,7 +105,7 @@ public class CollectableEntityTest {
 
     public void testBombDropPickUp() {
         DungeonManiaController controller = new DungeonManiaController();
-        controller.newGame("advanced-2", "Peaceful");
+        controller.newGame("advanced-2", "peaceful");
         DungeonResponse tickHolder = null;  
         // Moving the character to the bomb
         for (int i = 0; i < 5; i++) {

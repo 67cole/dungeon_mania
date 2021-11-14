@@ -1,6 +1,11 @@
 package dungeonmania;
 
+import dungeonmania.util.FileLoader;
 import dungeonmania.util.Position;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedList;
@@ -185,7 +190,14 @@ public class Dungeon {
      * @param dungeonName - this is the dungeon name
      */
     public static boolean dungeonNotValid(String dungeonName) {
-       
+        
+        String filename = "src\\test\\resources\\dungeons\\" + dungeonName + ".json";
+        File newFile = new File(filename);
+
+        if (newFile.length() == 0) {
+            return false;
+        }
+
         return true;
     }
 

@@ -136,7 +136,13 @@ public class Spider extends MovingEntity {
         }
     
     }
-
+    
+    /**
+     * Moves the spider
+     * @param List<Entity> entities
+     * @param Entity entity
+     * @return void
+     */
     @Override
     public void moveSpider(List<Entity> entities, Entity entity) {
         MovingEntity temp = (MovingEntity) entity;
@@ -207,6 +213,11 @@ public class Spider extends MovingEntity {
         }
     }
 
+    /**
+     * Generates a spawnpoint for the spider
+     * @param entities
+     * @return Position
+     */
     public Position getSpiderSpawn(List<Entity> entities) {
 
         boolean posFound = false;
@@ -232,16 +243,24 @@ public class Spider extends MovingEntity {
             // check if the square is a bouldeer
             // check if the square above is a boulder
         }
-        
-
-
         return null;
     }
     
+    /**
+     * generate a random number within the given range
+     * @param min
+     * @param max
+     * @return int
+     */
     public int getRandomNumber(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);
     }
 
+    /**
+     * check if amount of spiders has exceeded max amount
+     * @param entities
+     * @return boolean
+     */
     public static boolean checkMaxSpiders(List<Entity> entities) {
         int noSpiders = 0;
         for (Entity entity: entities) {

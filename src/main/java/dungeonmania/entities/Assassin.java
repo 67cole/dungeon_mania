@@ -18,6 +18,7 @@ import java.util.PriorityQueue;
 public class Assassin extends MovingEntity {
     private final static int STARTING_HEALTH = 6;
     private final static int ATTACK = 6;
+    private boolean friendly = false;
 
     /**
      * Creates the assassin
@@ -32,7 +33,19 @@ public class Assassin extends MovingEntity {
         setAttack(ATTACK);
     }
 
-    // returns a list of walkable positions
+    public boolean getFriendly() {
+        return this.friendly;
+    }
+
+    public void setFriendly(boolean friendly) {
+        this.friendly = friendly;
+    }
+
+    /**
+     * returns a list of walkable positions
+     * @param entities
+     * @return
+     */
     public List<Position> posList(List<Entity> entities) {
         List<Position> ls = new ArrayList<Position>();
         for (int i = 0; i < 16; i++) {
@@ -49,6 +62,14 @@ public class Assassin extends MovingEntity {
 
     }
 
+
+    /**
+     * returns the cost of moving one tile to another
+     * @param entities
+     * @param source
+     * @param dest
+     * @return int
+     */
     public int cost (List<Entity> entities, Position source, Position dest) {
         for (Entity ent : entities) {
             // if swamp tile, return movement factor instead of 1 (movement factor counts as distance of 2)
@@ -60,7 +81,14 @@ public class Assassin extends MovingEntity {
         return 1;
     }
 
-    public Position djikstra(List<Position> posList, Position source, List<Entity> entities) {
+    /**
+     * Performs dijkstra and returns the first position along the shortest found path
+     * @param posList
+     * @param source
+     * @param entities
+     * @return Position
+     */
+    public Position dijkstra(List<Position> posList, Position source, List<Entity> entities, Position nextPosition) {
         
         // create hashmap of dist and prev
         HashMap<Position, Double> dist = new HashMap<Position, Double>();
@@ -111,6 +139,11 @@ public class Assassin extends MovingEntity {
         return previous;
     }
 
+    /**
+     * returns a list of cardinal neighbour positions
+     * @param pos
+     * @return List<Position>
+     */
     public List<Position> getCardinalNeighbours(Position pos) {
         List<Position> neighbours = new ArrayList<Position>();
         // above
@@ -141,7 +174,7 @@ public class Assassin extends MovingEntity {
                 if (swampMove == false) {
                     continue;
                 }
-                temp.moveEntity(entities, player);
+                temp.moveEntity(entities, player, player);
             }
         }
     }  
@@ -150,11 +183,11 @@ public class Assassin extends MovingEntity {
     /**
      * Moving the assassin
      */
-    public void moveEntity (List<Entity> entities, Position playerPosition) {
+    public void moveEntity (List<Entity> entities, Position playerPosition, Position nextPosition) {
 
         List<Position> posList = posList(entities);
 
-        Position newPos = djikstra(posList, super.getPosition(), entities);
+        Position newPos = dijkstra(posList, super.getPosition(), entities, nextPosition);
         
         Position current = super.getPosition();
 
@@ -201,14 +234,30 @@ public class Assassin extends MovingEntity {
 
         // Now moving the assassin
         if (shortestDistance < originalDistance) {
+            // if dijkstra has found a shorter path, set position returned by dijkstra
             if (newPos != null) {
                 super.setPosition(newPos);
+            // else set position to result of pythagoreas
             } else {
                 super.setPosition(destination);
-            }
-            
+            }           
         } 
     }
+
+    /**
+     * This function checks whether or not the assassin can battle the enemy
+     * @param enemy
+     * @return boolean
+     */
+    public boolean assassinBattle(MovingEntity enemy) {
+        Position vector = Position.calculatePositionBetween(enemy.getPosition(), this.getPosition());
+        double distance = Math.sqrt(Math.pow(vector.getX(), 2) + Math.pow(vector.getY(), 2));
+        if (distance < 4) {
+            return true;
+        }
+        return false;   
+    }
+
 
    
 
