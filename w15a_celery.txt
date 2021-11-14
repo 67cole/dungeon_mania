@@ -615,3 +615,228 @@ BouldersTest > 11-3 Test the player is unable to push two boulders FAILED
 FAILURE
 DONE
 Test 12-1
+
+SaveLoadTest > 12-1 Test saving and loading a simple maze map FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.SaveLoadTest.testMazeSave(SaveLoadTest.java:21)
+FAILURE
+DONE
+Test 12-2
+
+SaveLoadTest > 12-2 Test saving and loading a map with boulders and switches FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.SaveLoadTest.testBouldersSave(SaveLoadTest.java:39)
+FAILURE
+DONE
+Test 12-3
+
+SaveLoadTest > 12-3 Test saving and loading a map with enemies and collectables FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.SaveLoadTest.testAdvancedSave(SaveLoadTest.java:58)
+FAILURE
+DONE
+Test 12-4
+
+SaveLoadTest > 12-4 Test saving on a map containing all types of entities FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.SaveLoadTest.testSaveAllEntities(SaveLoadTest.java:76)
+FAILURE
+DONE
+Test 13-1
+
+DoorsKeysTest > 13-1 Test player cannot walk through a closed door FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.DoorsKeysTest.testPlayerCannotWalkThroughClosedDoor(DoorsKeysTest.java:35)
+FAILURE
+DONE
+Test 13-2
+
+DoorsKeysTest > 13-2 Test player can pick up a key and add to inventory FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.DoorsKeysTest.testPickUpKey(DoorsKeysTest.java:54)
+FAILURE
+DONE
+Test 13-3
+
+DoorsKeysTest > 13-3 Test player can use a key to open a door FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.DoorsKeysTest.testUseKey(DoorsKeysTest.java:67)
+FAILURE
+DONE
+Test 13-4
+
+DoorsKeysTest > 13-4 Test the player cannot walk through an open door FAILED
+    java.lang.RuntimeException: Failed to create a new game due to multiple exceptions.  Will report both exceptions after each other (the stack traces will occur after one and another).  The first exception was with lowercase gamemode and second was with upper camel case gamemode (i.e. Standard)
+    ==First==
+    IllegalArgumentException: This gamemode is not valid.
+    ==Second==
+    IllegalArgumentException: This gamemode is not valid.
+        at dungeonmania.DungeonManiaController.newGame(DungeonManiaController.java:115)
+        at dungeonmania.controllerTest.Utils.newGame(Utils.java:30)
+        at dungeonmania.controllerTest.DoorsKeysTest.testPlayerCanWalkThroughOpenDoor(DoorsKeysTest.java:83)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+        at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:725)
+        at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+        at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:149)
+        at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:140)
+        at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:84)
+        at org.junit.jupiter.engine.execution.ExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(ExecutableInvoker.java:115)
+        at org.junit.jupiter.engine.execution.ExecutableInvoker.lambda$invoke$0(ExecutableInvoker.java:105)
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+        at org.junit.jupiter.engine.execution.ExecutableInvoker.invoke(ExecutableInvoker.java:104)
+        at org.junit.jupiter.engine.execution.ExecutableInvoker.invoke(ExecutableInvoker.java:98)
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:214)
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:210)
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:135)
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:66)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151)
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+        at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+        at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+        at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:96)
+        at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:75)
+        at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:99)
+        at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:79)
+        at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:75)
+        at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:61)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+        at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+        at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+        at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+        at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:94)
+        at com.sun.proxy.$Proxy2.stop(Unknown Source)
+        at org.gradle.api.internal.tasks.testing.worker.TestWorker.stop(TestWorker.java:135)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+        at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+        at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+        at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:182)
+        at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:164)
+        at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:414)
+        at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+        at org.gradle.internal.concurrent.ManagedExecutorImpl$1.run(ManagedExecutorImpl.java:48)
+        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1130)
+        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:630)
+        at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:56)
+        at java.base/java.lang.Thread.run(Thread.java:832)
+        at ══════════════════════════.==Second==()
+        at dungeonmania.DungeonManiaController.newGame(DungeonManiaController.java:115)
+        at dungeonmania.controllerTest.Utils.newGame(Utils.java:37)
+        at dungeonmania.controllerTest.DoorsKeysTest.testPlayerCanWalkThroughOpenDoor(DoorsKeysTest.java:83)
+FAILURE
+DONE
+Test 13-5
+
+DoorsKeysTest > 13-5 Test player cannot pickup two keys FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.DoorsKeysTest.testPlayerCannotPickup2Keys(DoorsKeysTest.java:104)
+FAILURE
+DONE
+Test 13-6
+
+DoorsKeysTest > 13-6 Test player can pick up a second key after using the first FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.DoorsKeysTest.testCanPickupSecondKeyAfterUsingFirst(DoorsKeysTest.java:122)
+FAILURE
+DONE
+Test 13-7
+
+DoorsKeysTest > 13-7 Test player cannot open a door with the wrong key FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.DoorsKeysTest.testPlayerCannotOpenDoorwithWrongKey(DoorsKeysTest.java:145)
+FAILURE
+DONE
+Test 14-1
+
+InterfaceTest > 14-1 Testing newGame interface method, normal operation FAILED
+    org.opentest4j.AssertionFailedError: expected: <204> but was: <0>
+        at org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:55)
+        at org.junit.jupiter.api.AssertionUtils.failNotEqual(AssertionUtils.java:62)
+        at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:166)
+        at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:161)
+        at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:628)
+        at dungeonmania.controllerTest.InterfaceTest.testNewGameInterfaceNormalOperation(InterfaceTest.java:26)
+FAILURE
+DONE
+Test 14-2
+SUCCESS
+DONE
+Test 14-3
+SUCCESS
+DONE
+Test 14-4
