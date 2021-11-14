@@ -1400,7 +1400,7 @@ public class DungeonManiaController {
      */
     public void addEntitiesToList(String dungeonName, Dungeon main) {
 
-        String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
+        String filename = "src\\test\\resources\\dungeons\\" + dungeonName + ".json";
         try {
             JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
             

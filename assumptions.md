@@ -56,6 +56,7 @@ TheOneRing
 
     -   Assumes the inventory is kept after respawn
     -   5 percent chance to receive after a successfull battle
+    -   When character uses one ring, the mob that it is fighting stays alive
 
 InvincibilityPotion
 
