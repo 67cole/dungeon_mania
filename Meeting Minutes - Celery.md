@@ -1,4 +1,4 @@
-== MILESTONE 1 NOTES ==
+
 
 16/10/21 (6:00 pm - 11:30 pm)
     -   This marked the start of our project. We read over the specs and discussed the varying parts of the codes to understand what we were implementing. 
@@ -24,7 +24,7 @@
     -   Afterwards, we decided to meet again in a couple of days to start the project as we were pretty much finished with Milestone 1. 
 
 
-== MILESTONE 2 NOTES ==
+
 
 24/10/21 - 25/10/21 (6:00 pm - 2:00 am)
     -   This meeting took 8 hours, due to the group just beginning to start the project. We decided to assign functions and roles for people to do:
@@ -83,4 +83,3 @@
     -   Overall, we were happy with the progress we've made with Milestone 1 and 2. The code was sufficient enough to build an MVP! :)  
 
 
-== MILESTONE 3 NOTES ==
