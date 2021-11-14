@@ -104,6 +104,9 @@ public class Mercenary extends MovingEntity {
             if (ent.getType().equals("player")) curr = ent.getPosition();
         }
         Position previous = curr;
+        if (dist.get(curr) == null) {
+            return null;
+        }
         if (dist.get(curr).isInfinite()) {
             return null;
         }
@@ -158,55 +161,59 @@ public class Mercenary extends MovingEntity {
         List<Position> posList = posList(entities);
 
         Position newPos = djikstra(posList, super.getPosition(), entities);
-        if (newPos != null) {
-            super.setPosition(newPos);
-        } else {
-            Position current = super.getPosition();
+        
+        Position current = super.getPosition();
 
-            // Get the adjacent positions around mercenary
-            List<Position> adjacent = current.getAdjacentPositions();
+        // Get the adjacent positions around mercenary
+        List<Position> adjacent = current.getAdjacentPositions();
 
-            // Index 1, 3, 5 and 7 are adjacent positions, so use a temporary list holder
-            List<Position> validPositions = new ArrayList<>();
-            validPositions.add(adjacent.get(1));
-            validPositions.add(adjacent.get(3));
-            validPositions.add(adjacent.get(5));
-            validPositions.add(adjacent.get(7));
+        // Index 1, 3, 5 and 7 are adjacent positions, so use a temporary list holder
+        List<Position> validPositions = new ArrayList<>();
+        validPositions.add(adjacent.get(1));
+        validPositions.add(adjacent.get(3));
+        validPositions.add(adjacent.get(5));
+        validPositions.add(adjacent.get(7));
 
 
-            // Final placeholders for positions moved and shortest distance
-            double shortestDistance = 99999999;
-            Position destination = null; 
+        // Final placeholders for positions moved and shortest distance
+        double shortestDistance = 99999999;
+        Position destination = null; 
 
-            // This looks through adjacent positions, checks whether the next square is movable
-            // then checks for the shortest distance between these squares
-            for (Position position : validPositions) {
-                if (checkMovement(position, entities)) {
-                    //Checks if the next square is a door, if its not locked, then 
-                    Door doorEntity = checkDoor(position, entities);
-                    if (doorEntity != null) {
-                        if (doorEntity.getLocked() == true) {
-                            continue;
-                        }
-                    }
-                    
-                    Position vector = Position.calculatePositionBetween(position, playerPosition);
-                    double distance = Math.sqrt(Math.pow(vector.getX(), 2) + Math.pow(vector.getY(), 2));
-
-                    if (distance <= shortestDistance) {
-                        destination = position; 
-                        shortestDistance = distance;
+        // This looks through adjacent positions, checks whether the next square is movable
+        // then checks for the shortest distance between these squares
+        for (Position position : validPositions) {
+            if (checkMovement(position, entities)) {
+                //Checks if the next square is a door, if its not locked, then 
+                Door doorEntity = checkDoor(position, entities);
+                if (doorEntity != null) {
+                    if (doorEntity.getLocked() == true) {
+                        continue;
                     }
                 }
-            }   
+                
+                Position vector = Position.calculatePositionBetween(position, playerPosition);
+                double distance = Math.sqrt(Math.pow(vector.getX(), 2) + Math.pow(vector.getY(), 2));
 
-            // Checks whether we need to move mercenary at all
-            Position originalVector = Position.calculatePositionBetween(current, playerPosition);
-            double originalDistance = Math.sqrt(Math.pow(originalVector.getX(), 2) + Math.pow(originalVector.getY(), 2));
+                if (distance <= shortestDistance) {
+                    destination = position; 
+                    shortestDistance = distance;
+                }
+            }
+        }   
 
-            // Now moving the mercenary
-            if (shortestDistance < originalDistance) super.setPosition(destination);
-        }
+        // Checks whether we need to move mercenary at all
+        Position originalVector = Position.calculatePositionBetween(current, playerPosition);
+        double originalDistance = Math.sqrt(Math.pow(originalVector.getX(), 2) + Math.pow(originalVector.getY(), 2));
+
+        // Now moving the mercenary
+        if (shortestDistance < originalDistance) {
+            if (newPos != null) {
+                super.setPosition(newPos);
+            } else {
+                super.setPosition(destination);
+            }
+            
+        } 
     }
 
     /**
