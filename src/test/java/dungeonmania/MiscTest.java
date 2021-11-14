@@ -36,7 +36,7 @@ public class MiscTest {
 
         DungeonManiaController controller = new DungeonManiaController();
 
-        controller.newGame("advanced.json", "Standard");
+        controller.newGame("advanced.json", "standard");
 
         assertThrows(IllegalArgumentException.class, () -> 
         controller.tick("xd", Direction.UP));
