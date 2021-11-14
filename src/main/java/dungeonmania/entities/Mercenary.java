@@ -94,7 +94,7 @@ public class Mercenary extends MovingEntity {
      * @param entities
      * @return Position
      */
-    public Position dijkstra(List<Position> posList, Position source, List<Entity> entities) {
+    public Position dijkstra(List<Position> posList, Position source, List<Entity> entities, Position nextPosition) {
         
         // create hashmap of dist and prev
         HashMap<Position, Double> dist = new HashMap<Position, Double>();
@@ -131,6 +131,7 @@ public class Mercenary extends MovingEntity {
         for (Entity ent : entities) {
             if (ent.getType().equals("player")) curr = ent.getPosition();
         }
+        curr = nextPosition;
         Position previous = curr;
         if (dist.get(curr) == null) {
             return null;
@@ -180,7 +181,7 @@ public class Mercenary extends MovingEntity {
                 if (swampMove == false) {
                     continue;
                 }             
-                mercenaryEntity.moveEntity(entities, player);
+                mercenaryEntity.moveEntity(entities, player, player);
             }
         }
     }
@@ -190,11 +191,11 @@ public class Mercenary extends MovingEntity {
      * @param entities
      * @param playerPosition
      */
-    public void moveEntity (List<Entity> entities, Position playerPosition) {
+    public void moveEntity (List<Entity> entities, Position playerPosition, Position nextPosition) {
 
         List<Position> posList = posList(entities);
 
-        Position newPos = dijkstra(posList, super.getPosition(), entities);
+        Position newPos = dijkstra(posList, super.getPosition(), entities, nextPosition);
         
         Position current = super.getPosition();
 
@@ -299,7 +300,7 @@ public class Mercenary extends MovingEntity {
 
                 if (distance < 4) {
                     Mercenary temp = (Mercenary) entity;
-                    temp.moveEntity(entities, character.getPosition());
+                    temp.moveEntity(entities, character.getPosition(), null);
                 }
             }
         }
