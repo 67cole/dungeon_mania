@@ -15,7 +15,7 @@ public class BuildableEntityTest {
 
     public void testCollectableItem() {
         DungeonManiaController controller = new DungeonManiaController();
-        controller.newGame("buildableTest", "Peaceful");
+        controller.newGame("buildableTest", "peaceful");
         DungeonResponse tickHolder = null;
         // Picking up items to build items
         for (int i = 0; i < 10; i++) {
