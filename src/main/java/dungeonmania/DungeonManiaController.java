@@ -182,7 +182,8 @@ public class DungeonManiaController {
         List<MovingEntity> mvList = new ArrayList<MovingEntity>();
         for (Entity entity : currDungeon.getEntities()) {
             if (entity.getType().equals("player") || entity.getType().equals("mercenary") ||
-            entity.getType().equals("spider") || entity.getType().equals("zombie_toast")) {
+            entity.getType().equals("spider") || entity.getType().equals("zombie_toast") 
+            || entity.getType().equals("hydra") || entity.getType().equals("assassin")) {
                 MovingEntity mv = (MovingEntity) entity;
                 mvList.add(mv);
             }
@@ -228,11 +229,30 @@ public class DungeonManiaController {
                     }
                 }
             }
+            else if (jEntity.get("type").getAsString().equals("hydra")) {
+                for (MovingEntity mvEntity : mvList) {
+                    if (mvEntity.getType().equals("hydra")) {
+                        jEntity.addProperty("attack", mvEntity.getAttack());
+                        jEntity.addProperty("health", mvEntity.getHealth());
+                    }
+                }
+            }
+            else if (jEntity.get("type").getAsString().equals("assassin")) {
+                for (MovingEntity mvEntity : mvList) {
+                    if (mvEntity.getType().equals("assassin")) {
+                        jEntity.addProperty("attack", mvEntity.getAttack());
+                        jEntity.addProperty("health", mvEntity.getHealth());
+                    }
+                }
+            }
             else if (jEntity.get("type").getAsString().equals("spider")) {
                 for (MovingEntity mvEntity : mvList) {
                     if (mvEntity.getType().equals("spider")) {
+                        Spider spider = (Spider) mvEntity;
                         jEntity.addProperty("attack", mvEntity.getAttack());
                         jEntity.addProperty("health", mvEntity.getHealth());
+                        jEntity.addProperty("loopPos", spider.getLoopPos());
+                        jEntity.addProperty("clockwise", spider.getClockwise());
                     }
                 }
             }
@@ -284,9 +304,15 @@ public class DungeonManiaController {
                 }
             }
 
-            else if (jEntity.get("type").getAsString().equals("portal")) {
+            else if (jEntity.get("type").getAsString().equals("REDportal") ||
+            jEntity.get("type").getAsString().equals("BLUEportal") || 
+            jEntity.get("type").getAsString().equals("YELLOWportal") ||
+            jEntity.get("type").getAsString().equals("GREYportal")) {
                 for (StaticEntity stEntity : staticList) {
-                    if (stEntity.getType().equals("portal")) {
+                    if (stEntity.getType().equals("REDportal") || 
+                    stEntity.getType().equals("GREYportal") || 
+                    stEntity.getType().equals("YELLOWportal") ||
+                    stEntity.getType().equals("BLUEportal")) {
                         Portal temp = (Portal) stEntity;
                         jEntity.addProperty("colour", temp.getColour());
                     }
@@ -1765,10 +1791,10 @@ public class DungeonManiaController {
      */
     public void addEntitiesToList(String dungeonName, Dungeon main) {
 
-        String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
         try {
-            JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
-            
+            Gson gson = new Gson();
+            String json = FileLoader.loadResourceFile("/dungeons/" + dungeonName + ".json");
+            JsonObject jsonObject = gson.fromJson(json, JsonElement.class).getAsJsonObject(); 
             JsonArray entitiesList = jsonObject.get("entities").getAsJsonArray();
             
             for (int i = 0; i < entitiesList.size(); i++) {
@@ -1915,9 +1941,10 @@ public class DungeonManiaController {
      */
     public String getGoalsFromJson(String dungeonName)  {
         String returnGoal = "";
-        String filename = "src\\main\\resources\\dungeons\\" + dungeonName + ".json";
         try {
-            JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
+            Gson gson = new Gson();
+            String json = FileLoader.loadResourceFile("/dungeons/" + dungeonName + ".json");
+            JsonObject jsonObject = gson.fromJson(json, JsonElement.class).getAsJsonObject();
             JsonObject goalCondition = jsonObject.get("goal-condition").getAsJsonObject();
             String goal = goalCondition.get("goal").getAsString();
             // For the case of a double goal
@@ -2102,10 +2129,25 @@ public class DungeonManiaController {
 
                     main.addEntities(doorEntity);
                     break;
-                case "portal":
+                case "REDportal":
                     String colour = entity.get("colour").getAsString();
-                    Portal portalEntity = new Portal(position, colour+"portal", entityId, false, colour);
+                    Portal portalEntity = new Portal(position, type, entityId, false, colour);
                     main.addEntities(portalEntity);
+                    break;
+                case "BLUEportal":
+                    String colour2 = entity.get("colour").getAsString();
+                    Portal portalEntity2 = new Portal(position, type, entityId, false, colour2);
+                    main.addEntities(portalEntity2);
+                    break;
+                case "GREYportal":
+                    String colour3 = entity.get("colour").getAsString();
+                    Portal portalEntity3 = new Portal(position, type, entityId, false, colour3);
+                    main.addEntities(portalEntity3);
+                    break;
+                case "YELLOWportal":
+                    String colour4 = entity.get("colour").getAsString();
+                    Portal portalEntity4 = new Portal(position, type, entityId, false, colour4);
+                    main.addEntities(portalEntity4);
                     break;
                 case "zombie_toast_spawner":
                     ZombieToastSpawner zombieToastSpawner = new ZombieToastSpawner(position, type, entityId, true);
@@ -2155,6 +2197,8 @@ public class DungeonManiaController {
                     Spider spiderEntity = new Spider(position, type, entityId, false);
                     spiderEntity.setAttack(entity.get("attack").getAsInt());
                     spiderEntity.setHealth(entity.get("health").getAsInt());
+                    spiderEntity.setLoopPos(entity.get("loopPos").getAsInt());
+                    spiderEntity.setClockwise(entity.get("clockwise").getAsBoolean());
                     main.addEntities(spiderEntity);
                     break;
                 case "zombie_toast":
@@ -2172,6 +2216,32 @@ public class DungeonManiaController {
                 case "time_turner":
                     TimeTurner tt = new TimeTurner(position, type, entityId, false);
                     main.addEntities(tt);
+                    break;
+                case "swamp_tile":
+                    SwampTile swamp = new SwampTile(position, type, entityId, false);
+                    main.addEntities(swamp);
+                    break;
+                case "light_bulb_off":
+                    LightBulb bulb  = new LightBulb(position, type, entityId, false);
+                    main.addEntities(bulb);
+                    break;
+                case "wire":
+                    Wire wire =  new Wire(position, type, entityId, false);
+                    main.addEntities(wire);
+                    break;
+                case "switch_door":
+                    SwitchDoor switchDoor = new SwitchDoor(position, type, entityId, false);
+                    main.addEntities(switchDoor);
+                    break;
+                case "hydra":
+                    Hydra hydraEntity = new Hydra(position, type, entityId, true);
+                    main.addEntities(hydraEntity);
+                    break;
+                case "assassin":
+                    Assassin assassinEntity = new Assassin(position, type, entityId, true);
+                    assassinEntity.setAttack(entity.get("attack").getAsInt());
+                    assassinEntity.setHealth(entity.get("health").getAsInt());
+                    main.addEntities(assassinEntity);
                     break;
             }
         }
