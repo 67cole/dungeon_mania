@@ -274,3 +274,147 @@ BasicGoalsTest > 7-3 Testing achieving an enemies goal with a single spider on t
 FAILURE
 DONE
 Test 7-4
+SUCCESS
+DONE
+Test 7-5
+
+BasicGoalsTest > 7-5 Test achieving a switch goal where there is one switch FAILED
+    org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+        at org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:55)
+        at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:40)
+        at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:35)
+        at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:179)
+        at dungeonmania.controllerTest.BasicGoalsTest.testSwitchGoalOneSwitch(BasicGoalsTest.java:102)
+FAILURE
+DONE
+Test 7-6
+
+BasicGoalsTest > 7-6 Test achieving a switch goal where there are two switches FAILED
+    org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+        at org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:55)
+        at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:40)
+        at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:35)
+        at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:179)
+        at dungeonmania.controllerTest.BasicGoalsTest.testSwitchGoalTwoSwitches(BasicGoalsTest.java:124)
+FAILURE
+DONE
+Test 7-7
+SUCCESS
+DONE
+Test 7-8
+
+BasicGoalsTest > Test a achieving a treasure goal with one treasure on the map FAILED
+    org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+        at org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:55)
+        at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:40)
+        at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:35)
+        at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:179)
+        at dungeonmania.controllerTest.BasicGoalsTest.testTreasureGoalOneTreasure(BasicGoalsTest.java:167)
+FAILURE
+DONE
+Test 7-9
+
+BasicGoalsTest > Testing a treasure goal with two treasure on the map FAILED
+    org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+        at org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:55)
+        at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:40)
+        at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:35)
+        at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:179)
+        at dungeonmania.controllerTest.BasicGoalsTest.testTreasureGoalCollectTwoTreasure(BasicGoalsTest.java:188)
+FAILURE
+DONE
+Test 8-1
+
+MovementTest > 8-1 Test the player can move down FAILED
+    java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+        at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64)
+        at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70)
+        at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:248)
+        at java.base/java.util.Objects.checkIndex(Objects.java:359)
+        at java.base/java.util.ArrayList.get(ArrayList.java:427)
+        at dungeonmania.controllerTest.MovementTest.testMovement(MovementTest.java:26)
+        at dungeonmania.controllerTest.MovementTest.testMovementDown(MovementTest.java:37)
+FAILURE
+DONE
+Test 8-2
+
+MovementTest > 8-2 Test the player can move up FAILED
+    java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+        at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64)
+        at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70)
+        at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:248)
+        at java.base/java.util.Objects.checkIndex(Objects.java:359)
+        at java.base/java.util.ArrayList.get(ArrayList.java:427)
+        at dungeonmania.controllerTest.MovementTest.testMovement(MovementTest.java:26)
+        at dungeonmania.controllerTest.MovementTest.testMovementUp(MovementTest.java:44)
+FAILURE
+DONE
+Test 8-3
+
+MovementTest > 8-3 Test the player can move left FAILED
+    java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+        at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64)
+        at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70)
+        at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:248)
+        at java.base/java.util.Objects.checkIndex(Objects.java:359)
+        at java.base/java.util.ArrayList.get(ArrayList.java:427)
+        at dungeonmania.controllerTest.MovementTest.testMovement(MovementTest.java:26)
+        at dungeonmania.controllerTest.MovementTest.testMovementLeft(MovementTest.java:51)
+FAILURE
+DONE
+Test 8-4
+
+MovementTest > 8-4 Test the player can move right FAILED
+    java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+        at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64)
+        at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70)
+        at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:248)
+        at java.base/java.util.Objects.checkIndex(Objects.java:359)
+        at java.base/java.util.ArrayList.get(ArrayList.java:427)
+        at dungeonmania.controllerTest.MovementTest.testMovement(MovementTest.java:26)
+        at dungeonmania.controllerTest.MovementTest.testMovementRight(MovementTest.java:58)
+FAILURE
+DONE
+Test 9-1
+
+BuildablesTest > 9-1 Test building a bow FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.BuildablesTest.testBuildBow(BuildablesTest.java:39)
+FAILURE
+DONE
+Test 9-2
+
+BuildablesTest > 9-2 Test building a shield with a key FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.BuildablesTest.testBuildShieldWithKey(BuildablesTest.java:70)
+FAILURE
+DONE
+Test 9-3
+
+BuildablesTest > 9-3 Test building a shield with treasure FAILED
+    java.lang.NullPointerException: Cannot invoke "dungeonmania.util.Position.translateBy(dungeonmania.util.Direction)" because "player" is null
+        at dungeonmania.DungeonManiaController.mercenaryMovement(DungeonManiaController.java:1400)
+        at dungeonmania.DungeonManiaController.tick(DungeonManiaController.java:732)
+        at dungeonmania.controllerTest.Utils.tick(Utils.java:20)
+        at dungeonmania.controllerTest.BuildablesTest.testBuildShieldWithTreasure(BuildablesTest.java:100)
+FAILURE
+DONE
+Test 10-1
+
+BombsTest > 10-1 Test picking up a bomb removes the bomb from the map FAILED
+    org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+        at org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:55)
+        at org.junit.jupiter.api.AssertionUtils.failNotEqual(AssertionUtils.java:62)
+        at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+        at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+        at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:527)
+        at dungeonmania.controllerTest.BombsTest.testBombPickUpRemoveFromMap(BombsTest.java:35)
+FAILURE
+DONE
+Test 10-2
