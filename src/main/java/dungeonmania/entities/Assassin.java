@@ -41,7 +41,11 @@ public class Assassin extends MovingEntity {
         this.friendly = friendly;
     }
 
-    // returns a list of walkable positions
+    /**
+     * returns a list of walkable positions
+     * @param entities
+     * @return
+     */
     public List<Position> posList(List<Entity> entities) {
         List<Position> ls = new ArrayList<Position>();
         for (int i = 0; i < 16; i++) {
@@ -58,7 +62,15 @@ public class Assassin extends MovingEntity {
 
     }
 
-    public int cost(List<Entity> entities, Position source, Position dest) {
+
+    /**
+     * returns the cost of moving one tile to another
+     * @param entities
+     * @param source
+     * @param dest
+     * @return int
+     */
+    public int cost (List<Entity> entities, Position source, Position dest) {
         for (Entity ent : entities) {
             // if swamp tile, return movement factor instead of 1 (movement factor counts as distance of 2)
             if (ent.getPosition().equals(source) && ent.getType().equals("swamp_tile")) {
@@ -69,7 +81,14 @@ public class Assassin extends MovingEntity {
         return 1;
     }
 
-    public Position djikstra(List<Position> posList, Position source, List<Entity> entities) {
+    /**
+     * Performs dijkstra and returns the first position along the shortest found path
+     * @param posList
+     * @param source
+     * @param entities
+     * @return Position
+     */
+    public Position dijkstra(List<Position> posList, Position source, List<Entity> entities) {
         
         // create hashmap of dist and prev
         HashMap<Position, Double> dist = new HashMap<Position, Double>();
@@ -120,6 +139,11 @@ public class Assassin extends MovingEntity {
         return previous;
     }
 
+    /**
+     * returns a list of cardinal neighbour positions
+     * @param pos
+     * @return List<Position>
+     */
     public List<Position> getCardinalNeighbours(Position pos) {
         List<Position> neighbours = new ArrayList<Position>();
         // above
@@ -163,7 +187,7 @@ public class Assassin extends MovingEntity {
 
         List<Position> posList = posList(entities);
 
-        Position newPos = djikstra(posList, super.getPosition(), entities);
+        Position newPos = dijkstra(posList, super.getPosition(), entities);
         
         Position current = super.getPosition();
 
@@ -210,8 +234,10 @@ public class Assassin extends MovingEntity {
 
         // Now moving the assassin
         if (shortestDistance < originalDistance) {
+            // if dijkstra has found a shorter path, set position returned by dijkstra
             if (newPos != null) {
                 super.setPosition(newPos);
+            // else set position to result of pythagoreas
             } else {
                 super.setPosition(destination);
             }

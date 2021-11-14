@@ -147,7 +147,7 @@ public class DungeonManiaController {
         
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
         lastTick = dr;
-        clearDatabase();
+        clearRewindDatabase();
         addToRewindDatabase();
         
         return dr;
@@ -541,12 +541,9 @@ public class DungeonManiaController {
         Position playerSpawnPosition = null;
         main = currDungeon;
 
-        
-
-
         // Get the character class
         Character character = Character.getCharacter(entities);
-        
+
         // Check potion duration and set it off if it expires
         potionTickAdder(character);
         potionChecker(character);
@@ -556,7 +553,6 @@ public class DungeonManiaController {
 
         // If the gamemode is hard, always turn off invincibility
         if (currDungeon.getHard()) character.setIsInvincible(false);
-
 
         // Checks if the character is invincible, then move the enemies
         if (character.isInvincible()) {
@@ -569,8 +565,6 @@ public class DungeonManiaController {
         if (!invincibilityActive) Mercenary.mercenaryMovement(entities, movementDirection);
         if (!invincibilityActive) Assassin.assassinMovement(entities, movementDirection);
         if (!invincibilityActive) ZombieToast.zombieMovement(entities, movementDirection);
-
-
 
         for (Entity entity : entities) {
             // Mercenary should only spawn if there is an enemy for the dungeon
@@ -797,7 +791,6 @@ public class DungeonManiaController {
             main.addEntities(unlockedDoor);
         }
 
-        
         Position playerPos = new Position(0, 0);
         for (Entity ent : entities) {
             if (ent.getType().equals("player")) playerPos = ent.getPosition();
@@ -810,14 +803,26 @@ public class DungeonManiaController {
         for (Entity enti : entities) {
             // if boulder, check that the boulder has a switch and explode any nearby bombs
             if (enti.getType().equals("boulder")) {
+                Entity bombEnt = null;
+                // checks if the square player is moving onto has a bomb, which shouldnt be picked up
+                for (Entity currEnt : entities) {
+                    if (currEnt.getType().equals("player")) {
+                        Position playerPosition = currEnt.getPosition();
+                        for (Entity bomb : entities) {
+                            if (bomb.getType().equals("bomb") && playerPosition.equals(bomb.getPosition())) {
+                                bombEnt = bomb;
+                            }
+                        }
+                    }
+                }
                 Position entPos = enti.getPosition();
                 ArrayList<Position> adjacentPos = entPos.getCardinallyAdjacentPositions();
                 if (playerPos.equals(adjacentPos.get(0)) || playerPos.equals(adjacentPos.get(1)) || playerPos.equals(adjacentPos.get(2)) || playerPos.equals(adjacentPos.get(3))) {
-                    ((Boulder) enti).doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);    
+                    ((Boulder) enti).doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);  
+                    currDungeon.inventory.remove(bombEnt);  
                 }
             }
         }
-
 
         // Find switches to check lightbulb light up eligibility
         for (Entity enti : entities) {
@@ -850,8 +855,6 @@ public class DungeonManiaController {
                 }
             }
         }
-
-       
         // add all nearby entities to the bomb to entiitesToBeRemoved
         entitiesToBeRemoved.addAll(allNearbyEntities);
         // Remove the collectible from the map
@@ -865,8 +868,6 @@ public class DungeonManiaController {
         }
 
         // The Goal Checker Central
-
-
         // Check boulders
         if (main.getDungeonGoals().contains("boulder")) {
             checkBoulderGoal(entities, main);
@@ -879,27 +880,20 @@ public class DungeonManiaController {
             checkTreasureGoal(entities, main);
         }
 
-
         // Check enemies
         if (main.getDungeonGoals().contains("mercenary")) {
             checkEnemiesGoal(entities, main);
         } 
-
-
-
-
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
         for(Entity entity: main.getEntities()) {
             EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
             erList.add(er);
         }
-
         List<ItemResponse> irList= new ArrayList<ItemResponse>();
         for(CollectableEntity collectableEntity: main.inventory) {
             ItemResponse ir = new ItemResponse(collectableEntity.getID(), collectableEntity.getType());
             irList.add(ir);
         }
-
         DungeonResponse dr = new DungeonResponse(currDungeon.getDungeonId(), currDungeon.getDungeonName(),
             erList, irList, currDungeon.buildables, currDungeon.getDungeonGoals());
 
@@ -1245,7 +1239,7 @@ public class DungeonManiaController {
      * 
      */
 
-    public void clearDatabase() {
+    public void clearRewindDatabase() {
 
         String filename = "src\\main\\java\\dungeonmania\\rewindDatabase.json";
         FileOutputStream fileOutputStream = null;
@@ -1254,7 +1248,15 @@ public class DungeonManiaController {
             fileOutputStream.close();
         } catch (Exception e) {}
 
+    }
 
+    public void clearDatabase() {
+        String filename = "src\\main\\java\\dungeonmania\\database.json";
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(filename, false);
+            fileOutputStream.close();
+        } catch (Exception e) {}
     }
 
     public DungeonResponse rewindGame(int ticks) {

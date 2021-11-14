@@ -1,5 +1,4 @@
 package dungeonmania;
-
 import org.junit.jupiter.api.Test;
 
 import dungeonmania.DungeonManiaController;
