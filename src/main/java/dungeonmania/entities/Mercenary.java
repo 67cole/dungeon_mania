@@ -19,6 +19,7 @@ import java.util.PriorityQueue;
 public class Mercenary extends MovingEntity {
     private final static int STARTING_HEALTH = 3;
     private final static int ATTACK = 2;
+    private boolean friendly;
 
     /**
      * Creates the mercenary
@@ -36,9 +37,14 @@ public class Mercenary extends MovingEntity {
         if (chance == 3) {
             setArmour(true);
         }
+        this.friendly = false;
     }
 
-    // returns a list of walkable positions
+    /**
+     * returns a list of walkable positions
+     * @param entities
+     * @return
+     */
     public List<Position> posList(List<Entity> entities) {
         List<Position> ls = new ArrayList<Position>();
         for (int i = 0; i < 16; i++) {
@@ -55,6 +61,22 @@ public class Mercenary extends MovingEntity {
 
     }
 
+    public boolean getFriendly() {
+        return this.friendly;
+    }
+
+
+    public void setFriendly() {
+        this.friendly = true;
+    }
+
+    /**
+     * returns the cost of moving one tile to another
+     * @param entities
+     * @param source
+     * @param dest
+     * @return int
+     */
     public int cost (List<Entity> entities, Position source, Position dest) {
         for (Entity ent : entities) {
             // if swamp tile, return movement factor instead of 1 (movement factor counts as distance of 2)
@@ -66,7 +88,14 @@ public class Mercenary extends MovingEntity {
         return 1;
     }
 
-    public Position djikstra(List<Position> posList, Position source, List<Entity> entities) {
+    /**
+     * Performs dijkstra and returns the first position along the shortest found path
+     * @param posList
+     * @param source
+     * @param entities
+     * @return Position
+     */
+    public Position dijkstra(List<Position> posList, Position source, List<Entity> entities, Position nextPosition) {
         
         // create hashmap of dist and prev
         HashMap<Position, Double> dist = new HashMap<Position, Double>();
@@ -103,6 +132,7 @@ public class Mercenary extends MovingEntity {
         for (Entity ent : entities) {
             if (ent.getType().equals("player")) curr = ent.getPosition();
         }
+        curr = nextPosition;
         Position previous = curr;
         if (dist.get(curr) == null) {
             return null;
@@ -117,6 +147,11 @@ public class Mercenary extends MovingEntity {
         return previous;
     }
 
+    /**
+     * returns a list of cardinal neighbour positions
+     * @param pos
+     * @return List<Position>
+     */
     public List<Position> getCardinalNeighbours(Position pos) {
         List<Position> neighbours = new ArrayList<Position>();
         // above
@@ -147,20 +182,41 @@ public class Mercenary extends MovingEntity {
                 if (swampMove == false) {
                     continue;
                 }             
-                mercenaryEntity.moveEntity(entities, player);
+                if (!mercenaryEntity.getFriendly()) mercenaryEntity.moveEntity(entities, player, player);
             }
         }
     }
 
+    /**
+     * Moves the mercenary around
+     * @param entities - The list of all entities in the dungeon
+     */
+    public static void allyMercenaryMovement(List<Entity> entities) {
+        Position player = Character.getPlayerPosition(entities);
+
+        boolean swampMove = true;
+        for (Entity entity : entities) {
+            if (entity.getType().equals("mercenary")) {
+                Mercenary mercenaryEntity = (Mercenary) entity;
+                swampMove = SwampTile.swampCanMove(mercenaryEntity, entities);
+                if (swampMove == false) {
+                    continue;
+                }             
+                if (mercenaryEntity.getFriendly()) mercenaryEntity.moveEntity(entities, player, player);
+            }
+        }
+    }
 
     /**
-     * Moving the mercenary
+     * moves the mercenary
+     * @param entities
+     * @param playerPosition
      */
-    public void moveEntity (List<Entity> entities, Position playerPosition) {
+    public void moveEntity (List<Entity> entities, Position playerPosition, Position nextPosition) {
 
         List<Position> posList = posList(entities);
 
-        Position newPos = djikstra(posList, super.getPosition(), entities);
+        Position newPos = dijkstra(posList, super.getPosition(), entities, nextPosition);
         
         Position current = super.getPosition();
 
@@ -176,7 +232,7 @@ public class Mercenary extends MovingEntity {
 
 
         // Final placeholders for positions moved and shortest distance
-        double shortestDistance = 99999999;
+        double shortestDistance = Double.POSITIVE_INFINITY;
         Position destination = null; 
 
         // This looks through adjacent positions, checks whether the next square is movable
@@ -206,11 +262,26 @@ public class Mercenary extends MovingEntity {
         double originalDistance = Math.sqrt(Math.pow(originalVector.getX(), 2) + Math.pow(originalVector.getY(), 2));
 
         // Now moving the mercenary
-        if (shortestDistance < originalDistance) {
+        if (shortestDistance < originalDistance || this.getFriendly()) {
             if (newPos != null) {
+                if (newPos.equals(playerPosition) && this.getFriendly()) {
+
+                    if (!destination.equals(playerPosition)) {
+                        super.setPosition(destination);
+                        return;
+                    }
+
+                    return;
+                }
+
                 super.setPosition(newPos);
+
             } else {
-                super.setPosition(destination);
+                if (destination.equals(playerPosition) && this.getFriendly()) {
+                    return;
+                }
+                
+                super.setPosition(destination);  
             }
             
         } 
@@ -265,7 +336,7 @@ public class Mercenary extends MovingEntity {
 
                 if (distance < 4) {
                     Mercenary temp = (Mercenary) entity;
-                    temp.moveEntity(entities, character.getPosition());
+                    temp.moveEntity(entities, character.getPosition(), null);
                 }
             }
         }

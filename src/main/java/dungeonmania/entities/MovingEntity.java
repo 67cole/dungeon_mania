@@ -150,6 +150,14 @@ public abstract class MovingEntity implements Entity {
     }
 
     /**
+     * Set isInteractable to off
+     */
+    public void setInteractable() {
+        this.isInteractable = false;
+    }
+
+
+    /**
      * Setting the armour status of entity
      * @return boolean
      */
