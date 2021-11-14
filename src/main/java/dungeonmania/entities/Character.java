@@ -5,7 +5,7 @@ import java.util.List;
 import dungeonmania.util.*;
 
 public class Character extends MovingEntity {
-    private final static int STARTING_HEALTH = 10;
+    public final static int STARTING_HEALTH = 10;
     private final static int ATTACK = 2;
 
     private Position spawnPosition = null;

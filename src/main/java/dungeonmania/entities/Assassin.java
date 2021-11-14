@@ -17,7 +17,7 @@ import java.util.PriorityQueue;
 
 public class Assassin extends MovingEntity {
     private final static int STARTING_HEALTH = 6;
-    private final static int ATTACK = 6;
+    private final static int ATTACK = 4;
     private boolean friendly = false;
 
     /**
