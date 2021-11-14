@@ -1,4 +1,4 @@
-
+== MILESTONE 1 NOTES ==
 
 16/10/21 (6:00 pm - 11:30 pm)
     -   This marked the start of our project. We read over the specs and discussed the varying parts of the codes to understand what we were implementing. 
@@ -24,7 +24,7 @@
     -   Afterwards, we decided to meet again in a couple of days to start the project as we were pretty much finished with Milestone 1. 
 
 
-
+== MILESTONE 2 NOTES ==
 
 24/10/21 - 25/10/21 (6:00 pm - 2:00 am)
     -   This meeting took 8 hours, due to the group just beginning to start the project. We decided to assign functions and roles for people to do:
@@ -83,3 +83,53 @@
     -   Overall, we were happy with the progress we've made with Milestone 1 and 2. The code was sufficient enough to build an MVP! :)  
 
 
+== MILESTONE 3 NOTES ==
+
+4/11/21 (6:00 pm - 12:00 am)
+    - This meeting lasted 6 hours as we began to read/understand the spec, and delegate tasks for the team to do;
+
+        Colin: DungeonGenerator, Hydra, Assassin, Interact (from milestone 2)
+        Jeremy: Dijkstra Path Finding
+        Thomas: Time Turner, Time travelling portal, time rules, save game and load game
+        Jonathan: Collectable Entities (Sunstone, anduril, sceptre, midnight armour)
+        Winston: Swamp tiles, lightbulbs, switch doors, wires, and their logic
+        For all: Any design/animation for frontend
+
+    - After we decided what to do, we pair programmed to create tests first.
+    - Assumptions were made for any confusing things from the spec for Milestone 3
+    - UML was also started by Jonathan for any new functions that we have planned
+    - Once tests were done, some implementation was started, with review from each team member
+
+    - Overall, today was a lot of progress as we spent a lot of time planning/perfecting
+
+11/11/21 (4:00pm to 10:00 am)
+    - This meeting lasted 6 hours, and the purpose was to discuss progression, and ask for any assistance or advice for people's respective tasks
+
+    - Colin and Winston took around 1-2 hours to help Jeremy with his implementation of Dijkstra. This was because interact needed this to be finished first.
+    - Jonathan worked on implementing and understanding the new collectable entities that need to be made
+    - Thomas began implementing time turner, using code that was already been made for save/load game as a framework
+    - The rest of the time, we were focused on working on our respective functions
+    - Jeremy added some changes to the frontend, including front scren music, player png, and in game music
+
+    - Overall, today was useful in progressing with our Milestone 3 implementation
+
+13/11/21 (6:00pm to 1:00 am)
+    - This meeting lasted 7 hours, and the purpose was to finalise our code as the deadline approaches quickly
+    - There were a lot of issues with interact and mercenary, particularly when the mercenary has been bribed - and how this applies with Dijkstra
+    - Colin and Jeremy continued to work on bugs with Dijkstra, mercenary and assassin
+    - Thomas finished his time turner functions and started working on Time Travelling portals
+    - Winston worked on switches/lightbulbs/trapdoors and how they interact with each other. He succeeded getting the first half of the milestone 3 requirements, and decided that the second half (involving XOR, etc) was too time-consuming. Instead, we had him help for swamp tiles and problems that Colin and Jeremy had
+    - Jonathan finalised his collectable items and needed to connect them to mercenary/assassin bribing
+    - Ultimately, we realised alot of our problems stemmed from Mercenary and Dijkstra. More testing was needed tomorrow (day before deadline)
+
+14/11/21 (12:00pm to 1:00am)
+    - This meeting lasted 13 hours. Note: this is because people came in and out
+    - As the last day, we needed to finish everything up. 
+    - Thomas realised we had some issues that stemmed from our Milestone 2 and spent 2-3 hours trying to find the issue.
+        - He realised it was due to some errors with loading in the json files from main/resources instead of test/resources. 
+    - Thomas and Jeremy added animations into the frontend, including a health bar and animating the movement of the player to be smooth
+    - Winston worked on polishing the timeline for submission
+    - Colin succesfully completed the dungeon generator, and was working on fixing any issues with interact and bribing
+    - The rest of time was spent debugging for minor issues with some functions and ensuring that the autotests can run properly.
+
+    Overall, it was a good day of finalisation and we hope that we do well for Milestone 3!
