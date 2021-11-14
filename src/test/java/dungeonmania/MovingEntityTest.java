@@ -1,4 +1,5 @@
 package dungeonmania;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -19,6 +20,7 @@ import dungeonmania.util.Position;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Currency;
 
 public class MovingEntityTest {
     // Checks the movement of the player
@@ -56,15 +58,14 @@ public class MovingEntityTest {
     // Check if newGame imports the json data properly and adds everything into the entitieslist
     @Test
     public void testMercenarySpawn() {
-        DungeonManiaController controller = new DungeonManiaController();
-        DungeonResponse newDungeon = controller.newGame("advanced-2", "peaceful");
+        DungeonManiaController controll = new DungeonManiaController();
+        DungeonResponse newDungeon = controll.newGame("advanced-2", "peaceful");
         Position toBePos = new Position(1,1);
         assertTrue(entityInPlace(toBePos, newDungeon, "player"));
         DungeonResponse tickHolder = null;
         for (int i = 0; i < 40; i++) {
-            tickHolder =  controller.tick(null, Direction.DOWN);
+            tickHolder =  controll.tick(null, Direction.DOWN);
         }
-
         assertTrue(entityInPlace(toBePos, tickHolder, "mercenary"));
 
     }
@@ -178,62 +179,62 @@ public class MovingEntityTest {
         tickHolder =  controller.tick(findItemID(tickHolder, "invincibility_potion"), Direction.NONE);
 
         tickHolder =  controller.tick(null, Direction.UP);
-        Position moveAwayM1 = new Position(3,1);
-        Position moveAwayM2 = new Position(3,6);
+        Position moveAwayM1 = new Position(4,2);
+        Position moveAwayM2 = new Position(6,3);
         assertTrue(entityInPlace(moveAwayM1, tickHolder, "mercenary"));
         assertTrue(entityInPlace(moveAwayM2, tickHolder, "mercenary"));
 
         tickHolder =  controller.tick(null, Direction.UP);
-        Position moveAwayM11 = new Position(4,1);
-        Position moveAwayM21 = new Position(3,7);
+        Position moveAwayM11 = new Position(5,2);
+        Position moveAwayM21 = new Position(6,4);
         assertTrue(entityInPlace(moveAwayM11, tickHolder, "mercenary"));
         assertTrue(entityInPlace(moveAwayM21, tickHolder, "mercenary"));
 
         tickHolder =  controller.tick(null, Direction.UP);
-        Position moveAwayM12 = new Position(5,1);
-        Position moveAwayM22 = new Position(3,8);
+        Position moveAwayM12 = new Position(6,2);
+        Position moveAwayM22 = new Position(6,5);
         assertTrue(entityInPlace(moveAwayM12, tickHolder, "mercenary"));
         assertTrue(entityInPlace(moveAwayM22, tickHolder, "mercenary"));
 
         tickHolder =  controller.tick(null, Direction.UP);
-        Position moveAwayM13 = new Position(6,1);
-        Position moveAwayM23 = new Position(3,9);
+        Position moveAwayM13 = new Position(6,3);
+        Position moveAwayM23 = new Position(6,6);
         assertTrue(entityInPlace(moveAwayM13, tickHolder, "mercenary"));
         assertTrue(entityInPlace(moveAwayM23, tickHolder, "mercenary"));
 
         tickHolder =  controller.tick(null, Direction.UP);
-        Position moveAwayM14 = new Position(6,2);
-        Position moveAwayM24 = new Position(4,9);
+        Position moveAwayM14 = new Position(6,4);
+        Position moveAwayM24 = new Position(6,7);
         assertTrue(entityInPlace(moveAwayM14, tickHolder, "mercenary"));
         assertTrue(entityInPlace(moveAwayM24, tickHolder, "mercenary"));
 
         tickHolder =  controller.tick(null, Direction.UP);
-        Position moveAwayM15 = new Position(6,3);
-        Position moveAwayM25 = new Position(5,9);
+        Position moveAwayM15 = new Position(6,5);
+        Position moveAwayM25 = new Position(6,8);
         assertTrue(entityInPlace(moveAwayM15, tickHolder, "mercenary"));
         assertTrue(entityInPlace(moveAwayM25, tickHolder, "mercenary"));
 
         tickHolder =  controller.tick(null, Direction.UP);
-        Position moveAwayM16 = new Position(6,4);
+        Position moveAwayM16 = new Position(6,6);
         Position moveAwayM26 = new Position(6,9);
         assertTrue(entityInPlace(moveAwayM16, tickHolder, "mercenary"));
         assertTrue(entityInPlace(moveAwayM26, tickHolder, "mercenary"));
 
         tickHolder =  controller.tick(null, Direction.UP);
-        Position moveAwayM17 = new Position(6,5);
+        Position moveAwayM17 = new Position(6,7);
         Position moveAwayM27 = new Position(6,9);
         assertTrue(entityInPlace(moveAwayM17, tickHolder, "mercenary"));
         assertTrue(entityInPlace(moveAwayM27, tickHolder, "mercenary"));
 
         tickHolder =  controller.tick(null, Direction.UP);
-        Position moveAwayM18 = new Position(6,6);
+        Position moveAwayM18 = new Position(6,8);
         Position moveAwayM28 = new Position(6,9);
         assertTrue(entityInPlace(moveAwayM18, tickHolder, "mercenary"));
         assertTrue(entityInPlace(moveAwayM28, tickHolder, "mercenary"));
 
         // This is the end of the invincibility potion tick
         tickHolder =  controller.tick(null, Direction.UP);
-        Position moveAwayM19 = new Position(6,5);
+        Position moveAwayM19 = new Position(6,7);
         Position moveAwayM29 = new Position(6,8);
         assertTrue(entityInPlace(moveAwayM19, tickHolder, "mercenary"));
         assertTrue(entityInPlace(moveAwayM29, tickHolder, "mercenary"));
@@ -263,7 +264,7 @@ public class MovingEntityTest {
         DungeonManiaController controller = new DungeonManiaController();
         DungeonResponse newDungeon = controller.newGame("advanced-2", "standard");
         DungeonResponse tickHolder = null;
-        for (int i = 0; i < 27; i++) {
+        for (int i = 0; i < 25; i++) {
             tickHolder =  controller.tick(null, Direction.LEFT);
         }
         Dungeon dung = controller.getCurrDungeon();
@@ -276,9 +277,93 @@ public class MovingEntityTest {
         }
         assertTrue(spiderPos.getX() != 0);
         assertTrue(spiderPos.getY() != 0);
-        System.out.printf("%d, %d", spiderPos.getX(), spiderPos.getY());
         assertTrue(entityInPlace(spiderPos, tickHolder, "spider"));
         
+    }
+
+    @Test
+    public void testSpiderDontSpawnOnBoulder() {
+        DungeonManiaController controller = new DungeonManiaController();
+        DungeonResponse newDungeon = controller.newGame("advanced-2", "standard");
+        DungeonResponse tickHolder = null;
+        for (int i = 0; i < 25; i++) {
+            tickHolder =  controller.tick(null, Direction.LEFT);
+        }
+        Dungeon dung = controller.getCurrDungeon();
+        List<Entity> entities = dung.getEntities();
+        Position spiderPos = new Position(0, 0);
+        for (Entity currEnt : entities) {
+            if (currEnt.getType().equals("spider")) {
+                spiderPos = currEnt.getPosition();
+            }
+        }
+        List<Entity> boulderList = new ArrayList<Entity>();
+        for (Entity currEnt : entities) {
+            if (currEnt.getType().equals("boulder")) boulderList.add(currEnt);
+        }
+        for (Entity currBoulder : boulderList) {
+            assertFalse(entityInPlace(currBoulder.getPosition(), newDungeon, "spider"));
+        }
+
+    }
+
+    @Test
+    public void testSpiderDontSpawnUnderBoulder() {
+        DungeonManiaController controller = new DungeonManiaController();
+        DungeonResponse newDungeon = controller.newGame("advanced-2", "standard");
+        DungeonResponse tickHolder = null;
+        for (int i = 0; i < 25; i++) {
+            tickHolder =  controller.tick(null, Direction.LEFT);
+        }
+        Dungeon dung = controller.getCurrDungeon();
+        List<Entity> entities = dung.getEntities();
+        Position spiderPos = new Position(0, 0);
+        for (Entity currEnt : entities) {
+            if (currEnt.getType().equals("spider")) {
+                spiderPos = currEnt.getPosition();
+            }
+        }
+        List<Entity> boulderList = new ArrayList<Entity>();
+        for (Entity currEnt : entities) {
+            if (currEnt.getType().equals("boulder")) boulderList.add(currEnt);
+        }
+        for (Entity currBoulder : boulderList) {
+            assertFalse(entityInPlace(currBoulder.getPosition().translateBy(0, 1), newDungeon, "spider"));
+        }
+
+    }
+    
+    @Test
+    public void testSpiderReverseDirection() {
+        DungeonManiaController controller = new DungeonManiaController();
+        DungeonResponse newDungeon = controller.newGame("spiderDungeon", "standard");
+        DungeonResponse tickHolder = null;
+        
+
+        Dungeon dung = controller.getCurrDungeon();
+        List<Entity> entities = dung.getEntities();
+        Position spiderPos = new Position(0, 0);
+        for (Entity currEnt : entities) {
+            if (currEnt.getType().equals("spider")) {
+                spiderPos = currEnt.getPosition();
+            }
+        }
+        tickHolder = controller.tick(null, Direction.LEFT);
+        assertTrue(entityInPlace(spiderPos.translateBy(Direction.UP), tickHolder, "spider"));
+        
+        tickHolder = controller.tick(null, Direction.LEFT);
+        assertTrue(entityInPlace(spiderPos.translateBy(Direction.UP), tickHolder, "spider"));
+        tickHolder = controller.tick(null, Direction.LEFT);
+        assertTrue(entityInPlace(spiderPos.translateBy(Direction.LEFT).translateBy(Direction.UP), tickHolder, "spider"));
+        boolean clockwise = true; 
+
+        for (Entity currEnt : entities) {
+            if (currEnt.getType().equals("spider")) {
+                clockwise = ((MovingEntity) currEnt).getClockwise();
+            }
+        }
+        // test that clockwise is reverted to false (since now moving anticlockwise)
+        assertFalse(clockwise);
     }
 
     /**
