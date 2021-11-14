@@ -664,6 +664,11 @@ public abstract class MovingEntity implements Entity {
             for (Mercenary merc: friendlyMercenaries) {
                 enemyHealth = enemyHealth - ((merc.getHealth() * (merc.getAttack())) / 5);
             }
+            // Applying ally damage to enemy first
+            List<Assassin> friendlyAssassin = getAssassin(entities);
+            for (Assassin assassin: friendlyAssassin) {
+                enemyHealth = enemyHealth - ((assassin.getHealth() * (assassin.getAttack())) / 5);
+            }
             // Calculations for character
             if (charHasMArmour) {
                 enemyAD = enemyAD / 4;
@@ -850,5 +855,23 @@ public abstract class MovingEntity implements Entity {
             }
         }
         return mercenaryList;
+    }
+
+    /**
+     * Get Assassin
+     * @param entities
+     * @return List<Assassin>
+     */
+    public List<Assassin> getAssassin(List<Entity> entities) {
+        List<Assassin> assassinList = new ArrayList<Assassin>();
+        // Look for a friendly Mercenary
+        for (Entity entityAssassin: entities) {
+            if (entityAssassin.getType().equals("assassin")) {
+               if (((Assassin) entityAssassin).getFriendly() == true) {
+                   assassinList.add((Assassin) entityAssassin);
+               }
+            }
+        }
+        return assassinList;
     }
 }

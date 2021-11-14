@@ -18,6 +18,7 @@ import java.util.PriorityQueue;
 public class Assassin extends MovingEntity {
     private final static int STARTING_HEALTH = 6;
     private final static int ATTACK = 6;
+    private boolean friendly = false;
 
     /**
      * Creates the assassin
@@ -30,6 +31,14 @@ public class Assassin extends MovingEntity {
         super(position, type, ID, isInteractable);
         setHealth(STARTING_HEALTH);
         setAttack(ATTACK);
+    }
+
+    public boolean getFriendly() {
+        return this.friendly;
+    }
+
+    public void setFriendly(boolean friendly) {
+        this.friendly = friendly;
     }
 
     // returns a list of walkable positions
