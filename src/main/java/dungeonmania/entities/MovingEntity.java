@@ -840,7 +840,7 @@ public abstract class MovingEntity implements Entity {
     }
 
     /**
-     * Get Mercenary
+     * Get Friendly Mercenaries in the range of the entity
      * @param entities
      * @return List<Mercenary>
      */
@@ -849,7 +849,7 @@ public abstract class MovingEntity implements Entity {
         // Look for a friendly Mercenary
         for (Entity entityMercenary: entities) {
             if (entityMercenary.getType().equals("mercenary")) {
-               if (((Mercenary) entityMercenary).getFriendly() == true) {
+               if (((Mercenary) entityMercenary).getFriendly() == true && ((Mercenary) entityMercenary).mercenaryBattle(this)) {
                    mercenaryList.add((Mercenary) entityMercenary);
                }
             }
@@ -858,7 +858,7 @@ public abstract class MovingEntity implements Entity {
     }
 
     /**
-     * Get Assassin
+     * Get Friendly Assassins in the range of the entity
      * @param entities
      * @return List<Assassin>
      */
@@ -867,7 +867,7 @@ public abstract class MovingEntity implements Entity {
         // Look for a friendly Mercenary
         for (Entity entityAssassin: entities) {
             if (entityAssassin.getType().equals("assassin")) {
-               if (((Assassin) entityAssassin).getFriendly() == true) {
+               if (((Assassin) entityAssassin).getFriendly() == true && ((Assassin) entityAssassin).assassinBattle(this)) {
                    assassinList.add((Assassin) entityAssassin);
                }
             }
