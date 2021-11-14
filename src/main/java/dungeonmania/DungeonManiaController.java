@@ -946,6 +946,26 @@ public class DungeonManiaController {
             if (!Treasure.playerHasEnoughGold(inventory)) {
                 throw new InvalidActionException("The player does not have enough gold to bribe the mercenary.");
             }
+            interactWithMercenary(inventory, interaction);
+
+
+
+        }
+
+        // Interaction with the assassin
+        if (interaction.getType().equals("assassin")) {
+            System.out.println("Interacting with assassin");
+            
+            // Check whether the player is close enough to the mercenary
+            if (!Mercenary.playerProximityMercenary(character, interaction)) {
+                throw new InvalidActionException("The player is not close enough to the mercenary.");
+            }
+
+            // Check whether the player has enough gold to bribe the mercenary
+            if (!Treasure.playerHasEnoughGold(inventory)) {
+                throw new InvalidActionException("The player does not have enough gold to bribe the mercenary.");
+            }
+            interactWithAssassin(inventory, interaction);
 
 
 
@@ -2355,6 +2375,54 @@ public class DungeonManiaController {
                 return;
             }
         }
+    }
+
+    /**
+     * Removes items required to bribe assassin from inventory and bribe the mercenary
+     * @param inventory
+     * @param interaction
+     */
+    public void interactWithAssassin(List<CollectableEntity> inventory, Entity interaction) {
+        Treasure coinHolder = null;
+        //Remove 2 coins from inventory after interacting with mercenary
+        for (int i = 0; i < 2; i++) {
+            for (CollectableEntity item: inventory) {
+                if (item.getType().equals("treasure")) {
+                    coinHolder = (Treasure)item;
+                }
+            } 
+            inventory.remove(coinHolder); 
+        }
+        TheOneRing ringHolder = null;
+        for (CollectableEntity item: inventory) {
+            if (item.getType().equals("one_ring")) {
+                ringHolder = (TheOneRing) item;
+            }
+        }
+        inventory.remove(ringHolder);
+        Assassin assassinEntity = (Assassin) interaction;
+        assassinEntity.setFriendly(true);
+    }
+
+    /**
+     * Removes items required to bribe mercenary from inventory and bribe the mercenary
+     * @param inventory
+     * @param interaction
+     */
+    public void interactWithMercenary(List<CollectableEntity> inventory, Entity interaction) {
+        Treasure coinHolder = null;
+        //Remove 2 coins from inventory after interacting with mercenary
+        for (int i = 0; i < 2; i++) {
+            for (CollectableEntity item: inventory) {
+                if (item.getType().equals("treasure")) {
+                    coinHolder = (Treasure)item;
+                }
+            } 
+            inventory.remove(coinHolder); 
+        }
+
+        Mercenary mercenaryEntity = (Mercenary) interaction;
+        mercenaryEntity.setFriendly(true);
     }
     /**
      * Searches for a zombie
