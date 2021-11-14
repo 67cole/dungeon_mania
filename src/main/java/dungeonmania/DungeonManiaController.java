@@ -519,7 +519,6 @@ public class DungeonManiaController {
         List<Entity> entities = currDungeon.getEntities();
         Dungeon main = null;
         List<Entity> entitiesToBeRemoved = new ArrayList<Entity>();
-        List<Entity> entitiesToBeAdded = new ArrayList<Entity>();
         List<Entity> allNearbyEntities = new ArrayList<Entity>();
         currDungeon.setTickCounter(currDungeon.getTickCounter() + 1);
         Spider spid = null;
@@ -639,7 +638,7 @@ public class DungeonManiaController {
                                     main.inventory.remove(item);
                                     entitiesToBeRemoved.add(item);
                                     Character respawnedCharacter = new Character(temp.getPosition(), temp.getType(), temp.getID(), temp.getIsInteractable());
-                                    entitiesToBeAdded.add(respawnedCharacter);
+                                    main.addEntities(respawnedCharacter);
                                     break;
                                 }
                             }
@@ -833,7 +832,31 @@ public class DungeonManiaController {
                         bulbEntity.lightOn();
                     } else {
                         bulbEntity.lightOff();
-                    }              
+                    }
+                // } else {
+                //     switch (logic) {
+                //         case "and":
+                //             if (bulbEntity.checkMultipleSwitch(main)) {
+                //                 bulbEntity.lightOn();
+                //             }
+                //             if (bulbEntity.checkMultipleWires(main)) {
+                //                 bulbEntity.lightOn();
+                //             } else {
+                //                 bulbEntity.lightOff();
+                //             }
+                //             break;
+                //         case "or":
+                //             break;
+                //         case "xor":
+                //             break;
+                //         case "not":
+                //             break;
+                //         case "co_and":
+                //             break;
+                //     }
+                    
+                // }
+                
             }
         }
 
@@ -856,8 +879,6 @@ public class DungeonManiaController {
         entitiesToBeRemoved.addAll(allNearbyEntities);
         // Remove the collectible from the map
         entityRemover(entitiesToBeRemoved, main);
-        // Adding entities to the map
-        entityAdder(entitiesToBeAdded, main);
         
         // Adding the bomb to the map
         if (bombHolder != null) {
@@ -1730,17 +1751,6 @@ public class DungeonManiaController {
             }
         }
     }
-
-     /**
-     * Removes an entity from Entities List
-     * @param entityList - the list of entities to be removed in the dungeon
-     * @param main - the dungeon
-     */
-    public void entityAdder(List<Entity> entityList, Dungeon main) {
-        for (Entity entityToBeAdded: entityList) {
-            main.addEntities(entityToBeAdded);
-        }
-    }
     /**
      * Uses the item in the inventory
      * @param player - the character
@@ -1780,17 +1790,13 @@ public class DungeonManiaController {
      * @param main
      */
     public void addEntitiesToList(String dungeonName, Dungeon main) {
-
-<<<<<<< HEAD
-        String filename = "src\\test\\resources\\dungeons\\" + dungeonName + ".json";
-=======
->>>>>>> master
+    
         try {
             Gson gson = new Gson();
             String json = FileLoader.loadResourceFile("/dungeons/" + dungeonName + ".json");
             JsonObject jsonObject = gson.fromJson(json, JsonElement.class).getAsJsonObject(); 
             JsonArray entitiesList = jsonObject.get("entities").getAsJsonArray();
-            
+
             for (int i = 0; i < entitiesList.size(); i++) {
                 JsonObject entity = entitiesList .get(i).getAsJsonObject();
                 String type = entity.get("type").getAsString();
@@ -2118,7 +2124,9 @@ public class DungeonManiaController {
                 case "door":    
                     int keyType = entity.get("keyType").getAsInt();
                     boolean locked = entity.get("locked").getAsBoolean();
+
                     Door doorEntity = new Door(position, type, entityId, false, keyType, locked);
+
                     main.addEntities(doorEntity);
                     break;
                 case "REDportal":
