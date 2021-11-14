@@ -292,6 +292,9 @@ public abstract class MovingEntity implements Entity {
                     if (entity.getType().equals("switch_door") && entity.getPosition().equals(attemptedMove)) {
                         return false;
                     }
+                    if (entity.getType().equals("zombie_toast_spawner") && entity.getPosition().equals(attemptedMove)) {
+                        return false;
+                    }
 
                 }
                 break;
@@ -308,6 +311,9 @@ public abstract class MovingEntity implements Entity {
                         return false;
                     }
                     if (entity.getType().equals("switch_door") && entity.getPosition().equals(attemptedMove1)) {
+                        return false;
+                    }
+                    if (entity.getType().equals("zombie_toast_spawner") && entity.getPosition().equals(attemptedMove1)) {
                         return false;
                     }
 
@@ -328,6 +334,9 @@ public abstract class MovingEntity implements Entity {
                     if (entity.getType().equals("switch_door") && entity.getPosition().equals(attemptedMove2)) {
                         return false;
                     }
+                    if (entity.getType().equals("zombie_toast_spawner") && entity.getPosition().equals(attemptedMove2)) {
+                        return false;
+                    }
 
                 }
                 break;
@@ -345,6 +354,9 @@ public abstract class MovingEntity implements Entity {
                         return false;
                     }
                     if (entity.getType().equals("switch_door") && entity.getPosition().equals(attemptedMove3)) {
+                        return false;
+                    }
+                    if (entity.getType().equals("zombie_toast_spawner") && entity.getPosition().equals(attemptedMove3)) {
                         return false;
                     }
 
@@ -369,7 +381,7 @@ public abstract class MovingEntity implements Entity {
     public boolean checkMovement(Position position, List<Entity> entities) {
         
         for (Entity entity : entities) {
-            if (entity.getPosition().equals(position) && !entity.getType().equals("door") && !entity.getType().equals("switch") && !entity.getType().equals("player") 
+            if (entity.getPosition().equals(position) && !entity.getType().equals("zombie_toast_spawner") && !entity.getType().equals("door") && !entity.getType().equals("switch") && !entity.getType().equals("player") 
             && !entity.getClass().getSuperclass().getName().equals("dungeonmania.entities.CollectableEntity") && !entity.getType().equals("swamp_tile")) {
                 return false;
             } 
