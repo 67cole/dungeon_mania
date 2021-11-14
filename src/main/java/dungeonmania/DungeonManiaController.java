@@ -540,10 +540,7 @@ public class DungeonManiaController {
         Character tempChar = null;
         Position playerSpawnPosition = null;
         main = currDungeon;
-
         
-
-
         // Get the character class
         Character character = Character.getCharacter(entities);
         
@@ -810,10 +807,23 @@ public class DungeonManiaController {
         for (Entity enti : entities) {
             // if boulder, check that the boulder has a switch and explode any nearby bombs
             if (enti.getType().equals("boulder")) {
+                Entity bombEnt = null;
+                // checks if the square player is moving onto has a bomb, which shouldnt be picked up
+                for (Entity currEnt : entities) {
+                    if (currEnt.getType().equals("player")) {
+                        Position playerPosition = currEnt.getPosition();
+                        for (Entity bomb : entities) {
+                            if (bomb.getType().equals("bomb") && playerPosition.equals(bomb.getPosition())) {
+                                bombEnt = bomb;
+                            }
+                        }
+                    }
+                }
                 Position entPos = enti.getPosition();
                 ArrayList<Position> adjacentPos = entPos.getCardinallyAdjacentPositions();
                 if (playerPos.equals(adjacentPos.get(0)) || playerPos.equals(adjacentPos.get(1)) || playerPos.equals(adjacentPos.get(2)) || playerPos.equals(adjacentPos.get(3))) {
-                    ((Boulder) enti).doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);    
+                    ((Boulder) enti).doExplode(entities, (Character) tempChar, main, enti, allNearbyEntities);  
+                    currDungeon.inventory.remove(bombEnt);  
                 }
             }
         }

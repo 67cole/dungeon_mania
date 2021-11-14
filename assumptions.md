@@ -79,7 +79,6 @@ Battle
 
 Bomb explosions
     -   if a boulder activates a switch with multiple cardinally adjacent bombs, explode each one
-    -   if pushing a boulder onto a switch involves picking up a cardinally adjacent bomb, pick it up and explode it
 
 Hydra
 
