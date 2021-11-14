@@ -19,7 +19,7 @@ import java.util.PriorityQueue;
 public class Mercenary extends MovingEntity {
     private final static int STARTING_HEALTH = 4;
     private final static int ATTACK = 5;
-    private boolean friendly = false;
+    private boolean friendly;
 
     /**
      * Creates the mercenary
@@ -37,14 +37,15 @@ public class Mercenary extends MovingEntity {
         if (chance == 3) {
             setArmour(true);
         }
+        this.friendly = false;
     }
 
     public boolean getFriendly() {
         return this.friendly;
     }
 
-    public void setFriendly(boolean friendly) {
-        this.friendly = friendly;
+    public void setFriendly() {
+        this.friendly = true;
     }
 
     // returns a list of walkable positions
@@ -181,7 +182,27 @@ public class Mercenary extends MovingEntity {
                 if (swampMove == false) {
                     continue;
                 }             
-                mercenaryEntity.moveEntity(entities, player, player);
+                if (!mercenaryEntity.getFriendly()) mercenaryEntity.moveEntity(entities, player, player);
+            }
+        }
+    }
+
+    /**
+     * Moves the mercenary around
+     * @param entities - The list of all entities in the dungeon
+     */
+    public static void allyMercenaryMovement(List<Entity> entities) {
+        Position player = Character.getPlayerPosition(entities);
+
+        boolean swampMove = true;
+        for (Entity entity : entities) {
+            if (entity.getType().equals("mercenary")) {
+                Mercenary mercenaryEntity = (Mercenary) entity;
+                swampMove = SwampTile.swampCanMove(mercenaryEntity, entities);
+                if (swampMove == false) {
+                    continue;
+                }             
+                if (mercenaryEntity.getFriendly()) mercenaryEntity.moveEntity(entities, player, player);
             }
         }
     }
@@ -241,11 +262,26 @@ public class Mercenary extends MovingEntity {
         double originalDistance = Math.sqrt(Math.pow(originalVector.getX(), 2) + Math.pow(originalVector.getY(), 2));
 
         // Now moving the mercenary
-        if (shortestDistance < originalDistance) {
+        if (shortestDistance < originalDistance || this.getFriendly()) {
             if (newPos != null) {
+                if (newPos.equals(playerPosition) && this.getFriendly()) {
+
+                    if (!destination.equals(playerPosition)) {
+                        super.setPosition(destination);
+                        return;
+                    }
+
+                    return;
+                }
+
                 super.setPosition(newPos);
+
             } else {
-                super.setPosition(destination);
+                if (destination.equals(playerPosition) && this.getFriendly()) {
+                    return;
+                }
+                
+                super.setPosition(destination);  
             }
             
         } 

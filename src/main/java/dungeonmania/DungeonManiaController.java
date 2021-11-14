@@ -629,6 +629,12 @@ public class DungeonManiaController {
                 for (Entity interactingEntity : interactingEntities) {
                     // Check if it is empty square or an entity
                     if (interactingEntity != null) {
+                        if (interactingEntity.getType().equals("mercenary")) {
+                            Mercenary templol = (Mercenary) interactingEntity;
+                            if (templol.getFriendly()) {
+                                continue;
+                            }
+                        }
                         // EntityFunction that handles all interactions with player
                         interactingEntity.entityFunction(entities, (Character) temp, movementDirection, main);
                         
@@ -771,7 +777,7 @@ public class DungeonManiaController {
             currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
 
             Position hydraSpawn = ZombieToastSpawner.checkWhiteSpace(character.getPosition(), entities);
-            Hydra hydraEntity = new Hydra(hydraSpawn, "hydra", entityId, true);
+            Hydra hydraEntity = new Hydra(hydraSpawn, "hydra", entityId, false);
             hydraHolder = hydraEntity;
             hydraAddedLater = 1;
         }
@@ -780,11 +786,14 @@ public class DungeonManiaController {
         if ((Spider.checkMaxSpiders(entities) == false) && (currDungeon.getTickCounter() % 25 == 0)) {
             String entityId =  String.format("entity%d", currDungeon.getEntityCounter());
             currDungeon.setEntityCounter(currDungeon.getEntityCounter() + 1); 
-            Spider newSpider = new Spider(null, "spider", entityId, true);  
+            Spider newSpider = new Spider(null, "spider", entityId, false);  
             newSpider.setPosition(newSpider.getSpiderSpawn(entities));                 
             spid = newSpider;
             spiderSpawned = 1;
         }
+
+        // Ally mercenary movement
+        Mercenary.allyMercenaryMovement(entities);
                  
         if (zombieAddedLater == 1) main.addEntities(zombieHolder);
         if (mercenaryAddedLater == 1) main.addEntities(mercenaryHolder);
@@ -929,6 +938,7 @@ public class DungeonManiaController {
         Entity interaction = Dungeon.IdToEntity(entityId, entities);
         // Interaction with the mercenary
         if (interaction.getType().equals("mercenary")) {
+            
             // Check whether the player is close enough to the mercenary
             if (!Mercenary.playerProximityMercenary(character, interaction)) {
                 throw new InvalidActionException("The player is not close enough to the mercenary.");
@@ -957,7 +967,7 @@ public class DungeonManiaController {
             }
             interactWithAssassin(inventory, interaction);
 
-
+            interactWithMercenary(inventory, interaction);
 
         }
 
@@ -2409,8 +2419,11 @@ public class DungeonManiaController {
         }
 
         Mercenary mercenaryEntity = (Mercenary) interaction;
-        mercenaryEntity.setFriendly(true);
+        mercenaryEntity.setFriendly();
+        mercenaryEntity.setInteractable();
     }
+
+    
     /**
      * Searches for a zombie
      * @param entites - list of entities in the dungeon
