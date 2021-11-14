@@ -18,7 +18,7 @@ public class BuildableEntityTest {
         controller.newGame("buildableTest", "peaceful");
         DungeonResponse tickHolder = null;
         // Picking up items to build items
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 12; i++) {
             tickHolder =  controller.tick(null, Direction.RIGHT);
         }
         int bow = 0;
@@ -41,18 +41,50 @@ public class BuildableEntityTest {
         assertTrue(shield == 1);
         // Building the shield
         tickHolder = controller.build("shield");
+        // Checking if midnightArmour is in buildable
+        int midnightArmour = 0;
+        for (String buildable: tickHolder.getBuildables()) {
+            if (buildable.equals("midnight_armour")) {
+                midnightArmour = 1;
+            }
+        }
+        assertTrue(midnightArmour == 1);
+        // Building the midnightArmour
+        tickHolder = controller.build("midnightArmour");
+         // Checking if sceptre is in buildable
+        int sceptre = 0;
+        for (String buildable: tickHolder.getBuildables()) {
+            if (buildable.equals("sceptre")) {
+                sceptre = 1;
+            }
+        }
+        assertTrue(sceptre == 1);
+        // Building the midnightArmour
+        tickHolder = controller.build("sceptre");
         // Checking if shield and bow are in inventory. Components are removed
         bow = 0;
         shield = 0;
+        midnightArmour = 0;
+        sceptre = 0;
         int arrow = 0;
         int wood = 0;
         int treasure = 0;
+        int sunStone = 0;
         for (ItemResponse item: tickHolder.getInventory()) {
             if (item.getType().equals("bow")) {
                 bow = 1;
             }
             if (item.getType().equals("shield")) {
                 shield = 1;
+            }
+            if (item.getType().equals("midnight_armour")) {
+                midnightArmour = 1;
+            }
+            if (item.getType().equals("sceptre")) {
+                sceptre = 1;
+            }
+            if (item.getType().equals("sun_stone")) {
+                sunStone = 1;
             }
             if (item.getType().equals("arrow")) {
                 arrow = 1;
@@ -66,6 +98,8 @@ public class BuildableEntityTest {
         }
         assertTrue(bow == 1);
         assertTrue(shield == 1);
+        assertTrue(sunStone == 1);
+        assertTrue(sceptre == 1);
         assertTrue(wood == 0);
         assertTrue(treasure == 0);
         assertTrue(arrow == 0);
