@@ -19,6 +19,7 @@ import java.util.PriorityQueue;
 public class Mercenary extends MovingEntity {
     private final static int STARTING_HEALTH = 3;
     private final static int ATTACK = 2;
+    private boolean friendly = false;
 
     /**
      * Creates the mercenary
@@ -38,6 +39,15 @@ public class Mercenary extends MovingEntity {
         }
     }
 
+    public boolean getFriendly() {
+        return this.friendly;
+    }
+
+    public void setFriendly(boolean friendly) {
+        this.friendly = friendly;
+    }
+
+    // returns a list of walkable positions
     /**
      * returns a list of walkable positions
      * @param entities

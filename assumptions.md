@@ -127,3 +127,7 @@ Sun Stone
     -   The Sun Stone is not prioritized in crafting.
     -   Not removed when used in crafting
 
+Rewind (Time Turner)
+    - Cannot go to a negative tick
+    - If there has been x amount of ticks, cannot rewind for any n > x.
+
