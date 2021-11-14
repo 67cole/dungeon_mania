@@ -240,10 +240,24 @@ public class Assassin extends MovingEntity {
             // else set position to result of pythagoreas
             } else {
                 super.setPosition(destination);
-            }
-            
+            }           
         } 
     }
+
+    /**
+     * This function checks whether or not the assassin can battle the enemy
+     * @param enemy
+     * @return boolean
+     */
+    public boolean assassinBattle(MovingEntity enemy) {
+        Position vector = Position.calculatePositionBetween(enemy.getPosition(), this.getPosition());
+        double distance = Math.sqrt(Math.pow(vector.getX(), 2) + Math.pow(vector.getY(), 2));
+        if (distance < 4) {
+            return true;
+        }
+        return false;   
+    }
+
 
    
 

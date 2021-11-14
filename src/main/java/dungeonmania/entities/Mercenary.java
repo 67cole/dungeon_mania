@@ -305,4 +305,18 @@ public class Mercenary extends MovingEntity {
             }
         }
     }
+
+    /**
+     * This function checks whether or not the mercenary can battle the enemy
+     * @param enemy
+     * @return boolean
+     */
+    public boolean mercenaryBattle(MovingEntity enemy) {
+        Position vector = Position.calculatePositionBetween(enemy.getPosition(), this.getPosition());
+        double distance = Math.sqrt(Math.pow(vector.getX(), 2) + Math.pow(vector.getY(), 2));
+        if (distance < 4) {
+            return true;
+        }
+        return false;
+    }
 }
