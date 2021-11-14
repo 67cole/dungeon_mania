@@ -201,8 +201,10 @@ public class Assassin extends MovingEntity {
 
         // Now moving the assassin
         if (shortestDistance < originalDistance) {
+            // if djikstra has found a shorter path, set position returned by djikstra
             if (newPos != null) {
                 super.setPosition(newPos);
+            // else set position to result of pythagoreas
             } else {
                 super.setPosition(destination);
             }
