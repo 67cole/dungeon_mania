@@ -914,29 +914,21 @@ public class DungeonManiaController {
 
 
     public DungeonResponse interact(String entityId) throws IllegalArgumentException, InvalidActionException {
-        System.out.println("passing thru interact");
         // Get entity list
         List<Entity> entities = currDungeon.getEntities();
 
         // Get inventory
         List<CollectableEntity> inventory = currDungeon.getInventory();
-        System.out.println("847");
         // Get the character class
         Character character = Character.getCharacter(entities);
-        System.out.println("850");
         // Check if the entity exists within the dungeon
         if (!Dungeon.entityIdCheck(entityId, entities)) {
             throw new IllegalArgumentException("The entity does not exist.");
         }
-        System.out.println("855");
         // Check what we are interacting with 
         Entity interaction = Dungeon.IdToEntity(entityId, entities);
-        System.out.println("858");
-        System.out.println(interaction.getType());
         // Interaction with the mercenary
         if (interaction.getType().equals("mercenary")) {
-            System.out.println("Interacting with mercenary");
-            
             // Check whether the player is close enough to the mercenary
             if (!Mercenary.playerProximityMercenary(character, interaction)) {
                 throw new InvalidActionException("The player is not close enough to the mercenary.");
@@ -954,8 +946,6 @@ public class DungeonManiaController {
 
         // Interaction with the assassin
         if (interaction.getType().equals("assassin")) {
-            System.out.println("Interacting with assassin");
-            
             // Check whether the player is close enough to the mercenary
             if (!Mercenary.playerProximityMercenary(character, interaction)) {
                 throw new InvalidActionException("The player is not close enough to the mercenary.");
@@ -1291,7 +1281,6 @@ public class DungeonManiaController {
 
     public DungeonResponse rewindGame(int ticks) {
 
-        System.out.println("entered 1046");
         String filename = "src\\main\\java\\dungeonmania\\rewindDatabase.json";
         JsonObject dungeon;
         List<EntityResponse> erList= new ArrayList<EntityResponse>();
@@ -1301,7 +1290,6 @@ public class DungeonManiaController {
             for (int i = 0; i < jsonArray.size(); i++) {
                 dungeon = jsonArray.get(i).getAsJsonObject();
                 if (dungeon.get("tickCounter").getAsInt() == ticks) {
-                    System.out.println("entered correct object here");
                     // in the correct dungeon object
                     Dungeon main = new Dungeon(dungeon.get("dungeonName").getAsString()
                     , dungeon.get("dungeonId").getAsString(), dungeon.get("goals").getAsString());
@@ -1621,7 +1609,6 @@ public class DungeonManiaController {
         // ( AND (Z OR F))
         String returnGoal = dungeon.getDungeonGoals();
 
-        System.out.println(returnGoal);
         returnGoal = returnGoal.replace("(" + goal + ")", "");
         returnGoal = returnGoal.replace(goal + " AND ", "");
         returnGoal = returnGoal.replace(" AND " + goal, "");
