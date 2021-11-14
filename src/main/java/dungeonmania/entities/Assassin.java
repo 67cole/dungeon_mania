@@ -78,7 +78,7 @@ public class Assassin extends MovingEntity {
      * @param entities
      * @return Position
      */
-    public Position dijkstra(List<Position> posList, Position source, List<Entity> entities) {
+    public Position dijkstra(List<Position> posList, Position source, List<Entity> entities, Position nextPosition) {
         
         // create hashmap of dist and prev
         HashMap<Position, Double> dist = new HashMap<Position, Double>();
@@ -164,7 +164,7 @@ public class Assassin extends MovingEntity {
                 if (swampMove == false) {
                     continue;
                 }
-                temp.moveEntity(entities, player);
+                temp.moveEntity(entities, player, player);
             }
         }
     }  
@@ -173,11 +173,11 @@ public class Assassin extends MovingEntity {
     /**
      * Moving the assassin
      */
-    public void moveEntity (List<Entity> entities, Position playerPosition) {
+    public void moveEntity (List<Entity> entities, Position playerPosition, Position nextPosition) {
 
         List<Position> posList = posList(entities);
 
-        Position newPos = dijkstra(posList, super.getPosition(), entities);
+        Position newPos = dijkstra(posList, super.getPosition(), entities, nextPosition);
         
         Position current = super.getPosition();
 
