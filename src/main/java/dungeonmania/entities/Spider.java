@@ -6,8 +6,8 @@ import java.util.List;
 import dungeonmania.util.*;
 
 public class Spider extends MovingEntity {
-    private final static int STARTING_HEALTH = 1;
-    private final static int ATTACK = 1;
+    private final static int STARTING_HEALTH = 3;
+    private final static int ATTACK = 5;
     private int loopPos = 0;
     private boolean clockwise = true;
     List<Position> clockwiseLoop = new ArrayList<Position>();
