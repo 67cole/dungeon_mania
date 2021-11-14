@@ -1542,10 +1542,10 @@ public class DungeonManiaController {
      */
     public void addEntitiesToList(String dungeonName, Dungeon main) {
 
-        String filename = "src\\test\\resources\\dungeons\\" + dungeonName + ".json";
         try {
-            JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
-            
+            Gson gson = new Gson();
+            String json = FileLoader.loadResourceFile("/dungeons/" + dungeonName + ".json");
+            JsonObject jsonObject = gson.fromJson(json, JsonElement.class).getAsJsonObject();
             JsonArray entitiesList = jsonObject.get("entities").getAsJsonArray();
             
             for (int i = 0; i < entitiesList.size(); i++) {
@@ -1655,9 +1655,11 @@ public class DungeonManiaController {
      */
     public String getGoalsFromJson(String dungeonName)  {
         String returnGoal = "";
-        String filename = "src\\test\\resources\\dungeons\\" + dungeonName + ".json";
+        
         try {
-            JsonObject jsonObject = JsonParser.parseReader(new FileReader(filename)).getAsJsonObject();
+            Gson gson = new Gson();
+            String json = FileLoader.loadResourceFile("/dungeons/" + dungeonName + ".json");
+            JsonObject jsonObject = gson.fromJson(json, JsonElement.class).getAsJsonObject();
             JsonObject goalCondition = jsonObject.get("goal-condition").getAsJsonObject();
             String goal = goalCondition.get("goal").getAsString();
             // For the case of a double goal
