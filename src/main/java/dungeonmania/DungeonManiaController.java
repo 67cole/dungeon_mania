@@ -144,7 +144,11 @@ public class DungeonManiaController {
             EntityResponse er = new EntityResponse(entity.getID(), entity.getType(), entity.getPosition(), entity.getIsInteractable());
             erList.add(er);
         }
-        
+        Character character = Character.getCharacter(main.getEntities());
+
+        // List<AnimationQueue> animations = new ArrayList<AnimationQueue>();
+        // animations.add(new AnimationQueue("PostTick", character.getID(), Arrays.asList("healthbar set 1, over 5s", "healthbar tint 0x00ff00"), false, -1));
+
         DungeonResponse dr = new DungeonResponse(dungeonId, dungeonName, erList, emptyInventory, emptyBuildables, goals);
         lastTick = dr;
         clearRewindDatabase();
@@ -515,6 +519,8 @@ public class DungeonManiaController {
             throw new InvalidActionException("The item is not in the inventory.");
         }
 
+        
+
         // Get entity list
         List<Entity> entities = currDungeon.getEntities();
         Dungeon main = null;
@@ -543,6 +549,7 @@ public class DungeonManiaController {
 
         // Get the character class
         Character character = Character.getCharacter(entities);
+        int initialHealth = character.getHealth();
 
         // Check potion duration and set it off if it expires
         potionTickAdder(character);
@@ -894,8 +901,11 @@ public class DungeonManiaController {
             ItemResponse ir = new ItemResponse(collectableEntity.getID(), collectableEntity.getType());
             irList.add(ir);
         }
+        List<AnimationQueue> animations = new ArrayList<AnimationQueue>();
+        movementAnimations(animations, movementDirection, character, initialHealth);
+
         DungeonResponse dr = new DungeonResponse(currDungeon.getDungeonId(), currDungeon.getDungeonName(),
-            erList, irList, currDungeon.buildables, currDungeon.getDungeonGoals());
+            erList, irList, currDungeon.buildables, currDungeon.getDungeonGoals(), animations);
 
         lastTick = dr;
         addToRewindDatabase();
@@ -2215,6 +2225,10 @@ public class DungeonManiaController {
                     LightBulb bulb  = new LightBulb(position, type, entityId, false);
                     main.addEntities(bulb);
                     break;
+                case "light_bulb_on":
+                    LightBulb bulbOn  = new LightBulb(position, type, entityId, false);
+                    main.addEntities(bulbOn);
+                    break;
                 case "wire":
                     Wire wire =  new Wire(position, type, entityId, false);
                     main.addEntities(wire);
@@ -2222,6 +2236,10 @@ public class DungeonManiaController {
                 case "switch_door":
                     SwitchDoor switchDoor = new SwitchDoor(position, type, entityId, false);
                     main.addEntities(switchDoor);
+                    break;
+                case "switchdoor_unlocked":
+                    SwitchDoor switchDoorU = new SwitchDoor(position, type, entityId, false);
+                    main.addEntities(switchDoorU);
                     break;
                 case "hydra":
                     Hydra hydraEntity = new Hydra(position, type, entityId, true);
@@ -2394,6 +2412,42 @@ public class DungeonManiaController {
 
             }
         }
+    }
+
+    public void movementAnimations(List<AnimationQueue> animations, Direction direction, Character character, int initialHealth) {
+
+        // double maxHealth;
+        // // Firstly show health
+
+       double a = (double)initialHealth / (double)Character.STARTING_HEALTH;
+        double b = (double)character.getHealth() /(double)Character.STARTING_HEALTH;
+
+        if ((double)initialHealth / (double)character.getHealth() != 1) {
+            animations.add(new AnimationQueue("PostTick", character.getID(), 
+            Arrays.asList("healthbar set " + (double)character.getHealth() / (double)Character.STARTING_HEALTH + ", over 0.5s", "healthbar tint 0x00ff00"), false, -1));
+        }
+
+        switch(direction) {
+            case UP:
+                animations.add(new AnimationQueue("PostTick", character.getID(), Arrays.asList("translate-y 1", "translate-y -1, over 0.4s", "sprite player"), false, -1));
+                break;
+
+            case DOWN:
+                animations.add(new AnimationQueue("PostTick", character.getID(), Arrays.asList("translate-y -1", "translate-y 1, over 0.4s", "sprite player"), false, -1));
+                break;
+            
+            case LEFT:
+            animations.add(new AnimationQueue("PostTick", character.getID(), Arrays.asList("translate-x 1", "translate-x -1, over 0.4s", "sprite player"), false, -1));
+                break;
+            
+            case RIGHT:
+                animations.add(new AnimationQueue("PostTick", character.getID(), Arrays.asList("translate-x -1", "translate-x 1, over 0.4s", "sprite player"), false, -1));
+                break;
+            
+            case NONE:
+                break;
+        }   
+
     }
 
 }

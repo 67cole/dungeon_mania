@@ -11,6 +11,11 @@
         "type": "zombie_toast_spawner"
       }, 
       {
+        "x": 4,
+        "y": 4,
+        "type": "assassin"
+      }, 
+      {
         "x": 2,
         "y": 2,
         "type": "sword"

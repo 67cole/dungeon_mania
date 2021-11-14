@@ -17,8 +17,8 @@ import java.util.PriorityQueue;
 
 
 public class Mercenary extends MovingEntity {
-    private final static int STARTING_HEALTH = 3;
-    private final static int ATTACK = 2;
+    private final static int STARTING_HEALTH = 4;
+    private final static int ATTACK = 5;
 
     /**
      * Creates the mercenary
