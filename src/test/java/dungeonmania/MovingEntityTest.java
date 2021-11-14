@@ -259,7 +259,7 @@ public class MovingEntityTest {
     @Test
     public void testSpiderSpawn() {
         DungeonManiaController controller = new DungeonManiaController();
-        DungeonResponse newDungeon = controller.newGame("advanced-3", "standard");
+        DungeonResponse newDungeon = controller.newGame("advanced-2", "standard");
         DungeonResponse tickHolder = null;
         for (int i = 0; i < 27; i++) {
             tickHolder =  controller.tick(null, Direction.LEFT);
