@@ -191,12 +191,13 @@ public class Dungeon {
      */
     public static boolean dungeonNotValid(String dungeonName) {
         
-        String filename = "src\\test\\resources\\dungeons\\" + dungeonName + ".json";
-        File newFile = new File(filename);
-
-        if (newFile.length() == 0) {
-            return false;
-        }
+        try {
+            String json = FileLoader.loadResourceFile("/dungeons/" + dungeonName + ".json");
+            File newFile = new File(json);
+            if (newFile.length() == 0) {
+                return false;
+            }
+        } catch (Exception e) {}
 
         return true;
     }
