@@ -186,23 +186,6 @@ public class Dungeon {
     }
 
     /**
-     * This function checks whether the dungeon exists
-     * @param dungeonName - this is the dungeon name
-     */
-    public static boolean dungeonNotValid(String dungeonName) {
-        
-        try {
-            String json = FileLoader.loadResourceFile("/dungeons/" + dungeonName + ".json");
-            File newFile = new File(json);
-            if (newFile.length() == 0) {
-                return false;
-            }
-        } catch (Exception e) {}
-
-        return true;
-    }
-
-    /**
      * This function checks whether the gamemode is valid
      * @param gameMode - this is the gameMode
      */

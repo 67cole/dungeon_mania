@@ -105,10 +105,6 @@ public class DungeonManiaController {
      * @throws IllegalArgumentException
      */
     public DungeonResponse newGame(String dungeonName, String gameMode) throws IllegalArgumentException {    
-        // INCOMPLETE *********
-        if (!Dungeon.dungeonNotValid(dungeonName)) {
-            throw new IllegalArgumentException("This dungeon does not exist.");
-        }
 
         if (!Dungeon.gameModeNotValid(gameMode)) {
             throw new IllegalArgumentException("This gamemode is not valid.");

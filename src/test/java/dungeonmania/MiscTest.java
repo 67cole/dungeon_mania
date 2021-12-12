@@ -15,15 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MiscTest {
     @Test
-    public void testInvalidLoadGame() {
-
-        DungeonManiaController controller = new DungeonManiaController();
-
-        assertThrows(IllegalArgumentException.class, () -> 
-        controller.newGame("xd", "peaceful"));
-    }
-
-    @Test
     public void testInvalidLoadGameGamemode() {
 
         DungeonManiaController controller = new DungeonManiaController();
