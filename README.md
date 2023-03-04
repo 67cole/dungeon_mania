@@ -1,3 +1,3 @@
-# Project 21T3
+# Dungeon Mania Project!
 
-[Link to specification](https://gitlab.cse.unsw.edu.au/COMP2511/21T3/project-specification)
+My parts - Character, entities and enemies movements and interactions.
